@@ -13,34 +13,24 @@
       --text-main: #111827;
       --text-soft: #4b5563;
       --accent: #1f2937;
-      --accent-soft: #4b5563;
-      --accent-light: #e5e7eb;
       --danger: #b91c1c;
       --success: #047857;
       --warning: #b45309;
-      --radius-lg: 18px;
-      --radius-md: 14px;
       --shadow-soft: 0 18px 45px rgba(15, 23, 42, 0.1);
       --shadow-subtle: 0 6px 20px rgba(15, 23, 42, 0.06);
     }
 
-    * {
-      box-sizing: border-box;
-    }
+    * { box-sizing: border-box; }
 
     body {
       margin: 0;
       padding: 24px;
-      font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI",
-        sans-serif;
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
       background: radial-gradient(circle at top left, #f9fafb, #e5e7eb);
       color: var(--text-main);
     }
 
-    body, html {
-      height: 100%;
-      width: 100%;
-    }
+    body, html { height: 100%; width: 100%; }
 
     .app-shell {
       max-width: 1500px;
@@ -78,9 +68,7 @@
       gap: 8px;
     }
 
-    .app-title-block h1 span.icon {
-      font-size: 24px;
-    }
+    .app-title-block h1 span.icon { font-size: 24px; }
 
     .app-title-block p {
       margin: 0;
@@ -108,31 +96,15 @@
       background: rgba(15, 23, 42, 0.82);
     }
 
-    .chip strong {
-      color: #f9fafb;
-    }
+    .chip strong { color: #f9fafb; }
+    .chip span.icon { font-size: 14px; }
 
-    .chip span.icon {
-      font-size: 14px;
-    }
-
-    .layout-main {
-      display: grid;
-      grid-template-columns: minmax(350px, 380px) minmax(0, 1fr);
-      gap: 20px;
-      align-items: flex-start;
-    }
-
-    @media (max-width: 1100px) {
-      .layout-main {
-        grid-template-columns: 1fr;
-      }
-    }
+    main.layout-main { display: flex; flex-direction: column; gap: 18px; }
 
     .panel {
       background: var(--bg-alt);
       border-radius: 22px;
-      padding: 18px 18px 18px 18px;
+      padding: 18px;
       box-shadow: var(--shadow-subtle);
       border: 1px solid var(--border-soft);
     }
@@ -142,7 +114,7 @@
       justify-content: space-between;
       align-items: center;
       gap: 10px;
-      margin-bottom: 14px;
+      margin-bottom: 10px;
     }
 
     .panel-title-row h2 {
@@ -151,29 +123,33 @@
       display: flex;
       align-items: center;
       gap: 8px;
-      color: var(--text-main);
     }
 
-    .panel-title-row h2 span.icon {
-      font-size: 18px;
+    .panel-title-row h2 span.icon { font-size: 18px; }
+
+    .top-layout {
+      display: grid;
+      grid-template-columns: minmax(0, 2.2fr) minmax(0, 1.5fr);
+      gap: 16px;
+      align-items: flex-start;
     }
 
-    .panel-subtitle {
-      margin: 0;
-      font-size: 12px;
-      color: var(--text-soft);
+    @media (max-width: 980px) {
+      .top-layout { grid-template-columns: 1fr; }
     }
 
     .filters-grid {
       display: grid;
-      grid-template-columns: repeat(2, minmax(0, 1fr));
+      grid-template-columns: repeat(3, minmax(0, 1fr));
       gap: 10px 12px;
     }
 
-    @media (max-width: 768px) {
-      .filters-grid {
-        grid-template-columns: 1fr;
-      }
+    @media (max-width: 900px) {
+      .filters-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+    }
+
+    @media (max-width: 600px) {
+      .filters-grid { grid-template-columns: 1fr; }
     }
 
     .field-group {
@@ -208,10 +184,9 @@
       font-size: 13px;
       background: #f9fafb;
       color: var(--text-main);
-      outline: none;
-      transition: border-color 0.15s ease, box-shadow 0.15s ease,
-        background-color 0.15s ease;
       min-height: 34px;
+      outline: none;
+      transition: border-color 0.15s ease, box-shadow 0.15s ease, background-color 0.15s ease;
     }
 
     input[type="text"]:focus,
@@ -228,7 +203,6 @@
       gap: 8px;
       font-size: 12px;
       color: var(--text-soft);
-      margin-top: 4px;
     }
 
     .checkbox-row input[type="checkbox"] {
@@ -239,8 +213,32 @@
       cursor: pointer;
     }
 
+    .class-chips {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+      margin-top: 2px;
+    }
+
+    .class-chips label {
+      font-size: 11px;
+      border-radius: 999px;
+      padding: 4px 9px;
+      border: 1px solid var(--border-soft);
+      background: #f9fafb;
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      cursor: pointer;
+    }
+
+    .class-chips input[type="checkbox"] {
+      width: 12px;
+      height: 12px;
+    }
+
     .controls-row {
-      margin-top: 14px;
+      margin-top: 10px;
       display: flex;
       flex-wrap: wrap;
       gap: 10px;
@@ -258,31 +256,16 @@
       gap: 8px;
       background: #111827;
       color: #f9fafb;
-      letter-spacing: 0.02em;
-      transition: transform 0.12s ease, box-shadow 0.12s ease,
-        background-color 0.12s ease, border-color 0.12s ease;
       min-height: 36px;
+      transition: transform 0.12s ease, box-shadow 0.12s ease, background-color 0.12s, border-color 0.12s;
     }
 
-    button.btn span.icon {
-      font-size: 14px;
-    }
+    button.btn span.icon { font-size: 14px; }
 
     button.btn:hover {
       transform: translateY(-1px);
       box-shadow: 0 10px 25px rgba(15, 23, 42, 0.38);
       background: #030712;
-    }
-
-    button.btn-ghost {
-      background: #ffffff;
-      color: var(--accent);
-      border-color: var(--border);
-    }
-
-    button.btn-ghost:hover {
-      background: #111827;
-      color: #f9fafb;
     }
 
     button.btn-subtle {
@@ -296,11 +279,18 @@
       color: var(--text-main);
     }
 
-    button.btn-sm {
-      padding: 7px 12px;
-      font-size: 12px;
-      min-height: 30px;
+    button.btn-ghost {
+      background: #ffffff;
+      color: #111827;
+      border-color: var(--border-soft);
     }
+
+    button.btn-ghost:hover {
+      background: #111827;
+      color: #f9fafb;
+    }
+
+    button.btn-sm { padding: 7px 12px; font-size: 12px; min-height: 30px; }
 
     button.btn:disabled {
       opacity: 0.5;
@@ -311,25 +301,18 @@
 
     .summary-grid {
       display: grid;
-      grid-template-columns: repeat(4, minmax(0, 1fr));
-      gap: 10px;
-      margin-top: 10px;
-    }
-
-    @media (max-width: 768px) {
-      .summary-grid {
-        grid-template-columns: repeat(2, minmax(0, 1fr));
-      }
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 8px;
     }
 
     .summary-card {
       border-radius: 16px;
-      padding: 10px 11px;
+      padding: 8px 10px;
       background: #f9fafb;
       border: 1px solid var(--border-soft);
       display: flex;
       flex-direction: column;
-      gap: 4px;
+      gap: 3px;
       font-size: 11px;
     }
 
@@ -339,48 +322,25 @@
       align-items: center;
     }
 
-    .summary-title span.icon {
-      font-size: 14px;
-    }
+    .summary-title span.icon { font-size: 14px; }
 
-    .summary-value {
-      font-size: 18px;
-      font-weight: 600;
-    }
+    .summary-value { font-size: 18px; font-weight: 600; }
 
-    .summary-meta {
-      font-size: 10px;
-      color: var(--text-soft);
-    }
+    .summary-meta { font-size: 10px; color: var(--text-soft); }
 
-    .summary-card.new {
-      border-color: rgba(4, 120, 87, 0.7);
-    }
+    .summary-card.new { border-color: rgba(4, 120, 87, 0.7); }
+    .summary-card.updated { border-color: rgba(180, 83, 9, 0.8); }
+    .summary-card.removed { border-color: rgba(185, 28, 28, 0.8); }
+    .summary-card.total { border-color: rgba(55, 65, 81, 0.8); }
 
-    .summary-card.updated {
-      border-color: rgba(180, 83, 9, 0.8);
-    }
-
-    .summary-card.removed {
-      border-color: rgba(185, 28, 28, 0.8);
-    }
-
-    .summary-card.total {
-      border-color: rgba(55, 65, 81, 0.8);
-    }
-
-    .change-lists {
-      margin-top: 10px;
-      font-size: 12px;
-      color: var(--text-soft);
-    }
+    .change-lists { margin-top: 8px; font-size: 12px; color: var(--text-soft); }
 
     .change-lists details {
       border-radius: 12px;
       border: 1px dashed var(--border);
       background: #f9fafb;
-      padding: 8px 10px;
-      margin-top: 6px;
+      padding: 6px 8px;
+      margin-top: 4px;
     }
 
     .change-lists summary {
@@ -391,9 +351,7 @@
       gap: 6px;
     }
 
-    .change-lists summary::-webkit-details-marker {
-      display: none;
-    }
+    .change-lists summary::-webkit-details-marker { display: none; }
 
     .change-lists summary .tag {
       font-size: 10px;
@@ -404,15 +362,13 @@
     }
 
     .change-lists ul {
-      margin: 8px 0 0 0;
+      margin: 6px 0 0 0;
       padding-left: 14px;
       max-height: 160px;
       overflow: auto;
     }
 
-    .change-lists li {
-      margin-bottom: 4px;
-    }
+    .change-lists li { margin-bottom: 3px; }
 
     .change-lists .pill {
       font-size: 11px;
@@ -423,10 +379,19 @@
       margin-left: 4px;
     }
 
-    .table-panel {
-      display: flex;
-      flex-direction: column;
-      gap: 12px;
+    .muted-tip {
+      font-size: 11px;
+      color: var(--text-soft);
+      margin-top: 6px;
+    }
+
+    .badge-soft {
+      font-size: 10px;
+      padding: 2px 8px;
+      border-radius: 999px;
+      border: 1px solid var(--border-soft);
+      background: #f9fafb;
+      color: var(--text-soft);
     }
 
     .sheet-tabs {
@@ -452,14 +417,8 @@
       color: var(--text-soft);
     }
 
-    .sheet-tab span.icon {
-      font-size: 14px;
-    }
-
-    .sheet-tab.active {
-      background: #111827;
-      color: #f9fafb;
-    }
+    .sheet-tab span.icon { font-size: 14px; }
+    .sheet-tab.active { background: #111827; color: #f9fafb; }
 
     .table-toolbar {
       display: flex;
@@ -467,6 +426,7 @@
       align-items: center;
       gap: 10px;
       justify-content: space-between;
+      margin-bottom: 6px;
     }
 
     .table-toolbar-left,
@@ -498,10 +458,7 @@
       color: var(--text-soft);
     }
 
-    .view-toggle button.active {
-      background: #111827;
-      color: #f9fafb;
-    }
+    .view-toggle button.active { background: #111827; color: #f9fafb; }
 
     .table-container {
       border-radius: 20px;
@@ -517,15 +474,8 @@
       scrollbar-width: thin;
     }
 
-    .table-scroll::-webkit-scrollbar {
-      width: 7px;
-      height: 7px;
-    }
-
-    .table-scroll::-webkit-scrollbar-thumb {
-      background: #d1d5db;
-      border-radius: 999px;
-    }
+    .table-scroll::-webkit-scrollbar { width: 7px; height: 7px; }
+    .table-scroll::-webkit-scrollbar-thumb { background: #d1d5db; border-radius: 999px; }
 
     table {
       border-collapse: collapse;
@@ -534,11 +484,7 @@
       font-size: 13px;
     }
 
-    thead {
-      position: sticky;
-      top: 0;
-      z-index: 1;
-    }
+    thead { position: sticky; top: 0; z-index: 1; }
 
     thead th {
       position: sticky;
@@ -552,13 +498,8 @@
       white-space: nowrap;
     }
 
-    tbody tr:nth-child(even) {
-      background: #f9fafb;
-    }
-
-    tbody tr:nth-child(odd) {
-      background: #ffffff;
-    }
+    tbody tr:nth-child(even) { background: #f9fafb; }
+    tbody tr:nth-child(odd) { background: #ffffff; }
 
     tbody td {
       padding: 7px 8px;
@@ -572,13 +513,8 @@
       font-size: 12px;
     }
 
-    tbody tr.new-row {
-      background: #ecfdf5;
-    }
-
-    tbody tr.updated-row {
-      background: #fffbeb;
-    }
+    tbody tr.new-row { background: #ecfdf5; }
+    tbody tr.updated-row { background: #fffbeb; }
 
     .status-pill {
       display: inline-flex;
@@ -608,17 +544,11 @@
       background: #f9fafb;
     }
 
-    .status-pill span.icon {
-      font-size: 14px;
-    }
-
-    .status-pill span.label {
-      text-transform: uppercase;
-      letter-spacing: 0.08em;
-    }
+    .status-pill span.icon { font-size: 14px; }
+    .status-pill span.label { text-transform: uppercase; letter-spacing: 0.08em; }
 
     .print-options {
-      margin-top: 10px;
+      margin-bottom: 6px;
       padding: 8px 10px;
       background: #f9fafb;
       border-radius: 16px;
@@ -631,7 +561,7 @@
       display: flex;
       flex-wrap: wrap;
       gap: 8px 14px;
-      margin-top: 6px;
+      margin-top: 4px;
     }
 
     .print-options label {
@@ -648,13 +578,15 @@
       border: 1px solid var(--border);
     }
 
-    .print-hint {
-      margin-top: 4px;
-      font-size: 10px;
-    }
+    .print-hint { font-size: 10px; margin-top: 3px; }
 
-    .col-hidden {
-      display: none;
+    .col-hidden { display: none; }
+
+    .loading-row td {
+      text-align: center;
+      padding: 20px 0;
+      font-size: 13px;
+      color: var(--text-soft);
     }
 
     .toast {
@@ -677,77 +609,22 @@
       z-index: 50;
     }
 
-    .toast.visible {
-      opacity: 1;
-      pointer-events: auto;
-      transform: translateY(0);
-    }
-
-    .toast span.icon {
-      font-size: 14px;
-    }
-
-    .badge-soft {
-      font-size: 10px;
-      padding: 2px 8px;
-      border-radius: 999px;
-      border: 1px solid var(--border-soft);
-      background: #f9fafb;
-      color: var(--text-soft);
-    }
-
-    .loading-row td {
-      text-align: center;
-      padding: 20px 0;
-      font-size: 13px;
-      color: var(--text-soft);
-    }
-
-    .muted-tip {
-      font-size: 11px;
-      color: var(--text-soft);
-      margin-top: 6px;
-    }
+    .toast.visible { opacity: 1; pointer-events: auto; transform: translateY(0); }
+    .toast span.icon { font-size: 14px; }
 
     @media print {
-      body {
-        background: #ffffff;
-        padding: 0;
-      }
-
+      body { background: #ffffff; padding: 0; }
       header.app-header,
-      .panel.filters,
+      .top-layout,
       .table-toolbar,
       .print-options .print-hint,
       .no-print,
-      .sheet-tabs {
-        display: none !important;
-      }
-
-      .app-shell {
-        max-width: none;
-        margin: 0;
-      }
-
-      .panel.table-panel {
-        box-shadow: none;
-        border-radius: 0;
-        border: none;
-        padding: 0;
-      }
-
-      .table-container {
-        box-shadow: none;
-        border-radius: 0;
-      }
-
-      .table-scroll {
-        max-height: none;
-      }
-
-      thead th {
-        background: #f3f4f6 !important;
-      }
+      .sheet-tabs { display: none !important; }
+      .app-shell { max-width: none; margin: 0; }
+      .panel { box-shadow: none; border-radius: 0; border: none; padding: 0; }
+      .table-container { box-shadow: none; border-radius: 0; border: none; }
+      .table-scroll { max-height: none; }
+      thead th { background: #f3f4f6 !important; }
     }
   </style>
 </head>
@@ -755,266 +632,202 @@
   <div class="app-shell">
     <header class="app-header">
       <div class="app-title-block">
-        <h1>
-          <span class="icon">📋</span>
-          Öğrenci Listesi Yöneticisi
-        </h1>
-        <p>
-          Birden fazla sekmeden veri okuyup değişiklikleri takip eden, TXT ile
-          karşılaştırma yapabilen geniş, modern panel.
-        </p>
+        <h1><span class="icon">📋</span>Öğrenci Listesi Yöneticisi</h1>
+        <p>Google E-Tablo verisi + TXT + localStorage ile değişiklik takibi.</p>
       </div>
       <div class="header-meta">
         <div class="chip">
-          <span class="icon">⬛</span>
-          <strong>Siyah / beyaz / gri tema</strong>
+          <span class="icon">⬛</span><strong>Siyah / beyaz / gri tema</strong>
         </div>
         <div class="chip">
-          <span class="icon">🧠</span>
-          <span>localStorage + TXT karşılaştırma desteği</span>
+          <span class="icon">🧠</span><span>localStorage + TXT karşılaştırma</span>
         </div>
       </div>
     </header>
 
     <main class="layout-main">
-      <!-- SOL PANEL -->
-      <section class="panel filters">
+      <section class="panel">
         <div class="panel-title-row">
-          <h2>
-            <span class="icon">🎛️</span>
-            Filtreler & Özet
-          </h2>
-        </div>
-        <p class="panel-subtitle">
-          Arama, sınıf, cinsiyet, burs ve tarih aralığıyla listeyi daralt.
-          Çift tıklama ile herhangi bir hücrenin metnini kopyalayabilirsin.
-        </p>
-
-        <div class="filters-grid" style="margin-top: 12px;">
-          <div class="field-group" style="grid-column: 1 / -1;">
-            <div class="field-label">
-              <span>Genel arama</span>
-              <span class="badge">isim, veli, numara…</span>
-            </div>
-            <input type="text" id="searchInput" placeholder="Örn: 8D, ZEHRA, 9220, KAYA…" />
-          </div>
-
-          <div class="field-group">
-            <div class="field-label"><span>Sınıf</span></div>
-            <select id="classFilter">
-              <option value="">Tümü</option>
-            </select>
-          </div>
-
-          <div class="field-group">
-            <div class="field-label"><span>Cinsiyet</span></div>
-            <select id="genderFilter">
-              <option value="">Tümü</option>
-              <option value="KIZ">Kız</option>
-              <option value="ERKEK">Erkek</option>
-            </select>
-          </div>
-
-          <div class="field-group">
-            <div class="field-label"><span>Burs durumu</span></div>
-            <select id="scholarFilter">
-              <option value="">Tümü</option>
-              <option value="nonempty">Burslu (dolu hücre)</option>
-              <option value="empty">Boş</option>
-            </select>
-          </div>
-
-          <div class="field-group">
-            <div class="field-label"><span>Durum</span></div>
-            <select id="statusFilter">
-              <option value="">Hepsi</option>
-              <option value="new">Sadece yeni</option>
-              <option value="updated">Güncellenenler</option>
-              <option value="normal">Normal kayıtlar</option>
-            </select>
-          </div>
-
-          <div class="field-group">
-            <div class="field-label"><span>Tarih &ge;</span></div>
-            <input type="date" id="dateFrom" />
-          </div>
-
-          <div class="field-group">
-            <div class="field-label"><span>Tarih &le;</span></div>
-            <input type="date" id="dateTo" />
-          </div>
-
-          <div class="field-group">
-            <label class="checkbox-row">
-              <input type="checkbox" id="recentOnly" />
-              <span>Yalnızca en yeni kayıtları göster (örn. ilk 30)</span>
-            </label>
-          </div>
-        </div>
-
-        <div class="controls-row">
-          <button class="btn btn-subtle" id="clearFiltersBtn" type="button">
-            <span class="icon">🧹</span>
-            Filtreleri temizle
-          </button>
-          <button class="btn btn-ghost" id="reloadBtn" type="button">
-            <span class="icon">🔄</span>
-            Bu sekmeyi yeniden yükle
-          </button>
-        </div>
-
-        <p class="muted-tip">
-          Çift tıklama ile herhangi bir hücrenin metnini panoya kopyalayabilirsin.
-        </p>
-
-        <hr style="border:none;border-top:1px solid var(--border-soft);margin:14px 0;">
-
-        <div>
-          <div class="panel-title-row" style="margin-bottom: 6px;">
-            <h2 style="font-size: 16px;">
-              <span class="icon">📊</span>
-              Değişiklik Özeti
-            </h2>
-          </div>
-          <p class="panel-subtitle">
-            Şu anki sekme, seçili karşılaştırma kaynağıyla (localStorage veya TXT dosyası)
-            kıyaslanır. Yeni, güncellenen veya silinen öğrenciler aşağıda özetlenir.
-          </p>
-
-          <div class="summary-grid">
-            <div class="summary-card total">
-              <div class="summary-title">
-                <span>Toplam</span>
-                <span class="icon">⬜</span>
-              </div>
-              <div class="summary-value" id="totalCount">–</div>
-              <div class="summary-meta">Tablodaki öğrenci sayısı.</div>
-            </div>
-            <div class="summary-card new">
-              <div class="summary-title">
-                <span>Yeni</span>
-                <span class="icon">🆕</span>
-              </div>
-              <div class="summary-value" id="newCount">–</div>
-              <div class="summary-meta">Önceki listeye göre yeni eklenen öğrenciler.</div>
-            </div>
-            <div class="summary-card updated">
-              <div class="summary-title">
-                <span>Güncellendi</span>
-                <span class="icon">✏️</span>
-              </div>
-              <div class="summary-value" id="updatedCount">–</div>
-              <div class="summary-meta">Bilgilerinde değişiklik olan öğrenciler.</div>
-            </div>
-            <div class="summary-card removed">
-              <div class="summary-title">
-                <span>Silinen</span>
-                <span class="icon">🗑️</span>
-              </div>
-              <div class="summary-value" id="removedCount">–</div>
-              <div class="summary-meta">Eski listede olup şu an olmayan kayıtlar.</div>
-            </div>
-          </div>
-
-          <div class="change-lists">
-            <details>
-              <summary>
-                <span>🆕 Yeni öğrenciler</span>
-                <span class="tag" id="newTagCount">0</span>
-              </summary>
-              <ul id="newList"></ul>
-            </details>
-            <details>
-              <summary>
-                <span>✏️ Güncellenen öğrenciler</span>
-                <span class="tag" id="updatedTagCount">0</span>
-              </summary>
-              <ul id="updatedList"></ul>
-            </details>
-            <details>
-              <summary>
-                <span>🗑️ Silinen öğrenciler</span>
-                <span class="tag" id="removedTagCount">0</span>
-              </summary>
-              <ul id="removedList"></ul>
-            </details>
-            <p class="muted-tip">
-              <span class="badge-soft" id="lastSavedInfo">Son kaydedilen liste: –</span>
-              <span class="badge-soft" id="compareSourceLabel">Karşılaştırma kaynağı: Yok</span>
-            </p>
-          </div>
-        </div>
-      </section>
-
-      <!-- SAĞ PANEL -->
-      <section class="panel table-panel">
-        <div class="panel-title-row">
-          <h2>
-            <span class="icon">🧾</span>
-            Öğrenci Tablosu
-          </h2>
+          <h2><span class="icon">🎛️</span>Filtreler, Özet ve Tablo</h2>
           <span class="badge-soft" id="lastLoadedInfo">Veri yükleniyor…</span>
         </div>
 
-        <!-- Sekme seçici -->
-        <div class="sheet-tabs no-print" id="sheetTabs"></div>
+        <!-- Üst satır: solda filtreler, sağda özet -->
+        <div class="top-layout">
+          <!-- FİLTRELER -->
+          <div>
+            <div class="filters-grid">
+              <div class="field-group" style="grid-column:1/-1;">
+                <div class="field-label">
+                  <span>Genel arama</span>
+                  <span class="badge">isim, veli, numara…</span>
+                </div>
+                <input type="text" id="searchInput" placeholder="Örn: 8D, ZEHRA, 9220, KAYA…" />
+              </div>
 
-        <div class="table-toolbar">
-          <div class="table-toolbar-left">
-            <div class="view-toggle">
-              <button type="button" data-view="all" class="active" id="viewAllBtn">
-                <span class="icon">⬜</span>
-                <span>Tüm kayıtlar</span>
+              <div class="field-group">
+                <div class="field-label"><span>Cinsiyet</span></div>
+                <select id="genderFilter">
+                  <option value="">Tümü</option>
+                  <option value="KIZ">Kız</option>
+                  <option value="ERKEK">Erkek</option>
+                </select>
+              </div>
+
+              <div class="field-group">
+                <div class="field-label"><span>Burs durumu</span></div>
+                <select id="scholarFilter">
+                  <option value="">Tümü</option>
+                  <option value="nonempty">Burslu (dolu)</option>
+                  <option value="empty">Boş</option>
+                </select>
+              </div>
+
+              <div class="field-group">
+                <div class="field-label"><span>Durum</span></div>
+                <select id="statusFilter">
+                  <option value="">Hepsi</option>
+                  <option value="new">Sadece yeni</option>
+                  <option value="updated">Güncellenenler</option>
+                  <option value="normal">Normal kayıtlar</option>
+                </select>
+              </div>
+
+              <div class="field-group">
+                <div class="field-label"><span>Tarih &ge;</span></div>
+                <input type="date" id="dateFrom" />
+              </div>
+
+              <div class="field-group">
+                <div class="field-label"><span>Tarih &le;</span></div>
+                <input type="date" id="dateTo" />
+              </div>
+
+              <div class="field-group" style="grid-column:1/-1;">
+                <div class="field-label"><span>Sınıf (çoklu seçim)</span></div>
+                <div id="classFilterContainer" class="class-chips"></div>
+              </div>
+
+              <div class="field-group" style="grid-column:1/-1;">
+                <label class="checkbox-row">
+                  <input type="checkbox" id="recentOnly" />
+                  <span>Yalnızca en yeni kayıtları göster (ilk 30)</span>
+                </label>
+              </div>
+            </div>
+
+            <div class="controls-row">
+              <button class="btn btn-subtle" id="clearFiltersBtn" type="button">
+                <span class="icon">🧹</span>Filtreleri temizle
               </button>
-              <button type="button" data-view="new-updated" id="viewNewUpdatedBtn">
-                <span class="icon">✨</span>
-                <span>Yeni + Güncellenen</span>
+              <button class="btn btn-ghost" id="reloadBtn" type="button">
+                <span class="icon">🔄</span>Bu sekmeyi yeniden yükle
+              </button>
+            </div>
+
+            <p class="muted-tip">Herhangi bir hücreye çift tıklayarak metni panoya kopyalayabilirsin.</p>
+          </div>
+
+          <!-- ÖZET -->
+          <div>
+            <div class="summary-grid">
+              <div class="summary-card total">
+                <div class="summary-title"><span>Toplam</span><span class="icon">⬜</span></div>
+                <div class="summary-value" id="totalCount">–</div>
+                <div class="summary-meta">Tablodaki öğrenci sayısı.</div>
+              </div>
+              <div class="summary-card new">
+                <div class="summary-title"><span>Yeni</span><span class="icon">🆕</span></div>
+                <div class="summary-value" id="newCount">–</div>
+                <div class="summary-meta">Önceki listeye göre yeni.</div>
+              </div>
+              <div class="summary-card updated">
+                <div class="summary-title"><span>Güncellendi</span><span class="icon">✏️</span></div>
+                <div class="summary-value" id="updatedCount">–</div>
+                <div class="summary-meta">Bilgileri değişenler.</div>
+              </div>
+              <div class="summary-card removed">
+                <div class="summary-title"><span>Silinen</span><span class="icon">🗑️</span></div>
+                <div class="summary-value" id="removedCount">–</div>
+                <div class="summary-meta">Eski listede olup şu an olmayanlar.</div>
+              </div>
+            </div>
+
+            <div class="change-lists">
+              <details>
+                <summary><span>🆕 Yeni öğrenciler</span><span class="tag" id="newTagCount">0</span></summary>
+                <ul id="newList"></ul>
+              </details>
+              <details>
+                <summary><span>✏️ Güncellenen öğrenciler</span><span class="tag" id="updatedTagCount">0</span></summary>
+                <ul id="updatedList"></ul>
+              </details>
+              <details>
+                <summary><span>🗑️ Silinen öğrenciler</span><span class="tag" id="removedTagCount">0</span></summary>
+                <ul id="removedList"></ul>
+              </details>
+              <p class="muted-tip">
+                <span class="badge-soft" id="lastSavedInfo">Son kaydedilen liste: –</span>
+                <span class="badge-soft" id="compareSourceLabel">Karşılaştırma kaynağı: Yok</span>
+              </p>
+            </div>
+          </div>
+        </div>
+
+        <!-- TABLO ARAÇLARI + TABLONUN KENDİSİ -->
+        <div style="margin-top: 14px;">
+          <div class="sheet-tabs no-print" id="sheetTabs"></div>
+
+          <div class="table-toolbar">
+            <div class="table-toolbar-left">
+              <div class="view-toggle">
+                <button type="button" data-view="all" class="active" id="viewAllBtn">
+                  <span class="icon">⬜</span><span>Tüm kayıtlar</span>
+                </button>
+                <button type="button" data-view="new-updated" id="viewNewUpdatedBtn">
+                  <span class="icon">✨</span><span>Yeni + Güncellenen</span>
+                </button>
+              </div>
+            </div>
+            <div class="table-toolbar-right">
+              <button class="btn btn-subtle btn-sm no-print" id="saveSnapshotBtn" type="button">
+                <span class="icon">💾</span>Bu listeyi hafızaya kaydet
+              </button>
+              <button class="btn btn-subtle btn-sm no-print" id="downloadTxtBtn" type="button">
+                <span class="icon">📥</span>TXT indir
+              </button>
+              <button class="btn btn-subtle btn-sm no-print" id="uploadTxtBtn" type="button">
+                <span class="icon">📤</span>TXT yükle & karşılaştır
+              </button>
+              <button class="btn btn-ghost btn-sm no-print" id="printBtn" type="button">
+                <span class="icon">🖨️</span>Yazdır
               </button>
             </div>
           </div>
-          <div class="table-toolbar-right">
-            <button class="btn btn-subtle btn-sm no-print" id="saveSnapshotBtn" type="button">
-              <span class="icon">💾</span>
-              Bu listeyi hafızaya kaydet
-            </button>
-            <button class="btn btn-subtle btn-sm no-print" id="downloadTxtBtn" type="button">
-              <span class="icon">📥</span>
-              TXT olarak indir
-            </button>
-            <button class="btn btn-subtle btn-sm no-print" id="uploadTxtBtn" type="button">
-              <span class="icon">📤</span>
-              TXT yükle & karşılaştır
-            </button>
-            <button class="btn btn-ghost btn-sm no-print" id="printBtn" type="button">
-              <span class="icon">🖨️</span>
-              Yazdır
-            </button>
+
+          <input type="file" id="uploadTxtInput" accept=".txt,.json" style="display:none;" />
+
+          <div class="print-options no-print">
+            <div><strong>Yazdırma seçenekleri</strong> 🖨️</div>
+            <div class="print-hint">
+              Yazdır'a bastığında sadece seçili kolonlar görünür. Filtreler ne görüyorsan ona göre uygulanır.
+            </div>
+            <div class="cols" id="printColsContainer"></div>
           </div>
-        </div>
 
-        <input type="file" id="uploadTxtInput" accept=".txt,.json" style="display:none;" />
-
-        <div class="print-options no-print">
-          <div><strong>Yazdırma seçenekleri</strong> 🖨️</div>
-          <div class="print-hint">
-            Yazdır'a bastığında sadece seçili kolonlar görünür. Tüm filtreler geçerlidir.
-            Çıktı siyah / beyaz / gri tonlarında modern tablolar şeklindedir.
-          </div>
-          <div class="cols" id="printColsContainer"></div>
-        </div>
-
-        <div class="table-container">
-          <div class="table-scroll">
-            <table id="studentsTable">
-              <thead>
-                <tr id="tableHeaderRow"></tr>
-              </thead>
-              <tbody id="tableBody">
-                <tr class="loading-row">
-                  <td>Veri yükleniyor…</td>
-                </tr>
-              </tbody>
-            </table>
+          <div class="table-container">
+            <div class="table-scroll">
+              <table id="studentsTable">
+                <thead>
+                  <tr id="tableHeaderRow"></tr>
+                </thead>
+                <tbody id="tableBody">
+                  <tr class="loading-row">
+                    <td>Veri yükleniyor…</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
           </div>
         </div>
       </section>
@@ -1029,53 +842,51 @@
 
   <script>
     // =======================
-    // K O N F İ G Ü R A S Y O N
+    // KONFİGÜRASYON
     // =======================
     const SHEET_ID = "16BD_BrNLYBaXviCzB8yDKBGS2Vdj5DHi";
 
-    // Buradaki name alanları sekme adlarıdır (alt tarafta yazan isimler).
-    // İstersen buraya başka sekmeleri de ekleyebilirsin.
+    // Sadece burayı kendine göre düzenle:
+    // name  → Google Sheet içindeki sekme adı
+    // label → ekranda görünen ad
     const SHEET_TABS = [
       { name: "2025-2026", label: "2025-2026" }
+      // Örnek:
       // { name: "2024-2025", label: "2024-2025" },
       // { name: "2023-2024", label: "2023-2024" }
     ];
 
     let currentSheetName = SHEET_TABS[0].name;
-
-    const STORAGE_KEY_BASE = "ogrenci_listesi_snapshot_v2_";
+    const STORAGE_KEY_BASE = "ogrenci_listesi_snapshot_v3_";
 
     const COLUMNS = [
-      { key: "status", label: "Durum" },
-      { key: "isim", label: "İsim" },
-      { key: "soyisim", label: "Soyisim" },
+      { key: "status",   label: "Durum" },
+      { key: "isim",     label: "İsim" },
+      { key: "soyisim",  label: "Soyisim" },
       { key: "cinsiyet", label: "Cinsiyet" },
-      { key: "sinif", label: "Sınıf" },
-      { key: "okulNo", label: "Okul Numarası" },
-      { key: "veliAdi", label: "Veli Adı" },
+      { key: "sinif",    label: "Sınıf" },
+      { key: "okulNo",   label: "Okul Numarası" },
+      { key: "veliAdi",  label: "Veli Adı" },
       { key: "veliSoyadi", label: "Veli Soyadı" },
       { key: "veliTelefon", label: "Veli Telefon" },
-      { key: "yil", label: "Yıl" },
-      { key: "tarih", label: "Tarih" },
-      { key: "burslu", label: "Burslu mu?" }
+      { key: "yil",      label: "Yıl" },
+      { key: "tarih",    label: "Tarih" },
+      { key: "burslu",   label: "Burslu mu?" }
     ];
 
     let students = [];
-    let snapshot = null; // önceki liste
-    let snapshotSource = "none"; // "none" | "local" | "file"
-    let activeViewMode = "all"; // "all" | "new-updated"
+    let snapshot = null;
+    let snapshotSource = "none"; // none | local | file
+    let activeViewMode = "all";  // all | new-updated
 
     // =======================
-    // A R A Ç  F O N K S.
+    // ARAÇ FONKSİYONLAR
     // =======================
-
     function getSheetCsvUrl(sheetName) {
-      return (
-        "https://docs.google.com/spreadsheets/d/" +
+      return "https://docs.google.com/spreadsheets/d/" +
         SHEET_ID +
         "/gviz/tq?tqx=out:csv&sheet=" +
-        encodeURIComponent(sheetName)
-      );
+        encodeURIComponent(sheetName);
     }
 
     function getStorageKey() {
@@ -1084,12 +895,9 @@
 
     function showToast(message) {
       const toast = document.getElementById("toast");
-      const msg = document.getElementById("toastMessage");
-      msg.textContent = message;
+      document.getElementById("toastMessage").textContent = message;
       toast.classList.add("visible");
-      setTimeout(() => {
-        toast.classList.remove("visible");
-      }, 2000);
+      setTimeout(() => toast.classList.remove("visible"), 2000);
     }
 
     function parseCSV(text) {
@@ -1125,15 +933,14 @@
         currentRow.push(current);
         rows.push(currentRow);
       }
-
-      return rows.filter((r) => r.length > 0);
+      return rows.filter(r => r.length > 0);
     }
 
     function parseDateTR(str) {
       if (!str) return null;
       const parts = str.trim().split(".");
       if (parts.length !== 3) return null;
-      const [g, a, y] = parts.map((p) => parseInt(p, 10));
+      const [g, a, y] = parts.map(p => parseInt(p, 10));
       if (isNaN(g) || isNaN(a) || isNaN(y)) return null;
       return new Date(y, a - 1, g);
     }
@@ -1143,13 +950,10 @@
       const d = new Date(isoString);
       if (isNaN(d.getTime())) return "–";
       const datePart = d.toLocaleDateString("tr-TR", {
-        year: "numeric",
-        month: "2-digit",
-        day: "2-digit"
+        year: "numeric", month: "2-digit", day: "2-digit"
       });
       const timePart = d.toLocaleTimeString("tr-TR", {
-        hour: "2-digit",
-        minute: "2-digit"
+        hour: "2-digit", minute: "2-digit"
       });
       return `${datePart} ${timePart}`;
     }
@@ -1167,12 +971,11 @@
     }
 
     // =======================
-    //   S N A P S H O T  Y A P I S I
+    // SNAPSHOT YAPISI
     // =======================
-
     function buildSnapshotObject(currentStudents) {
       const records = {};
-      currentStudents.forEach((s) => {
+      currentStudents.forEach(s => {
         records[s.id] = {
           id: s.id,
           data: {
@@ -1265,19 +1068,17 @@
       snapshotSource = "file";
       updateSnapshotLabels();
       showToast("TXT dosyası yüklendi, karşılaştırma bu dosyaya göre yapılıyor.");
-      loadData(); // yeniden oku ve bu snapshot ile karşılaştır
+      loadData(); // tekrar oku ve bu snapshot ile karşılaştır
     }
 
     // =======================
-    //   V E R İ  Y Ü K L E M E
+    // VERİ YÜKLEME
     // =======================
-
     async function loadData() {
       const body = document.getElementById("tableBody");
       body.innerHTML =
         '<tr class="loading-row"><td>Google E-Tablo → CSV verisi okunuyor…</td></tr>';
-      document.getElementById("lastLoadedInfo").textContent =
-        "Veri yükleniyor…";
+      document.getElementById("lastLoadedInfo").textContent = "Veri yükleniyor…";
 
       try {
         const url = getSheetCsvUrl(currentSheetName);
@@ -1285,11 +1086,8 @@
         if (!res.ok) throw new Error("Ağ hatası: " + res.status);
         const text = await res.text();
 
-        // Eğer CSV yerine HTML hata sayfası geldiyse uyar
         if (text.startsWith("<")) {
-          throw new Error(
-            "Erişim izni veya link ayarları nedeniyle CSV alınamadı (HTML döndü)."
-          );
+          throw new Error("CSV yerine HTML döndü. Paylaşım ayarlarını kontrol et.");
         }
 
         const rows = parseCSV(text);
@@ -1299,38 +1097,38 @@
           return;
         }
 
-        const header = rows[0].map((h) => h.trim());
-        const dataRows = rows.slice(1).filter((r) =>
-          r.some((cell) => cell.trim() !== "")
+        const header = rows[0].map(h => h.trim());
+        const dataRows = rows.slice(1).filter(r =>
+          r.some(cell => cell.trim() !== "")
         );
 
-        const headerIndex = (name) => header.indexOf(name);
+        const headerIndex = name => header.indexOf(name);
 
-        const idxIsim = headerIndex("İsim") === -1 ? 0 : headerIndex("İsim");
-        const idxSoy = headerIndex("Soyisim*");
-        const idxCins = headerIndex("Cinsiyet*");
-        const idxSinif = headerIndex("Sınıf");
-        const idxOkulNo = headerIndex("Okul Numarası");
-        const idxVeliAd = headerIndex("Veli Adı");
+        const idxIsim    = headerIndex("İsim") === -1 ? 0 : headerIndex("İsim");
+        const idxSoy     = headerIndex("Soyisim*");
+        const idxCins    = headerIndex("Cinsiyet*");
+        const idxSinif   = headerIndex("Sınıf");
+        const idxOkulNo  = headerIndex("Okul Numarası");
+        const idxVeliAd  = headerIndex("Veli Adı");
         const idxVeliSoy = headerIndex("Veli Soyadı");
         const idxVeliTel = headerIndex("Veli Telefon");
-        const idxYil = headerIndex("YIL");
-        const idxTarih = headerIndex("Tarih");
-        const idxBurs = headerIndex("Burslu mu?");
+        const idxYil     = headerIndex("YIL");
+        const idxTarih   = headerIndex("Tarih");
+        const idxBurs    = headerIndex("Burslu mu?");
 
-        const parsed = dataRows.map((row) => {
+        const parsed = dataRows.map(row => {
           const s = {
-            isim: (row[idxIsim] || "").trim(),
-            soyisim: (row[idxSoy] || "").trim(),
-            cinsiyet: (row[idxCins] || "").trim().toUpperCase(),
-            sinif: (row[idxSinif] || "").trim(),
-            okulNo: (row[idxOkulNo] || "").trim(),
-            veliAdi: (row[idxVeliAd] || "").trim(),
-            veliSoyadi: (row[idxVeliSoy] || "").trim(),
+            isim:        (row[idxIsim]    || "").trim(),
+            soyisim:     (row[idxSoy]     || "").trim(),
+            cinsiyet:    (row[idxCins]    || "").trim().toUpperCase(),
+            sinif:       (row[idxSinif]   || "").trim(),
+            okulNo:      (row[idxOkulNo]  || "").trim(),
+            veliAdi:     (row[idxVeliAd]  || "").trim(),
+            veliSoyadi:  (row[idxVeliSoy] || "").trim(),
             veliTelefon: (row[idxVeliTel] || "").trim(),
-            yil: (row[idxYil] || "").trim(),
-            tarih: (row[idxTarih] || "").trim(),
-            burslu: (row[idxBurs] || "").trim()
+            yil:         (row[idxYil]     || "").trim(),
+            tarih:       (row[idxTarih]   || "").trim(),
+            burslu:      (row[idxBurs]    || "").trim()
           };
           s.id = createStudentId(s);
           s.dateObj = parseDateTR(s.tarih);
@@ -1341,9 +1139,9 @@
         let removed = [];
         if (snapshot && snapshot.records) {
           const prevMap = snapshot.records;
-          const currentIds = new Set(parsed.map((s) => s.id));
+          const currentIds = new Set(parsed.map(s => s.id));
 
-          parsed.forEach((s) => {
+          parsed.forEach(s => {
             const prev = prevMap[s.id];
             if (!prev) {
               s.status = "new";
@@ -1377,29 +1175,13 @@
 
         students = parsed;
 
-        // "Son eklenenler" için: tarih DESC, yıl DESC, okul no DESC
-        students.sort((a, b) => {
-          const da = a.dateObj;
-          const db = b.dateObj;
-          if (da && db && da.getTime() !== db.getTime()) return db - da;
-          const ya = parseInt(a.yil || "0", 10);
-          const yb = parseInt(b.yil || "0", 10);
-          if (ya !== yb) return yb - ya;
-          const na = parseInt(a.okulNo || "0", 10);
-          const nb = parseInt(b.okulNo || "0", 10);
-          return nb - na;
-        });
-
         renderHeader();
         populateFilters();
         updateSummary(removed);
         applyFilters(removed);
 
-        document.getElementById(
-          "lastLoadedInfo"
-        ).textContent = `Sekme: ${currentSheetName} | Son yükleme: ${formatDateTimeForBadge(
-          new Date().toISOString()
-        )}`;
+        document.getElementById("lastLoadedInfo").textContent =
+          `Sekme: ${currentSheetName} | Son yükleme: ${formatDateTimeForBadge(new Date().toISOString())}`;
       } catch (err) {
         console.error(err);
         body.innerHTML =
@@ -1412,13 +1194,12 @@
     }
 
     // =======================
-    //   A R A Y Ü Z
+    // ARAYÜZ OLUŞTURMA
     // =======================
-
     function renderSheetTabs() {
       const container = document.getElementById("sheetTabs");
       container.innerHTML = "";
-      SHEET_TABS.forEach((tab) => {
+      SHEET_TABS.forEach(tab => {
         const btn = document.createElement("button");
         btn.type = "button";
         btn.className = "sheet-tab";
@@ -1427,7 +1208,7 @@
         btn.addEventListener("click", () => {
           if (currentSheetName === tab.name) return;
           currentSheetName = tab.name;
-          loadSnapshot(); // o sekmeye ait localStorage
+          loadSnapshot();
           renderSheetTabs();
           loadData();
         });
@@ -1448,7 +1229,7 @@
 
       const printContainer = document.getElementById("printColsContainer");
       printContainer.innerHTML = "";
-      COLUMNS.forEach((col) => {
+      COLUMNS.forEach(col => {
         const id = "print-col-" + col.key;
         const label = document.createElement("label");
         label.innerHTML = `
@@ -1460,23 +1241,32 @@
     }
 
     function populateFilters() {
-      const classFilter = document.getElementById("classFilter");
-      const classes = Array.from(
-        new Set(students.map((s) => s.sinif).filter((x) => x))
-      ).sort();
-      classFilter.innerHTML = '<option value="">Tümü</option>';
-      classes.forEach((c) => {
-        const opt = document.createElement("option");
-        opt.value = c;
-        opt.textContent = c;
-        classFilter.appendChild(opt);
+      // Sınıf çoklu seçim için chip'ler
+      const container = document.getElementById("classFilterContainer");
+      const classes = Array.from(new Set(students.map(s => s.sinif).filter(Boolean))).sort();
+      container.innerHTML = "";
+      classes.forEach(cls => {
+        const id = "class-filter-" + cls.replace(/\s+/g, "_");
+        const label = document.createElement("label");
+        label.innerHTML = `
+          <input type="checkbox" id="${id}" value="${cls}">
+          <span>${cls}</span>
+        `;
+        container.appendChild(label);
       });
+    }
+
+    function getSelectedClasses() {
+      const boxes = document.querySelectorAll("#classFilterContainer input[type='checkbox']");
+      const selected = [];
+      boxes.forEach(cb => { if (cb.checked) selected.push(cb.value); });
+      return selected;
     }
 
     function updateSummary(removedRecords = []) {
       const total = students.length;
-      const newCount = students.filter((s) => s.status === "new").length;
-      const updatedCount = students.filter((s) => s.status === "updated").length;
+      const newCount = students.filter(s => s.status === "new").length;
+      const updatedCount = students.filter(s => s.status === "updated").length;
       const removedCount = removedRecords.length;
 
       document.getElementById("totalCount").textContent = total;
@@ -1495,57 +1285,45 @@
       updatedList.innerHTML = "";
       removedList.innerHTML = "";
 
-      students
-        .filter((s) => s.status === "new")
-        .forEach((s) => {
-          const li = document.createElement("li");
-          li.textContent = `${s.okulNo || "–"} • ${s.isim} ${s.soyisim} (${s.sinif})`;
-          newList.appendChild(li);
-        });
+      students.filter(s => s.status === "new").forEach(s => {
+        const li = document.createElement("li");
+        li.textContent = `${s.okulNo || "–"} • ${s.isim} ${s.soyisim} (${s.sinif})`;
+        newList.appendChild(li);
+      });
 
-      students
-        .filter((s) => s.status === "updated")
-        .forEach((s) => {
-          const li = document.createElement("li");
-          li.textContent = `${s.okulNo || "–"} • ${s.isim} ${s.soyisim} (${s.sinif})`;
-          updatedList.appendChild(li);
-        });
+      students.filter(s => s.status === "updated").forEach(s => {
+        const li = document.createElement("li");
+        li.textContent = `${s.okulNo || "–"} • ${s.isim} ${s.soyisim} (${s.sinif})`;
+        updatedList.appendChild(li);
+      });
 
-      removedRecords.forEach((r) => {
+      removedRecords.forEach(r => {
         const d = r.data || {};
         const li = document.createElement("li");
-        li.innerHTML = `${d.okulNo || "–"} • ${d.isim || ""} ${
-          d.soyisim || ""
-        } <span class="pill">${d.sinif || ""}</span>`;
+        li.innerHTML = `${d.okulNo || "–"} • ${d.isim || ""} ${d.soyisim || ""} <span class="pill">${d.sinif || ""}</span>`;
         removedList.appendChild(li);
       });
     }
 
     function applyFilters(removedRecords = []) {
-      const searchText = document
-        .getElementById("searchInput")
-        .value.trim()
-        .toLowerCase();
-      const classVal = document.getElementById("classFilter").value;
+      const searchText = document.getElementById("searchInput").value.trim().toLowerCase();
       const genderVal = document.getElementById("genderFilter").value;
       const scholarVal = document.getElementById("scholarFilter").value;
       const statusVal = document.getElementById("statusFilter").value;
       const recentOnly = document.getElementById("recentOnly").checked;
       const dateFromVal = document.getElementById("dateFrom").value;
       const dateToVal = document.getElementById("dateTo").value;
+      const selectedClasses = getSelectedClasses();
 
       let fromDate = null;
       let toDate = null;
       if (dateFromVal) fromDate = new Date(dateFromVal + "T00:00:00");
-      if (dateToVal) toDate = new Date(dateToVal + "T23:59:59");
+      if (dateToVal)   toDate   = new Date(dateToVal   + "T23:59:59");
 
       let filtered = students.slice();
 
-      filtered = filtered.filter((s) => {
-        if (
-          activeViewMode === "new-updated" &&
-          !(s.status === "new" || s.status === "updated")
-        ) {
+      filtered = filtered.filter(s => {
+        if (activeViewMode === "new-updated" && !(s.status === "new" || s.status === "updated")) {
           return false;
         }
 
@@ -1555,7 +1333,7 @@
           if (statusVal === "updated" && s.status !== "updated") return false;
         }
 
-        if (classVal && s.sinif !== classVal) return false;
+        if (selectedClasses.length && !selectedClasses.includes(s.sinif)) return false;
         if (genderVal && s.cinsiyet !== genderVal) return false;
 
         if (scholarVal === "nonempty" && !s.burslu) return false;
@@ -1566,23 +1344,33 @@
 
         if (searchText) {
           const combined = [
-            s.isim,
-            s.soyisim,
-            s.cinsiyet,
-            s.sinif,
-            s.okulNo,
-            s.veliAdi,
-            s.veliSoyadi,
-            s.veliTelefon,
-            s.yil,
-            s.tarih,
-            s.burslu
-          ]
-            .join(" ")
-            .toLowerCase();
+            s.isim, s.soyisim, s.cinsiyet, s.sinif,
+            s.okulNo, s.veliAdi, s.veliSoyadi, s.veliTelefon,
+            s.yil, s.tarih, s.burslu
+          ].join(" ").toLowerCase();
           if (!combined.includes(searchText)) return false;
         }
         return true;
+      });
+
+      // Sıralama: Yeni → Güncellenen → Normal, sonra tarih/yıl/okul no ile son eklenen üstte
+      const statusOrder = { new: 0, updated: 1, normal: 2 };
+      filtered.sort((a, b) => {
+        const sa = statusOrder[a.status] ?? 2;
+        const sb = statusOrder[b.status] ?? 2;
+        if (sa !== sb) return sa - sb;
+
+        const da = a.dateObj;
+        const db = b.dateObj;
+        if (da && db && da.getTime() !== db.getTime()) return db - da;
+
+        const ya = parseInt(a.yil || "0", 10);
+        const yb = parseInt(b.yil || "0", 10);
+        if (ya !== yb) return yb - ya;
+
+        const na = parseInt(a.okulNo || "0", 10);
+        const nb = parseInt(b.okulNo || "0", 10);
+        return nb - na;
       });
 
       if (recentOnly && filtered.length > 30) {
@@ -1602,14 +1390,13 @@
         tr.className = "loading-row";
         const td = document.createElement("td");
         td.colSpan = COLUMNS.length;
-        td.textContent =
-          "Filtre sonuçlarına göre gösterilecek öğrenci bulunamadı.";
+        td.textContent = "Filtre sonuçlarına göre gösterilecek öğrenci yok.";
         tr.appendChild(td);
         body.appendChild(tr);
         return;
       }
 
-      rows.forEach((s) => {
+      rows.forEach(s => {
         const tr = document.createElement("tr");
         if (s.status === "new") tr.classList.add("new-row");
         if (s.status === "updated") tr.classList.add("updated-row");
@@ -1641,10 +1428,8 @@
               const span = document.createElement("span");
               span.textContent = value;
               span.className = "muted";
-              value = "";
               td.appendChild(span);
-            }
-            if (value) {
+            } else {
               td.textContent = value;
             }
           }
@@ -1665,13 +1450,13 @@
       );
 
       const hiddenFields = new Set();
-      checkboxes.forEach((cb) => {
+      checkboxes.forEach(cb => {
         const field = cb.dataset.field;
         if (!cb.checked) hiddenFields.add(field);
       });
 
-      rows.forEach((tr) => {
-        Array.from(tr.children).forEach((cell) => {
+      rows.forEach(tr => {
+        Array.from(tr.children).forEach(cell => {
           const field = cell.dataset.field;
           if (!field) return;
           if (hiddenFields.has(field)) {
@@ -1684,65 +1469,43 @@
     }
 
     // =======================
-    //   E T K İ N L İ K L E R
+    // ETKİNLİKLER
     // =======================
-
     function setupEventListeners() {
-      document
-        .getElementById("searchInput")
-        .addEventListener("input", () => applyFilters());
-      document
-        .getElementById("classFilter")
-        .addEventListener("change", () => applyFilters());
-      document
-        .getElementById("genderFilter")
-        .addEventListener("change", () => applyFilters());
-      document
-        .getElementById("scholarFilter")
-        .addEventListener("change", () => applyFilters());
-      document
-        .getElementById("statusFilter")
-        .addEventListener("change", () => applyFilters());
-      document
-        .getElementById("dateFrom")
-        .addEventListener("change", () => applyFilters());
-      document
-        .getElementById("dateTo")
-        .addEventListener("change", () => applyFilters());
-      document
-        .getElementById("recentOnly")
-        .addEventListener("change", () => applyFilters());
+      document.getElementById("searchInput").addEventListener("input", () => applyFilters());
+      document.getElementById("genderFilter").addEventListener("change", () => applyFilters());
+      document.getElementById("scholarFilter").addEventListener("change", () => applyFilters());
+      document.getElementById("statusFilter").addEventListener("change", () => applyFilters());
+      document.getElementById("dateFrom").addEventListener("change", () => applyFilters());
+      document.getElementById("dateTo").addEventListener("change", () => applyFilters());
+      document.getElementById("recentOnly").addEventListener("change", () => applyFilters());
+
+      document.getElementById("classFilterContainer").addEventListener("change", () => applyFilters());
 
       document.getElementById("clearFiltersBtn").addEventListener("click", () => {
         document.getElementById("searchInput").value = "";
-        document.getElementById("classFilter").value = "";
         document.getElementById("genderFilter").value = "";
         document.getElementById("scholarFilter").value = "";
         document.getElementById("statusFilter").value = "";
         document.getElementById("dateFrom").value = "";
         document.getElementById("dateTo").value = "";
         document.getElementById("recentOnly").checked = false;
+        document.querySelectorAll("#classFilterContainer input[type='checkbox']").forEach(cb => cb.checked = false);
         applyFilters();
       });
 
-      document.getElementById("reloadBtn").addEventListener("click", () => {
-        loadData();
-      });
+      document.getElementById("reloadBtn").addEventListener("click", () => loadData());
 
-      document.getElementById("saveSnapshotBtn").addEventListener("click", () =>
-        saveSnapshot(students)
-      );
+      document.getElementById("saveSnapshotBtn").addEventListener("click", () => saveSnapshot(students));
 
       document.getElementById("printBtn").addEventListener("click", () => {
         syncPrintColumnVisibility();
         window.print();
       });
 
-      document
-        .getElementById("printColsContainer")
-        .addEventListener("change", () => {
-          syncPrintColumnVisibility();
-        });
+      document.getElementById("printColsContainer").addEventListener("change", () => {
+        syncPrintColumnVisibility();
+      });
 
       document.getElementById("viewAllBtn").addEventListener("click", () => {
         activeViewMode = "all";
@@ -1751,47 +1514,41 @@
         applyFilters();
       });
 
-      document
-        .getElementById("viewNewUpdatedBtn")
-        .addEventListener("click", () => {
-          activeViewMode = "new-updated";
-          document
-            .getElementById("viewNewUpdatedBtn")
-            .classList.add("active");
-          document.getElementById("viewAllBtn").classList.remove("active");
-          applyFilters();
-        });
+      document.getElementById("viewNewUpdatedBtn").addEventListener("click", () => {
+        activeViewMode = "new-updated";
+        document.getElementById("viewNewUpdatedBtn").classList.add("active");
+        document.getElementById("viewAllBtn").classList.remove("active");
+        applyFilters();
+      });
 
       // Çift tıklama ile hücre kopyalama
-      document
-        .getElementById("tableBody")
-        .addEventListener("dblclick", async (e) => {
-          const cell = e.target.closest("td");
-          if (!cell) return;
-          const text = cell.innerText.trim();
-          if (!text) return;
-          try {
-            if (navigator.clipboard && navigator.clipboard.writeText) {
-              await navigator.clipboard.writeText(text);
-            } else {
-              const tmp = document.createElement("textarea");
-              tmp.value = text;
-              document.body.appendChild(tmp);
-              tmp.select();
-              document.execCommand("copy");
-              document.body.removeChild(tmp);
-            }
-            showToast("Metin panoya kopyalandı.");
-          } catch (err) {
-            console.error(err);
-            showToast("Kopyalama sırasında bir hata oluştu.");
+      document.getElementById("tableBody").addEventListener("dblclick", async e => {
+        const cell = e.target.closest("td");
+        if (!cell) return;
+        const text = cell.innerText.trim();
+        if (!text) return;
+        try {
+          if (navigator.clipboard && navigator.clipboard.writeText) {
+            await navigator.clipboard.writeText(text);
+          } else {
+            const tmp = document.createElement("textarea");
+            tmp.value = text;
+            document.body.appendChild(tmp);
+            tmp.select();
+            document.execCommand("copy");
+            document.body.removeChild(tmp);
           }
-        });
+          showToast("Metin panoya kopyalandı.");
+        } catch (err) {
+          console.error(err);
+          showToast("Kopyalama sırasında hata oluştu.");
+        }
+      });
 
-      // TXT İNDİR
+      // TXT indir
       document.getElementById("downloadTxtBtn").addEventListener("click", () => {
         if (!students.length) {
-          showToast("İndirilecek liste bulunamadı.");
+          showToast("İndirilecek liste yok.");
           return;
         }
         const snap = buildSnapshotObject(students);
@@ -1800,8 +1557,8 @@
         });
         const url = URL.createObjectURL(blob);
         const a = document.createElement("a");
-        a.href = url;
         const safeName = (currentSheetName || "liste").replace(/[^0-9A-Za-z_-]/g, "_");
+        a.href = url;
         a.download = `ogrenci_listesi_${safeName}.txt`;
         document.body.appendChild(a);
         a.click();
@@ -1810,13 +1567,13 @@
         showToast("TXT dosyası indirildi.");
       });
 
-      // TXT YÜKLE
+      // TXT yükle
       const uploadInput = document.getElementById("uploadTxtInput");
       document.getElementById("uploadTxtBtn").addEventListener("click", () => {
         uploadInput.value = "";
         uploadInput.click();
       });
-      uploadInput.addEventListener("change", (e) => {
+      uploadInput.addEventListener("change", e => {
         const file = e.target.files && e.target.files[0];
         if (!file) return;
         const reader = new FileReader();
@@ -1834,7 +1591,7 @@
     }
 
     // =======================
-    // B A Ş L A T
+    // BAŞLAT
     // =======================
     document.addEventListener("DOMContentLoaded", () => {
       renderSheetTabs();
