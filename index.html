@@ -1,0 +1,572 @@
+<!-- /index.html : Tek dosyalık Öğrenci Liste Yöneticisi (Açık Tema + Otomatik Çekme) -->
+<!doctype html>
+<html lang="tr">
+<head>
+<meta charset="utf-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1"/>
+<title>Öğrenci Liste Yöneticisi — Açık Tema</title>
+<style>
+  :root{
+    --bg:#f7f8fb; --card:#ffffff; --muted:#5b6573; --text:#101318; --accent:#4060ff;
+    --ok:#2e7d32; --warn:#8a5b00; --danger:#c62828; --ring:#cfd6e4; --line:#e6e9f2;
+    --btn:#f1f4fb; --btnH:#e7ebf7; --chip:#eef2fb; --copy:#2b3a67;
+  }
+  *{box-sizing:border-box}
+  html,body{height:100%}
+  body{margin:0; background:var(--bg); color:var(--text); font:16px/1.45 system-ui,-apple-system,Segoe UI,Roboto,Helvetica,Arial}
+  .wrap{max-width:1400px; margin:0 auto; padding:24px}
+  h1{margin:0 0 16px; letter-spacing:.2px; font-weight:800}
+  .bar{display:flex; gap:12px; flex-wrap:wrap; margin-bottom:14px}
+  .btn{
+    padding:14px 18px; background:var(--btn); border:1px solid var(--ring); border-radius:14px; cursor:pointer;
+    font-weight:700; letter-spacing:.2px; transition:.15s; user-select:none; color:#0e1a3a
+  }
+  .btn:hover{background:var(--btnH); transform:translateY(-1px)}
+  .btn[disabled]{opacity:.55; cursor:not-allowed}
+  .pill{background:#f3f6ff; border:1px solid var(--ring); padding:10px 14px; border-radius:999px}
+  .inputs{display:grid; gap:12px; grid-template-columns:repeat(12,1fr)}
+  .inputs > *{grid-column:span 3; min-width:220px}
+  .inputs input, .inputs select, textarea{
+    width:100%; padding:12px 14px; border-radius:12px; border:1px solid var(--ring); background:var(--card); color:var(--text)
+  }
+  textarea{min-height:120px; resize:vertical}
+  .tabs{display:flex; gap:10px; margin:12px 0 2px}
+  .tab{padding:12px 16px; border-radius:12px; background:var(--card); border:1px solid var(--line); cursor:pointer; font-weight:700}
+  .tab.active{outline:2px solid var(--accent); outline-offset:1px}
+  .panel{display:none}
+  .panel.active{display:block}
+  .tableWrap{background:var(--card); border:1px solid var(--line); border-radius:16px; overflow:hidden; box-shadow:0 6px 18px rgba(16,19,24,.06)}
+  table{width:100%; border-collapse:collapse; font-size:15px}
+  thead th{
+    position:sticky; top:0; background:#f6f8ff; border-bottom:1px solid var(--line); padding:12px; text-align:left; z-index:2; cursor:pointer
+  }
+  tbody td{border-bottom:1px solid var(--line); padding:10px 12px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis}
+  tbody tr:hover{background:#f3f6ff}
+  .tag{display:inline-flex; align-items:center; gap:6px; padding:4px 10px; border-radius:999px; font-size:12px; border:1px solid var(--line)}
+  .tag.new{background:#eaf6ec; color:#106b21; border-color:#cfe8d4}
+  .tag.upd{background:#fff4e0; color:#7a4d00; border-color:#fde2b3}
+  .tag.last{background:#e9efff; color:#1f3d9e; border-color:#c9d7ff}
+  .muted{color:var(--muted)}
+  .flex{display:flex; gap:8px; align-items:center}
+  .right{margin-left:auto}
+  .kbadge{font-size:12px; opacity:.8}
+  .filters{display:grid; grid-template-columns:repeat(6,1fr); gap:10px; margin:10px 0 14px}
+  .chipBtn{padding:8px 12px; border-radius:999px; border:1px solid var(--ring); background:var(--chip); cursor:pointer}
+  .chipBtn.active{outline:2px solid var(--accent)}
+  .hidden{display:none}
+  .toast{position:fixed; bottom:22px; left:50%; transform:translateX(-50%); background:#10141f; color:#fff; border:1px solid #2b3350;
+         padding:10px 14px; border-radius:10px; display:none}
+  .legend{display:flex; gap:10px; align-items:center; margin:10px 0}
+  .printer{display:grid; grid-template-columns:1fr 1fr; gap:16px}
+  .cols{display:grid; grid-template-columns:repeat(3,1fr); gap:8px; max-height:260px; overflow:auto; padding:8px; background:#fff; border:1px solid var(--ring); border-radius:12px}
+  .cols label{display:flex; gap:8px; align-items:center; padding:6px 8px; border-radius:8px}
+  @media print{
+    body{background:#fff; color:#000}
+    .noprint{display:none !important}
+    .tableWrap{border:none; box-shadow:none}
+    thead th{background:#fff; border:1px solid #000}
+    tbody td{border:1px solid #000}
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <h1>🎓 Öğrenci Liste Yöneticisi <span class="kbadge muted">— açık tema, otomatik çekme</span></h1>
+
+  <div class="bar noprint">
+    <button class="btn" id="btnLoadUrl" title="URL'den CSV/TSV çek (L)">🔗 URL'den Yükle</button>
+    <button class="btn" id="btnLoadFile">📄 Dosyadan Yükle</button>
+    <button class="btn" id="btnPaste">📋 Metin Yapıştır</button>
+    <button class="btn" id="btnSaveBaseline" disabled>🏷️ Şu Anı ‘Son Yüklenen’ Olarak İşaretle</button>
+    <button class="btn" id="btnPrint" disabled title="Yazdır / PDF (P)">🖨️ Yazdır</button>
+    <div class="right pill">Toplam: <b id="statCount">0</b> • Yeni: <b id="statNew">0</b> • Günc.: <b id="statUpd">0</b> • Silinen: <b id="statRem">0</b></div>
+  </div>
+
+  <div class="tabs noprint">
+    <div class="tab active" data-tab="list">Liste</div>
+    <div class="tab" data-tab="filters">Filtre & Yazdır</div>
+    <div class="tab" data-tab="changes">Değişiklikler</div>
+  </div>
+
+  <!-- LISTE -->
+  <div class="panel active" id="panel-list">
+    <div class="legend noprint">
+      <span class="tag new">🆕 Yeni</span>
+      <span class="tag upd">✏️ Güncellenen</span>
+      <span class="tag last">🏷️ Son Yüklenen</span>
+      <span class="muted">Hücreye <b>çift tık</b> → kopyala</span>
+    </div>
+    <div class="filters noprint" id="filterBar"></div>
+    <div class="tableWrap">
+      <table id="dataTable" aria-label="Öğrenci tablosu">
+        <thead><tr id="thRow"></tr></thead>
+        <tbody id="tb"></tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- FILTRE/YAZDIR -->
+  <div class="panel" id="panel-filters">
+    <div class="inputs noprint">
+      <div class="pill" style="grid-column:span 12">
+        <b>Google Sheet</b> → <code>https://docs.google.com/spreadsheets/d/<u>SHEET_ID</u>/export?format=csv&gid=<u>GID</u></code>
+      </div>
+      <div>
+        <label class="muted">Sheet ID</label>
+        <input id="inpSheetId" value="16BD_BrNLYBaXviCzB8yDKBGS2Vdj5DHi"/>
+      </div>
+      <div>
+        <label class="muted">GID (sayfa)</label>
+        <input id="inpGid" value="0"/>
+      </div>
+      <div style="grid-column:span 6">
+        <label class="muted">CSV URL (otomatik dolu)</label>
+        <input id="inpUrl" value="https://docs.google.com/spreadsheets/d/16BD_BrNLYBaXviCzB8yDKBGS2Vdj5DHi/export?format=csv&gid=0"/>
+      </div>
+      <div style="grid-column:span 12">
+        <label class="muted">Ham Metin (CSV/TSV)</label>
+        <textarea id="inpText" placeholder="Başlık satırı ile birlikte metni yapıştırın"></textarea>
+      </div>
+      <div style="grid-column:span 12" class="flex">
+        <input type="file" id="file" accept=".csv,.tsv,.txt" class="hidden"/>
+        <button class="btn" id="goUrl">🔗 URL’den Al</button>
+        <button class="btn" id="goText">📋 Metni Yükle</button>
+        <button class="btn" id="goFile">📄 Dosya Seç</button>
+        <span class="muted">Kısayollar: <b>L</b> yükle, <b>F</b> filtre, <b>P</b> yazdır</span>
+      </div>
+    </div>
+
+    <hr class="noprint" style="border-color:#e6e9f2; opacity:.8"/>
+
+    <div class="printer noprint">
+      <div>
+        <h3>🖨️ Yazdır Ayarları</h3>
+        <div class="cols" id="printCols"></div>
+      </div>
+      <div>
+        <h3>Seçenekler</h3>
+        <div class="inputs" style="grid-template-columns:repeat(2,1fr)">
+          <div>
+            <label class="muted">Sayfa Yönü</label>
+            <select id="pageOrient">
+              <option value="portrait">Dikey</option>
+              <option value="landscape" selected>Yatay</option>
+            </select>
+          </div>
+          <div>
+            <label class="muted">Satır Aralığı</label>
+            <select id="rowDense">
+              <option value="normal">Normal</option>
+              <option value="dense">Sıkı</option>
+              <option value="spacious">Geniş</option>
+            </select>
+          </div>
+          <div style="grid-column:span 2">
+            <button class="btn" id="btnPreview">🖨️ Önizle & Yazdır</button>
+          </div>
+        </div>
+        <p class="muted">Yazdırmada yalnızca seçtiğiniz sütunlar görünür.</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- DEĞİŞİKLİKLER -->
+  <div class="panel" id="panel-changes">
+    <div class="tableWrap">
+      <table id="chgTable">
+        <thead>
+          <tr>
+            <th>Durum</th><th>Okul No</th><th>İsim</th><th>Soyisim</th><th>Detay</th>
+          </tr>
+        </thead>
+        <tbody id="chgBody"></tbody>
+      </table>
+    </div>
+  </div>
+
+  <div class="toast" id="toast">Kopyalandı</div>
+</div>
+
+<script>
+/* ------------- Yardımcılar ------------- */
+const $ = (q, d=document)=>d.querySelector(q);
+const $$ = (q, d=document)=>Array.from(d.querySelectorAll(q));
+const sleep = ms => new Promise(r=>setTimeout(r,ms));
+
+function parseDelimited(text){
+  const firstLine = text.split(/\r?\n/)[0] || '';
+  const guess = ([',',';','\t']).reduce((best,sep)=>{
+    const c=(firstLine.match(new RegExp(`\\${sep}`,'g'))||[]).length;
+    return c>(best.c||-1)?{sep,c}:{sep:best.sep,c:best.c};
+  },{sep:',',c:-1}).sep;
+  const rows=[]; let row=[], i=0, cur='', inQ=false;
+  const s=text.replace(/\r/g,'');
+  while(i<s.length){
+    const ch=s[i];
+    if(inQ){
+      if(ch==='"' && s[i+1]==='"'){ cur+='"'; i++; }
+      else if(ch==='"'){ inQ=false; }
+      else cur+=ch;
+    }else{
+      if(ch==='"'){ inQ=true; }
+      else if(ch===guess){ row.push(cur); cur=''; }
+      else if(ch==='\n'){ row.push(cur); rows.push(row); row=[]; cur=''; }
+      else cur+=ch;
+    }
+    i++;
+  }
+  if(cur.length||row.length) { row.push(cur); rows.push(row); }
+  return {rows, sep:guess};
+}
+function normHeader(h){
+  const map = {
+    "isim":"İsim","ad":"İsim","adi":"İsim",
+    "soyisim":"Soyisim","soyad":"Soyisim","soyadi":"Soyisim",
+    "cinsiyet":"Cinsiyet","sınıf":"Sınıf","sinif":"Sınıf",
+    "okul numarası":"Okul Numarası","okul numarasi":"Okul Numarası","okulno":"Okul Numarası",
+    "veli adı":"Veli Adı","veli adi":"Veli Adı",
+    "veli soyadı":"Veli Soyadı","veli soyadi":"Veli Soyadı",
+    "veli telefon":"Veli Telefon","telefon":"Veli Telefon",
+    "yil":"YIL","yıl":"YIL","year":"YIL",
+    "tarih":"Tarih","burslu mu?":"Burslu mu?","burs":"Burslu mu?"
+  };
+  const k = h.trim().toLowerCase();
+  return map[k] || h.trim();
+}
+function parseTRDate(s){
+  if(!s) return null;
+  const m = s.trim().match(/^(\d{1,2})\.(\d{1,2})\.(\d{4})$/);
+  if(!m) return null;
+  const [_,d,mo,y]=m; return new Date(+y, +mo-1, +d);
+}
+function makeKey(r){
+  return [r["Okul Numarası"]||"", r["İsim"]||"", r["Soyisim"]||""].join(" | ").trim();
+}
+
+/* ------------- Durum ------------- */
+const state = {
+  data: [], headers: [],
+  lastSet: new Set(),
+  compare: {new:[], upd:[], rem:[]},
+  sheetKey: "manual",
+  sort: {col:"__rank", dir:"desc"},
+  colVisible: new Map(),
+};
+
+function storageKey(){ return "ogrenci_dataset_"+state.sheetKey; }
+function currentSheetKey(){
+  const id = $("#inpSheetId").value.trim() || "manual";
+  const gid = $("#inpGid").value.trim() || "0";
+  const url = $("#inpUrl").value.trim();
+  if(url) return "url_"+btoa(url).slice(0,12);
+  return id+"_"+gid;
+}
+
+/* ------------- Yükleme ------------- */
+async function loadFromUrl(url){
+  const res = await fetch(url, {cache:"no-store"});
+  if(!res.ok) throw new Error("URL okunamadı: "+res.status);
+  const text = await res.text();
+  return parseAndSet(text);
+}
+async function loadFromFile(file){ const text = await file.text(); return parseAndSet(text); }
+async function loadFromText(text){ return parseAndSet(text); }
+
+function parseAndSet(text){
+  const {rows} = parseDelimited(text);
+  if(!rows.length) throw new Error("Veri boş");
+  const headers = rows[0].map(normHeader);
+  const data = rows.slice(1).map(r=>{
+    const obj={}; headers.forEach((h,i)=> obj[h]= (r[i]??'').trim() );
+    obj.__key = makeKey(obj);
+    const dt = parseTRDate(obj["Tarih"]); obj.__date = dt? +dt : 0;
+    const no = parseInt((obj["Okul Numarası"]||"").replace(/\D/g,''))||0; obj.__no = no;
+    obj.__rank = (obj.__date||0)*10 + (obj.__no||0);
+    return obj;
+  });
+  state.headers = headers;
+  state.data = data;
+  state.colVisible = new Map(headers.map(h=>[h,true]));
+  state.sheetKey = currentSheetKey();
+  computeDiffs();
+  markLastSetIfExists();
+  renderAll();
+  enableButtons(true);
+  return {headers,data};
+}
+
+/* ------------- Karşılaştırma ------------- */
+function saveBaseline(){
+  const payload = {when:Date.now(), headers:state.headers, data:state.data};
+  localStorage.setItem(storageKey(), JSON.stringify(payload));
+  state.lastSet = new Set(state.data.map(x=>x.__key));
+  localStorage.setItem(storageKey()+"_lastset", JSON.stringify([...state.lastSet]));
+  computeDiffs(); renderAll();
+}
+function markLastSetIfExists(){
+  try{
+    const raw = localStorage.getItem(storageKey()+"_lastset");
+    state.lastSet = new Set(raw? JSON.parse(raw): []);
+  }catch{ state.lastSet=new Set(); }
+}
+function computeDiffs(){
+  let prev=[];
+  try{
+    const raw = localStorage.getItem(storageKey());
+    if(raw){ prev = JSON.parse(raw).data||[]; }
+  }catch{ prev=[]; }
+  const prevMap = new Map(prev.map(x=>[x.__key, x]));
+  const curMap = new Map(state.data.map(x=>[x.__key, x]));
+  const add=[], upd=[], rem=[];
+  state.data.forEach(r=>{
+    const old = prevMap.get(r.__key);
+    if(!old){ add.push(r); }
+    else{
+      const changed = state.headers.some(h => (old[h]||"") !== (r[h]||""));
+      if(changed){ upd.push({old, cur:r}); }
+    }
+  });
+  prev.forEach(p=>{ if(!curMap.has(p.__key)) rem.push(p); });
+  state.compare = {new:add, upd, rem};
+}
+
+/* ------------- UI ------------- */
+function enableButtons(on){
+  $("#btnSaveBaseline").disabled = !on;
+  $("#btnPrint").disabled = !on;
+}
+function renderAll(){
+  renderFilters(); renderTable(); renderChanges(); renderPrintCols();
+  $("#statCount").textContent = state.data.length;
+  $("#statNew").textContent = state.compare.new.length;
+  $("#statUpd").textContent = state.compare.upd.length;
+  $("#statRem").textContent = state.compare.rem.length;
+}
+
+function renderFilters(){
+  const bar = $("#filterBar"); bar.innerHTML="";
+  const make = (label, inner) => { const wrap = document.createElement("div"); wrap.innerHTML = `<label class="muted">${label}</label>`; wrap.appendChild(inner); return wrap; };
+  const q = document.createElement("input"); q.placeholder="Serbest arama (isim, soyisim, veli, tel...)"; q.addEventListener("input", ()=>renderTable()); q.id="fltQ";
+  bar.appendChild(make("Arama",q));
+  const sinif = document.createElement("input"); sinif.placeholder="Sınıf (örn: 8D)"; sinif.addEventListener("input", ()=>renderTable()); sinif.id="fltSinif";
+  bar.appendChild(make("Sınıf", sinif));
+  const cins = document.createElement("select"); cins.innerHTML = `<option value="">Hepsi</option><option>KIZ</option><option>ERKEK</option>`; cins.addEventListener("change", ()=>renderTable()); cins.id="fltCins";
+  bar.appendChild(make("Cinsiyet", cins));
+  const yil = document.createElement("input"); yil.placeholder="YIL (örn: 2025)"; yil.addEventListener("input", ()=>renderTable()); yil.id="fltYil";
+  bar.appendChild(make("YIL", yil));
+  const burs = document.createElement("input"); burs.placeholder="Burslu? (Evet/Hayır/Boş)"; burs.addEventListener("input", ()=>renderTable()); burs.id="fltBurs";
+  bar.appendChild(make("Burslu mu?", burs));
+  const d1 = document.createElement("input"); d1.type="date"; d1.id="fltD1"; d1.addEventListener("change", ()=>renderTable());
+  const d2 = document.createElement("input"); d2.type="date"; d2.id="fltD2"; d2.addEventListener("change", ()=>renderTable());
+  const wrap = document.createElement("div"); wrap.style.gridColumn="span 2"; const c1=document.createElement("div"); c1.append("Başlangıç:", d1); const c2=document.createElement("div"); c2.append("Bitiş:", d2); wrap.append(c1,c2);
+  bar.appendChild(make("Tarih Aralığı", wrap));
+
+  const colsWrap = document.createElement("div"); colsWrap.style.gridColumn="span 6";
+  const row = document.createElement("div"); row.className="flex"; row.style.flexWrap="wrap";
+  state.headers.forEach(h=>{
+    const b=document.createElement("button"); b.className="chipBtn"+(state.colVisible.get(h)?" active":""); b.textContent = h;
+    b.onclick=()=>{ state.colVisible.set(h, !state.colVisible.get(h)); b.classList.toggle("active"); renderTable(); renderPrintCols(); };
+    row.appendChild(b);
+  });
+  colsWrap.appendChild(row); bar.appendChild(make("Sütun Görünürlüğü", colsWrap));
+}
+
+function renderTable(){
+  const th = $("#thRow"); th.innerHTML="";
+  const heads = state.headers.filter(h=>state.colVisible.get(h));
+  const helperCols = ["Durum"];
+  [...helperCols, ...heads].forEach(h=>{
+    const el=document.createElement("th"); el.textContent=h;
+    el.onclick = ()=>{ if(h!=="Durum"){ state.sort.col=h; state.sort.dir = (state.sort.dir==="asc"?"desc":"asc"); drawBody(); } };
+    th.appendChild(el);
+  });
+  drawBody();
+}
+function filteredData(){
+  const q = $("#fltQ")?.value.trim().toLowerCase() || "";
+  const sinif = $("#fltSinif")?.value.trim().toLowerCase() || "";
+  const cins = $("#fltCins")?.value || "";
+  const yil = $("#fltYil")?.value.trim() || "";
+  const burs = $("#fltBurs")?.value.trim().toLowerCase() || "";
+  const d1 = $("#fltD1")?.value ? new Date($("#fltD1").value) : null;
+  const d2 = $("#fltD2")?.value ? new Date($("#fltD2").value) : null;
+  return state.data.filter(r=>{
+    if(q){
+      const blob = [r["İsim"], r["Soyisim"], r["Veli Adı"], r["Veli Soyadı"], r["Veli Telefon"], r["Okul Numarası"], r["Sınıf"]].join(" ").toLowerCase();
+      if(!blob.includes(q)) return false;
+    }
+    if(sinif && (r["Sınıf"]||"").toLowerCase()!=sinif) return false;
+    if(cins && (r["Cinsiyet"]||"")!=cins) return false;
+    if(yil && (r["YIL"]||"")!=yil) return false;
+    if(burs && !((r["Burslu mu?"]||"").toLowerCase().includes(burs))) return false;
+    if(d1 || d2){
+      const dt = parseTRDate(r["Tarih"]); if(!dt) return false;
+      if(d1 && dt<d1) return false;
+      if(d2 && dt>d2) return false;
+    }
+    return true;
+  });
+}
+function drawBody(){
+  const tb = $("#tb"); tb.innerHTML="";
+  const rows = filteredData();
+  const keysNew = new Set(state.compare.new.map(x=>x.__key));
+  rows.sort((a,b)=>{
+    const isNewA = keysNew.has(a.__key), isNewB = keysNew.has(b.__key);
+    if(isNewA!==isNewB) return isNewB - isNewA;
+    const col = state.sort.col;
+    if(col && a[col]!==undefined){
+      const va=a[col]??"", vb=b[col]??"";
+      const numA=+va, numB=+vb;
+      let cmp;
+      if(!isNaN(numA)&&!isNaN(numB)) cmp = numA-numB; else cmp = String(va).localeCompare(String(vb),'tr');
+      return state.sort.dir==="asc"? cmp : -cmp;
+    }
+    if(a.__date!==b.__date) return b.__date - a.__date;
+    return (b.__no||0)-(a.__no||0);
+  });
+  const heads = state.headers.filter(h=>state.colVisible.get(h));
+  for(const r of rows){
+    const tr = document.createElement("tr");
+    const td0 = document.createElement("td");
+    const tags=[];
+    if(state.compare.new.find(x=>x.__key===r.__key)) tags.push(`<span class="tag new">🆕 Yeni</span>`);
+    if(state.compare.upd.find(x=>x.cur.__key===r.__key)) tags.push(`<span class="tag upd">✏️ Günc.</span>`);
+    if(state.lastSet.has(r.__key)) tags.push(`<span class="tag last">🏷️ Son</span>`);
+    td0.innerHTML = tags.join(" ");
+    tr.appendChild(td0);
+    for(const h of heads){
+      const td=document.createElement("td");
+      const val = r[h]??"";
+      td.textContent = val; td.title = val;
+      td.addEventListener("dblclick", ()=>copyCell(val));
+      tr.appendChild(td);
+    }
+    tb.appendChild(tr);
+  }
+}
+function renderChanges(){
+  const body = $("#chgBody"); body.innerHTML="";
+  const makeRow = (durum, r, det="")=>{
+    const tr=document.createElement("tr");
+    tr.innerHTML = `<td>${durum}</td><td>${r["Okul Numarası"]||""}</td><td>${r["İsim"]||""}</td><td>${r["Soyisim"]||""}</td><td class="muted">${det}</td>`;
+    body.appendChild(tr);
+  };
+  state.compare.new.forEach(r=>makeRow("🆕 Yeni", r));
+  state.compare.upd.forEach(p=> {
+    const changes = state.headers.filter(h => (p.old[h]||"")!==(p.cur[h]||""))
+      .map(h=>`${h}: “${p.old[h]||""}” → “${p.cur[h]||""}”`).join("; ");
+    makeRow("✏️ Güncellendi", p.cur, changes);
+  });
+  state.compare.rem.forEach(r=>makeRow("🗑️ Silinen", r));
+}
+function renderPrintCols(){
+  const wrap = $("#printCols"); wrap.innerHTML="";
+  state.headers.forEach(h=>{
+    const id="pcol_"+btoa(h).replace(/=/g,'');
+    const lab=document.createElement("label");
+    lab.innerHTML=`<input type="checkbox" id="${id}" ${state.colVisible.get(h)?'checked':''}/> <span>${h}</span>`;
+    lab.querySelector("input").onchange = (e)=> state.colVisible.set(h, e.target.checked);
+    wrap.appendChild(lab);
+  });
+}
+
+/* ------------- Kopyalama / Yazdırma ------------- */
+async function copyCell(text){
+  try{ await navigator.clipboard.writeText(text); showToast("Kopyalandı: " + (text.length>30? text.slice(0,30)+"…": text)); }
+  catch{ showToast("Kopyalanamadı"); }
+}
+let toastTimer; 
+function showToast(msg){
+  const t=$("#toast"); t.textContent=msg; t.style.display="block";
+  clearTimeout(toastTimer); toastTimer=setTimeout(()=> t.style.display="none", 1200);
+}
+function buildPrintHtml(selectedCols, dense){
+  const rows = filteredData();
+  const icons = {"İsim":"👤","Soyisim":"📛","Okul Numarası":"#️⃣","Veli Telefon":"☎️","Tarih":"🗓️","Sınıf":"🏫","Cinsiyet":"⚧","YIL":"🗂️","Burslu mu?":"🏷️","Veli Adı":"👪","Veli Soyadı":"👪"};
+  const style = `<style>
+      body{font:12pt/1.25 system-ui; color:#000; margin:12mm}
+      table{width:100%; border-collapse:collapse}
+      th,td{border:1px solid #000; padding:${dense==="dense"?"4px":dense==="spacious"?"10px":"6px"}; text-align:left}
+      thead th{background:#f2f2f2}
+    </style>`;
+  const headRow = selectedCols.map(h=>`<th>${icons[h]||"⬜"} ${h}</th>`).join("");
+  const body = rows.map(r=>`<tr>` + selectedCols.map(h=>`<td>${(r[h]??"").toString().replace(/</g,"&lt;")}</td>`).join("") + `</tr>`).join("");
+  return `<!doctype html><html><head><meta charset="utf-8">${style}</head><body>
+  <h2>Öğrenci Listesi</h2>
+  <table><thead><tr>${headRow}</tr></thead><tbody>${body}</tbody></table>
+  </body></html>`;
+}
+
+/* ------------- Olaylar ------------- */
+function switchTab(name){
+  $$(".tab").forEach(t=>t.classList.toggle("active", t.dataset.tab===name));
+  $("#panel-list").classList.toggle("active", name==="list");
+  $("#panel-filters").classList.toggle("active", name==="filters");
+  $("#panel-changes").classList.toggle("active", name==="changes");
+}
+$$(".tab").forEach(t=> t.onclick=()=> switchTab(t.dataset.tab));
+
+$("#btnLoadUrl").onclick = ()=> switchTab("filters");
+$("#btnLoadFile").onclick = ()=> { $("#file").click(); };
+$("#btnPaste").onclick = ()=> { switchTab("filters"); $("#inpText").focus(); };
+
+$("#file").addEventListener("change", async e=>{
+  if(!e.target.files?.[0]) return;
+  try{ await loadFromFile(e.target.files[0]); showToast("Dosyadan yüklendi"); }
+  catch(err){ alert(err.message); }
+  e.target.value="";
+});
+$("#goUrl").onclick = async ()=>{
+  const url = $("#inpUrl").value.trim() || (`https://docs.google.com/spreadsheets/d/${$("#inpSheetId").value.trim()}/export?format=csv&gid=${$("#inpGid").value.trim()||"0"}`);
+  try{ await loadFromUrl(url); showToast("URL'den çekildi"); switchTab("list"); }
+  catch(err){ alert(err.message + "\nErişim/CORS engeli olabilir. Alternatif: Dosyadan yükleyin veya metin yapıştırın."); }
+};
+$("#goText").onclick = async ()=>{
+  const t = $("#inpText").value.trim();
+  if(!t) return alert("Metin boş");
+  try{ await loadFromText(t); showToast("Metinden yüklendi"); switchTab("list"); }
+  catch(err){ alert(err.message); }
+};
+$("#goFile").onclick = ()=> $("#file").click();
+$("#btnSaveBaseline").onclick = ()=> { saveBaseline(); showToast("Bu yükleme ‘Son Yüklenen’ olarak işaretlendi ve karşılaştırma için kaydedildi."); renderChanges(); };
+$("#btnPrint").onclick = ()=> switchTab("filters");
+$("#btnPreview").onclick = ()=>{
+  const dense = $("#rowDense").value;
+  const orient = $("#pageOrient").value;
+  const selected = state.headers.filter(h=> $("#printCols").querySelector(`input[id^="pcol_"][id$="${btoa(h).replace(/=/g,'').slice(-8)}"]`)?.checked || state.colVisible.get(h));
+  if(!selected.length) return alert("En az bir sütun seçin.");
+  const html = buildPrintHtml(selected, dense);
+  const w = window.open("", "_blank");
+  w.document.write(html); w.document.close(); w.focus();
+  setTimeout(()=>{ w.document.head.insertAdjacentHTML('beforeend', `<style>@page{size:${orient}}</style>`); w.print(); }, 300);
+};
+/* Kısayollar */
+document.addEventListener("keydown", (e)=>{
+  if(e.key.toLowerCase()==="f"){ e.preventDefault(); switchTab("filters"); }
+  if(e.key.toLowerCase()==="p"){ e.preventDefault(); $("#btnPreview").click(); }
+  if(e.key.toLowerCase()==="l"){ e.preventDefault(); switchTab("filters"); }
+});
+
+/* ------------- Otomatik Çekme ------------- */
+async function autoFetch(){
+  const urlDefault = "https://docs.google.com/spreadsheets/d/16BD_BrNLYBaXviCzB8yDKBGS2Vdj5DHi/export?format=csv&gid=0";
+  $("#inpUrl").value = urlDefault;
+  $("#inpSheetId").value = "16BD_BrNLYBaXviCzB8yDKBGS2Vdj5DHi";
+  $("#inpGid").value = "0";
+  try{
+    await loadFromUrl(urlDefault);
+    showToast("Google Sheets verisi otomatik çekildi");
+    switchTab("list");
+  }catch(e){
+    // why: Erişim engeli olursa kullanıcıya alternatif bırakmak
+    switchTab("filters");
+    showToast("URL otomatik yüklenemedi, Filtre sekmesinden deneyin");
+  }
+}
+enableButtons(false);
+renderFilters(); renderPrintCols();
+window.addEventListener("DOMContentLoaded", autoFetch);
+</script>
+</body>
+</html>
