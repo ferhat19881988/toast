@@ -20,7 +20,7 @@
       --warning: #b45309;
       --radius-lg: 18px;
       --radius-md: 14px;
-      --shadow-soft: 0 18px 45px rgba(15, 23, 42, 0.10);
+      --shadow-soft: 0 18px 45px rgba(15, 23, 42, 0.1);
       --shadow-subtle: 0 6px 20px rgba(15, 23, 42, 0.06);
     }
 
@@ -43,7 +43,7 @@
     }
 
     .app-shell {
-      max-width: 1400px;
+      max-width: 1500px;
       margin: 0 auto;
       display: flex;
       flex-direction: column;
@@ -51,10 +51,10 @@
     }
 
     header.app-header {
-      background: rgba(17, 24, 39, 0.95);
+      background: rgba(17, 24, 39, 0.96);
       color: #f9fafb;
-      border-radius: 24px;
-      padding: 20px 26px;
+      border-radius: 26px;
+      padding: 22px 26px;
       display: flex;
       flex-wrap: wrap;
       align-items: center;
@@ -95,6 +95,7 @@
       font-size: 12px;
       color: #d1d5db;
       align-items: center;
+      justify-content: flex-end;
     }
 
     .chip {
@@ -104,7 +105,7 @@
       display: inline-flex;
       align-items: center;
       gap: 6px;
-      background: rgba(15, 23, 42, 0.8);
+      background: rgba(15, 23, 42, 0.82);
     }
 
     .chip strong {
@@ -117,12 +118,12 @@
 
     .layout-main {
       display: grid;
-      grid-template-columns: minmax(320px, 380px) minmax(0, 1fr);
+      grid-template-columns: minmax(350px, 380px) minmax(0, 1fr);
       gap: 20px;
       align-items: flex-start;
     }
 
-    @media (max-width: 1024px) {
+    @media (max-width: 1100px) {
       .layout-main {
         grid-template-columns: 1fr;
       }
@@ -428,6 +429,38 @@
       gap: 12px;
     }
 
+    .sheet-tabs {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+      background: #f3f4f6;
+      border-radius: 999px;
+      padding: 4px;
+      margin-bottom: 8px;
+    }
+
+    .sheet-tab {
+      border: none;
+      background: transparent;
+      border-radius: 999px;
+      padding: 7px 12px;
+      font-size: 12px;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      color: var(--text-soft);
+    }
+
+    .sheet-tab span.icon {
+      font-size: 14px;
+    }
+
+    .sheet-tab.active {
+      background: #111827;
+      color: #f9fafb;
+    }
+
     .table-toolbar {
       display: flex;
       flex-wrap: wrap;
@@ -479,7 +512,7 @@
     }
 
     .table-scroll {
-      max-height: 620px;
+      max-height: 650px;
       overflow: auto;
       scrollbar-width: thin;
     }
@@ -497,7 +530,7 @@
     table {
       border-collapse: collapse;
       width: 100%;
-      min-width: 900px;
+      min-width: 960px;
       font-size: 13px;
     }
 
@@ -686,7 +719,8 @@
       .panel.filters,
       .table-toolbar,
       .print-options .print-hint,
-      .no-print {
+      .no-print,
+      .sheet-tabs {
         display: none !important;
       }
 
@@ -713,7 +747,6 @@
 
       thead th {
         background: #f3f4f6 !important;
-        box-shadow: none;
       }
     }
   </style>
@@ -727,24 +760,24 @@
           Öğrenci Listesi Yöneticisi
         </h1>
         <p>
-          Google E-Tablo verisini okuyan, değişiklikleri takip eden ve gelişmiş
-          yazdırma seçenekleri sunan tek dosyalık panel.
+          Birden fazla sekmeden veri okuyup değişiklikleri takip eden, TXT ile
+          karşılaştırma yapabilen geniş, modern panel.
         </p>
       </div>
       <div class="header-meta">
         <div class="chip">
           <span class="icon">⬛</span>
-          <strong>Modern siyah/beyaz/gri tema</strong>
+          <strong>Siyah / beyaz / gri tema</strong>
         </div>
         <div class="chip">
           <span class="icon">🧠</span>
-          <span>Son liste yerel hafızada tutulur (localStorage)</span>
+          <span>localStorage + TXT karşılaştırma desteği</span>
         </div>
       </div>
     </header>
 
     <main class="layout-main">
-      <!-- SOL PANEL: FİLTRELER + ÖZET -->
+      <!-- SOL PANEL -->
       <section class="panel filters">
         <div class="panel-title-row">
           <h2>
@@ -754,7 +787,7 @@
         </div>
         <p class="panel-subtitle">
           Arama, sınıf, cinsiyet, burs ve tarih aralığıyla listeyi daralt.
-          Çift tıklama ile herhangi bir hücreyi panoya kopyalayabilirsin.
+          Çift tıklama ile herhangi bir hücrenin metnini kopyalayabilirsin.
         </p>
 
         <div class="filters-grid" style="margin-top: 12px;">
@@ -767,18 +800,14 @@
           </div>
 
           <div class="field-group">
-            <div class="field-label">
-              <span>Sınıf</span>
-            </div>
+            <div class="field-label"><span>Sınıf</span></div>
             <select id="classFilter">
               <option value="">Tümü</option>
             </select>
           </div>
 
           <div class="field-group">
-            <div class="field-label">
-              <span>Cinsiyet</span>
-            </div>
+            <div class="field-label"><span>Cinsiyet</span></div>
             <select id="genderFilter">
               <option value="">Tümü</option>
               <option value="KIZ">Kız</option>
@@ -787,9 +816,7 @@
           </div>
 
           <div class="field-group">
-            <div class="field-label">
-              <span>Burs durumu</span>
-            </div>
+            <div class="field-label"><span>Burs durumu</span></div>
             <select id="scholarFilter">
               <option value="">Tümü</option>
               <option value="nonempty">Burslu (dolu hücre)</option>
@@ -798,9 +825,7 @@
           </div>
 
           <div class="field-group">
-            <div class="field-label">
-              <span>Durum</span>
-            </div>
+            <div class="field-label"><span>Durum</span></div>
             <select id="statusFilter">
               <option value="">Hepsi</option>
               <option value="new">Sadece yeni</option>
@@ -810,16 +835,12 @@
           </div>
 
           <div class="field-group">
-            <div class="field-label">
-              <span>Tarih &ge;</span>
-            </div>
+            <div class="field-label"><span>Tarih &ge;</span></div>
             <input type="date" id="dateFrom" />
           </div>
 
           <div class="field-group">
-            <div class="field-label">
-              <span>Tarih &le;</span>
-            </div>
+            <div class="field-label"><span>Tarih &le;</span></div>
             <input type="date" id="dateTo" />
           </div>
 
@@ -838,7 +859,7 @@
           </button>
           <button class="btn btn-ghost" id="reloadBtn" type="button">
             <span class="icon">🔄</span>
-            Veriyi yeniden yükle
+            Bu sekmeyi yeniden yükle
           </button>
         </div>
 
@@ -846,7 +867,7 @@
           Çift tıklama ile herhangi bir hücrenin metnini panoya kopyalayabilirsin.
         </p>
 
-        <hr style="border: none; border-top: 1px solid var(--border-soft); margin: 14px 0;" />
+        <hr style="border:none;border-top:1px solid var(--border-soft);margin:14px 0;">
 
         <div>
           <div class="panel-title-row" style="margin-bottom: 6px;">
@@ -856,8 +877,8 @@
             </h2>
           </div>
           <p class="panel-subtitle">
-            Şu anki liste, en son kaydedilen listeyle karşılaştırılır. Yeni, güncellenen veya
-            silinen öğrenciler aşağıda özetlenir.
+            Şu anki sekme, seçili karşılaştırma kaynağıyla (localStorage veya TXT dosyası)
+            kıyaslanır. Yeni, güncellenen veya silinen öğrenciler aşağıda özetlenir.
           </p>
 
           <div class="summary-grid">
@@ -867,9 +888,7 @@
                 <span class="icon">⬜</span>
               </div>
               <div class="summary-value" id="totalCount">–</div>
-              <div class="summary-meta">
-                Tablodaki öğrenci sayısı.
-              </div>
+              <div class="summary-meta">Tablodaki öğrenci sayısı.</div>
             </div>
             <div class="summary-card new">
               <div class="summary-title">
@@ -877,9 +896,7 @@
                 <span class="icon">🆕</span>
               </div>
               <div class="summary-value" id="newCount">–</div>
-              <div class="summary-meta">
-                Önceki listeye göre yeni eklenen öğrenciler.
-              </div>
+              <div class="summary-meta">Önceki listeye göre yeni eklenen öğrenciler.</div>
             </div>
             <div class="summary-card updated">
               <div class="summary-title">
@@ -887,9 +904,7 @@
                 <span class="icon">✏️</span>
               </div>
               <div class="summary-value" id="updatedCount">–</div>
-              <div class="summary-meta">
-                Bilgilerinde değişiklik olan öğrenciler.
-              </div>
+              <div class="summary-meta">Bilgilerinde değişiklik olan öğrenciler.</div>
             </div>
             <div class="summary-card removed">
               <div class="summary-title">
@@ -897,9 +912,7 @@
                 <span class="icon">🗑️</span>
               </div>
               <div class="summary-value" id="removedCount">–</div>
-              <div class="summary-meta">
-                Eski listede olup şu an olmayan kayıtlar.
-              </div>
+              <div class="summary-meta">Eski listede olup şu an olmayan kayıtlar.</div>
             </div>
           </div>
 
@@ -927,12 +940,13 @@
             </details>
             <p class="muted-tip">
               <span class="badge-soft" id="lastSavedInfo">Son kaydedilen liste: –</span>
+              <span class="badge-soft" id="compareSourceLabel">Karşılaştırma kaynağı: Yok</span>
             </p>
           </div>
         </div>
       </section>
 
-      <!-- SAĞ PANEL: TABLO + YAZDIRMA -->
+      <!-- SAĞ PANEL -->
       <section class="panel table-panel">
         <div class="panel-title-row">
           <h2>
@@ -941,6 +955,9 @@
           </h2>
           <span class="badge-soft" id="lastLoadedInfo">Veri yükleniyor…</span>
         </div>
+
+        <!-- Sekme seçici -->
+        <div class="sheet-tabs no-print" id="sheetTabs"></div>
 
         <div class="table-toolbar">
           <div class="table-toolbar-left">
@@ -960,6 +977,14 @@
               <span class="icon">💾</span>
               Bu listeyi hafızaya kaydet
             </button>
+            <button class="btn btn-subtle btn-sm no-print" id="downloadTxtBtn" type="button">
+              <span class="icon">📥</span>
+              TXT olarak indir
+            </button>
+            <button class="btn btn-subtle btn-sm no-print" id="uploadTxtBtn" type="button">
+              <span class="icon">📤</span>
+              TXT yükle & karşılaştır
+            </button>
             <button class="btn btn-ghost btn-sm no-print" id="printBtn" type="button">
               <span class="icon">🖨️</span>
               Yazdır
@@ -967,15 +992,15 @@
           </div>
         </div>
 
+        <input type="file" id="uploadTxtInput" accept=".txt,.json" style="display:none;" />
+
         <div class="print-options no-print">
           <div><strong>Yazdırma seçenekleri</strong> 🖨️</div>
           <div class="print-hint">
-            Yazdır'a bastığında sadece seçili kolonlar görünür. Tüm filtreler geçerli
-            olur. Liste modern siyah/beyaz/grimsi tablolar halinde çıkar.
+            Yazdır'a bastığında sadece seçili kolonlar görünür. Tüm filtreler geçerlidir.
+            Çıktı siyah / beyaz / gri tonlarında modern tablolar şeklindedir.
           </div>
-          <div class="cols" id="printColsContainer">
-            <!-- JS ile doldurulacak -->
-          </div>
+          <div class="cols" id="printColsContainer"></div>
         </div>
 
         <div class="table-container">
@@ -1006,18 +1031,20 @@
     // =======================
     // K O N F İ G Ü R A S Y O N
     // =======================
-const SHEET_ID   = "16BD_BrNLYBaXviCzB8yDKBGS2Vdj5DHi"; // senin dosya ID’n
-const SHEET_NAME = "2025-2026"; // sekmenin adı (alt taraftaki isim)
+    const SHEET_ID = "16BD_BrNLYBaXviCzB8yDKBGS2Vdj5DHi";
 
-// JS içinde dinamik olarak CSV adresini üretelim:
-const SHEET_CSV_URL =
-  "https://docs.google.com/spreadsheets/d/" +
-  SHEET_ID +
-  "/gviz/tq?tqx=out:csv&sheet=" +
-  encodeURIComponent(SHEET_NAME);
-    const STORAGE_KEY = "ogrenci_listesi_snapshot_v1";
+    // Buradaki name alanları sekme adlarıdır (alt tarafta yazan isimler).
+    // İstersen buraya başka sekmeleri de ekleyebilirsin.
+    const SHEET_TABS = [
+      { name: "2025-2026", label: "2025-2026" }
+      // { name: "2024-2025", label: "2024-2025" },
+      // { name: "2023-2024", label: "2023-2024" }
+    ];
 
-    // Kolon tanımları (anahtarlar, etiketler)
+    let currentSheetName = SHEET_TABS[0].name;
+
+    const STORAGE_KEY_BASE = "ogrenci_listesi_snapshot_v2_";
+
     const COLUMNS = [
       { key: "status", label: "Durum" },
       { key: "isim", label: "İsim" },
@@ -1034,12 +1061,26 @@ const SHEET_CSV_URL =
     ];
 
     let students = [];
-    let snapshot = null;
+    let snapshot = null; // önceki liste
+    let snapshotSource = "none"; // "none" | "local" | "file"
     let activeViewMode = "all"; // "all" | "new-updated"
 
     // =======================
-    //   A R A Ç  F O N K S.
+    // A R A Ç  F O N K S.
     // =======================
+
+    function getSheetCsvUrl(sheetName) {
+      return (
+        "https://docs.google.com/spreadsheets/d/" +
+        SHEET_ID +
+        "/gviz/tq?tqx=out:csv&sheet=" +
+        encodeURIComponent(sheetName)
+      );
+    }
+
+    function getStorageKey() {
+      return STORAGE_KEY_BASE + (currentSheetName || "default");
+    }
 
     function showToast(message) {
       const toast = document.getElementById("toast");
@@ -1052,7 +1093,6 @@ const SHEET_CSV_URL =
     }
 
     function parseCSV(text) {
-      // Basit ama tırnak destekli CSV ayrıştırıcı
       const rows = [];
       let currentRow = [];
       let current = "";
@@ -1098,14 +1138,6 @@ const SHEET_CSV_URL =
       return new Date(y, a - 1, g);
     }
 
-    function formatDateForInput(d) {
-      if (!d) return "";
-      const year = d.getFullYear();
-      const month = String(d.getMonth() + 1).padStart(2, "0");
-      const day = String(d.getDate()).padStart(2, "0");
-      return `${year}-${month}-${day}`;
-    }
-
     function formatDateTimeForBadge(isoString) {
       if (!isoString) return "–";
       const d = new Date(isoString);
@@ -1123,7 +1155,6 @@ const SHEET_CSV_URL =
     }
 
     function createStudentId(row) {
-      // Birden fazla kritere bak: Okul No + İsim + Soyisim
       const num = (row.okulNo || "").trim();
       const name = (row.isim || "").trim().toUpperCase();
       const surname = (row.soyisim || "").trim().toUpperCase();
@@ -1136,36 +1167,14 @@ const SHEET_CSV_URL =
     }
 
     // =======================
-    //   L O C A L S T O R A G E
+    //   S N A P S H O T  Y A P I S I
     // =======================
 
-    function loadSnapshot() {
-      try {
-        const raw = localStorage.getItem(STORAGE_KEY);
-        if (!raw) {
-          snapshot = null;
-          document.getElementById("lastSavedInfo").textContent =
-            "Son kaydedilen liste: Henüz yok";
-          return;
-        }
-        snapshot = JSON.parse(raw);
-        document.getElementById(
-          "lastSavedInfo"
-        ).textContent = `Son kaydedilen liste: ${formatDateTimeForBadge(
-          snapshot.savedAt
-        )} (${Object.keys(snapshot.records || {}).length} öğrenci)`;
-      } catch (e) {
-        console.error("Snapshot yüklenemedi", e);
-        snapshot = null;
-      }
-    }
-
-    function saveSnapshot(currentStudents) {
+    function buildSnapshotObject(currentStudents) {
       const records = {};
       currentStudents.forEach((s) => {
-        const id = s.id;
-        records[id] = {
-          id,
+        records[s.id] = {
+          id: s.id,
           data: {
             isim: s.isim,
             soyisim: s.soyisim,
@@ -1181,24 +1190,82 @@ const SHEET_CSV_URL =
           }
         };
       });
-
-      const payload = {
+      return {
         savedAt: new Date().toISOString(),
+        sheetName: currentSheetName,
         records
       };
+    }
+
+    function updateSnapshotLabels() {
+      const lastSavedInfo = document.getElementById("lastSavedInfo");
+      const compareLabel = document.getElementById("compareSourceLabel");
+
+      if (!snapshot) {
+        lastSavedInfo.textContent = "Son kaydedilen liste: Henüz yok";
+        compareLabel.textContent = "Karşılaştırma kaynağı: Yok";
+        return;
+      }
+
+      const count = Object.keys(snapshot.records || {}).length;
+      lastSavedInfo.textContent =
+        "Son kaydedilen liste: " +
+        formatDateTimeForBadge(snapshot.savedAt) +
+        ` (${count} öğrenci, sekme: ${snapshot.sheetName || "-"})`;
+
+      if (snapshotSource === "local") {
+        compareLabel.textContent = "Karşılaştırma kaynağı: Tarayıcı hafızası (localStorage)";
+      } else if (snapshotSource === "file") {
+        compareLabel.textContent = "Karşılaştırma kaynağı: Yüklenen TXT dosyası";
+      } else {
+        compareLabel.textContent = "Karşılaştırma kaynağı: Yok";
+      }
+    }
+
+    function loadSnapshot() {
       try {
-        localStorage.setItem(STORAGE_KEY, JSON.stringify(payload));
-        snapshot = payload;
-        document.getElementById(
-          "lastSavedInfo"
-        ).textContent = `Son kaydedilen liste: ${formatDateTimeForBadge(
-          snapshot.savedAt
-        )} (${Object.keys(snapshot.records || {}).length} öğrenci)`;
-        showToast("Bu liste yerel hafızaya kaydedildi.");
+        const raw = localStorage.getItem(getStorageKey());
+        if (!raw) {
+          snapshot = null;
+          snapshotSource = "none";
+          updateSnapshotLabels();
+          return;
+        }
+        snapshot = JSON.parse(raw);
+        snapshotSource = "local";
+        updateSnapshotLabels();
+      } catch (e) {
+        console.error("Snapshot yüklenemedi", e);
+        snapshot = null;
+        snapshotSource = "none";
+        updateSnapshotLabels();
+      }
+    }
+
+    function saveSnapshot(currentStudents) {
+      const snap = buildSnapshotObject(currentStudents);
+      try {
+        localStorage.setItem(getStorageKey(), JSON.stringify(snap));
+        snapshot = snap;
+        snapshotSource = "local";
+        updateSnapshotLabels();
+        showToast("Bu sekmenin listesi tarayıcı hafızasına kaydedildi.");
       } catch (e) {
         console.error("Snapshot kaydedilemedi", e);
         showToast("Liste kaydedilirken bir hata oluştu.");
       }
+    }
+
+    function applySnapshotFromFile(obj) {
+      if (!obj || !obj.records) {
+        showToast("TXT içeriği beklenen formatta değil.");
+        return;
+      }
+      snapshot = obj;
+      snapshotSource = "file";
+      updateSnapshotLabels();
+      showToast("TXT dosyası yüklendi, karşılaştırma bu dosyaya göre yapılıyor.");
+      loadData(); // yeniden oku ve bu snapshot ile karşılaştır
     }
 
     // =======================
@@ -1208,16 +1275,24 @@ const SHEET_CSV_URL =
     async function loadData() {
       const body = document.getElementById("tableBody");
       body.innerHTML =
-        '<tr class="loading-row"><td>Google E-Tablo&nbsp;→ CSV verisi okunuyor…</td></tr>';
+        '<tr class="loading-row"><td>Google E-Tablo → CSV verisi okunuyor…</td></tr>';
       document.getElementById("lastLoadedInfo").textContent =
         "Veri yükleniyor…";
 
       try {
-        const res = await fetch(SHEET_CSV_URL);
+        const url = getSheetCsvUrl(currentSheetName);
+        const res = await fetch(url);
         if (!res.ok) throw new Error("Ağ hatası: " + res.status);
         const text = await res.text();
-        const rows = parseCSV(text);
 
+        // Eğer CSV yerine HTML hata sayfası geldiyse uyar
+        if (text.startsWith("<")) {
+          throw new Error(
+            "Erişim izni veya link ayarları nedeniyle CSV alınamadı (HTML döndü)."
+          );
+        }
+
+        const rows = parseCSV(text);
         if (!rows.length) {
           body.innerHTML =
             '<tr class="loading-row"><td>CSV içeriği boş görünüyor.</td></tr>';
@@ -1259,17 +1334,15 @@ const SHEET_CSV_URL =
           };
           s.id = createStudentId(s);
           s.dateObj = parseDateTR(s.tarih);
-          s.status = "normal"; // new | updated | normal
+          s.status = "normal";
           return s;
         });
 
-        // Snapshot ile karşılaştır
         let removed = [];
         if (snapshot && snapshot.records) {
           const prevMap = snapshot.records;
           const currentIds = new Set(parsed.map((s) => s.id));
 
-          // Yeni / güncellenen
           parsed.forEach((s) => {
             const prev = prevMap[s.id];
             if (!prev) {
@@ -1295,7 +1368,6 @@ const SHEET_CSV_URL =
             }
           });
 
-          // Silinenler
           for (const prevId in prevMap) {
             if (!currentIds.has(prevId)) {
               removed.push(prevMap[prevId]);
@@ -1304,13 +1376,12 @@ const SHEET_CSV_URL =
         }
 
         students = parsed;
-        // Varsayılan sıralama: tarih (desc) + yıl (desc) + okulNo (desc)
+
+        // "Son eklenenler" için: tarih DESC, yıl DESC, okul no DESC
         students.sort((a, b) => {
           const da = a.dateObj;
           const db = b.dateObj;
-          if (da && db && da.getTime() !== db.getTime()) {
-            return db - da;
-          }
+          if (da && db && da.getTime() !== db.getTime()) return db - da;
           const ya = parseInt(a.yil || "0", 10);
           const yb = parseInt(b.yil || "0", 10);
           if (ya !== yb) return yb - ya;
@@ -1326,9 +1397,9 @@ const SHEET_CSV_URL =
 
         document.getElementById(
           "lastLoadedInfo"
-        ).textContent = `Son yükleme: ${formatDateTimeForBadge(
+        ).textContent = `Sekme: ${currentSheetName} | Son yükleme: ${formatDateTimeForBadge(
           new Date().toISOString()
-        )} | Kaynak: Google E-Tablo CSV`;
+        )}`;
       } catch (err) {
         console.error(err);
         body.innerHTML =
@@ -1341,8 +1412,28 @@ const SHEET_CSV_URL =
     }
 
     // =======================
-    //   A R A Y Ü Z  G Ü N C E L L E
+    //   A R A Y Ü Z
     // =======================
+
+    function renderSheetTabs() {
+      const container = document.getElementById("sheetTabs");
+      container.innerHTML = "";
+      SHEET_TABS.forEach((tab) => {
+        const btn = document.createElement("button");
+        btn.type = "button";
+        btn.className = "sheet-tab";
+        if (tab.name === currentSheetName) btn.classList.add("active");
+        btn.innerHTML = `<span class="icon">📑</span><span>${tab.label}</span>`;
+        btn.addEventListener("click", () => {
+          if (currentSheetName === tab.name) return;
+          currentSheetName = tab.name;
+          loadSnapshot(); // o sekmeye ait localStorage
+          renderSheetTabs();
+          loadData();
+        });
+        container.appendChild(btn);
+      });
+    }
 
     function renderHeader() {
       const headerRow = document.getElementById("tableHeaderRow");
@@ -1355,7 +1446,6 @@ const SHEET_CSV_URL =
         headerRow.appendChild(th);
       });
 
-      // Print kolon kutuları
       const printContainer = document.getElementById("printColsContainer");
       printContainer.innerHTML = "";
       COLUMNS.forEach((col) => {
@@ -1446,12 +1536,8 @@ const SHEET_CSV_URL =
 
       let fromDate = null;
       let toDate = null;
-      if (dateFromVal) {
-        fromDate = new Date(dateFromVal + "T00:00:00");
-      }
-      if (dateToVal) {
-        toDate = new Date(dateToVal + "T23:59:59");
-      }
+      if (dateFromVal) fromDate = new Date(dateFromVal + "T00:00:00");
+      if (dateToVal) toDate = new Date(dateToVal + "T23:59:59");
 
       let filtered = students.slice();
 
@@ -1496,18 +1582,14 @@ const SHEET_CSV_URL =
             .toLowerCase();
           if (!combined.includes(searchText)) return false;
         }
-
         return true;
       });
 
-      // "Son eklenen" vurgusu için: filtre sonrası en üstte zaten tarih + numaraya göre sıralı.
       if (recentOnly && filtered.length > 30) {
         filtered = filtered.slice(0, 30);
       }
 
       renderTable(filtered);
-
-      // Özet tekrar gösterilsin (silinenler dahil)
       updateSummary(removedRecords);
     }
 
@@ -1567,16 +1649,16 @@ const SHEET_CSV_URL =
             }
           }
 
-          body.appendChild(tr).appendChild(td);
+          tr.appendChild(td);
         });
+
+        body.appendChild(tr);
       });
 
-      // Yazdırma için görünmez yapılmış kolonları uygula
       syncPrintColumnVisibility();
     }
 
     function syncPrintColumnVisibility() {
-      const headerRow = document.getElementById("tableHeaderRow");
       const rows = document.querySelectorAll("#studentsTable tr");
       const checkboxes = document.querySelectorAll(
         "#printColsContainer input[type='checkbox']"
@@ -1631,19 +1713,17 @@ const SHEET_CSV_URL =
         .getElementById("recentOnly")
         .addEventListener("change", () => applyFilters());
 
-      document
-        .getElementById("clearFiltersBtn")
-        .addEventListener("click", () => {
-          document.getElementById("searchInput").value = "";
-          document.getElementById("classFilter").value = "";
-          document.getElementById("genderFilter").value = "";
-          document.getElementById("scholarFilter").value = "";
-          document.getElementById("statusFilter").value = "";
-          document.getElementById("dateFrom").value = "";
-          document.getElementById("dateTo").value = "";
-          document.getElementById("recentOnly").checked = false;
-          applyFilters();
-        });
+      document.getElementById("clearFiltersBtn").addEventListener("click", () => {
+        document.getElementById("searchInput").value = "";
+        document.getElementById("classFilter").value = "";
+        document.getElementById("genderFilter").value = "";
+        document.getElementById("scholarFilter").value = "";
+        document.getElementById("statusFilter").value = "";
+        document.getElementById("dateFrom").value = "";
+        document.getElementById("dateTo").value = "";
+        document.getElementById("recentOnly").checked = false;
+        applyFilters();
+      });
 
       document.getElementById("reloadBtn").addEventListener("click", () => {
         loadData();
@@ -1664,25 +1744,25 @@ const SHEET_CSV_URL =
           syncPrintColumnVisibility();
         });
 
-      document.getElementById("viewAllBtn").addEventListener("click", (e) => {
+      document.getElementById("viewAllBtn").addEventListener("click", () => {
         activeViewMode = "all";
         document.getElementById("viewAllBtn").classList.add("active");
-        document
-          .getElementById("viewNewUpdatedBtn")
-          .classList.remove("active");
+        document.getElementById("viewNewUpdatedBtn").classList.remove("active");
         applyFilters();
       });
 
       document
         .getElementById("viewNewUpdatedBtn")
-        .addEventListener("click", (e) => {
+        .addEventListener("click", () => {
           activeViewMode = "new-updated";
-          document.getElementById("viewNewUpdatedBtn").classList.add("active");
+          document
+            .getElementById("viewNewUpdatedBtn")
+            .classList.add("active");
           document.getElementById("viewAllBtn").classList.remove("active");
           applyFilters();
         });
 
-      // Çift tıklama ile hücreyi kopyalama
+      // Çift tıklama ile hücre kopyalama
       document
         .getElementById("tableBody")
         .addEventListener("dblclick", async (e) => {
@@ -1707,12 +1787,57 @@ const SHEET_CSV_URL =
             showToast("Kopyalama sırasında bir hata oluştu.");
           }
         });
+
+      // TXT İNDİR
+      document.getElementById("downloadTxtBtn").addEventListener("click", () => {
+        if (!students.length) {
+          showToast("İndirilecek liste bulunamadı.");
+          return;
+        }
+        const snap = buildSnapshotObject(students);
+        const blob = new Blob([JSON.stringify(snap, null, 2)], {
+          type: "text/plain;charset=utf-8"
+        });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement("a");
+        a.href = url;
+        const safeName = (currentSheetName || "liste").replace(/[^0-9A-Za-z_-]/g, "_");
+        a.download = `ogrenci_listesi_${safeName}.txt`;
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+        URL.revokeObjectURL(url);
+        showToast("TXT dosyası indirildi.");
+      });
+
+      // TXT YÜKLE
+      const uploadInput = document.getElementById("uploadTxtInput");
+      document.getElementById("uploadTxtBtn").addEventListener("click", () => {
+        uploadInput.value = "";
+        uploadInput.click();
+      });
+      uploadInput.addEventListener("change", (e) => {
+        const file = e.target.files && e.target.files[0];
+        if (!file) return;
+        const reader = new FileReader();
+        reader.onload = () => {
+          try {
+            const obj = JSON.parse(reader.result);
+            applySnapshotFromFile(obj);
+          } catch (err) {
+            console.error(err);
+            showToast("TXT içeriği okunamadı (JSON parse hatası).");
+          }
+        };
+        reader.readAsText(file, "utf-8");
+      });
     }
 
     // =======================
-    //   B A Ş L A T
+    // B A Ş L A T
     // =======================
     document.addEventListener("DOMContentLoaded", () => {
+      renderSheetTabs();
       setupEventListeners();
       loadSnapshot();
       loadData();
@@ -1720,4 +1845,3 @@ const SHEET_CSV_URL =
   </script>
 </body>
 </html>
-
