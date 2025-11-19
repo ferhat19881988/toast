@@ -1006,9 +1006,15 @@
     // =======================
     // K O N F İ G Ü R A S Y O N
     // =======================
-    const SHEET_CSV_URL =
-      "https://docs.google.com/spreadsheets/d/16BD_BrNLYBaXviCzB8yDKBGS2Vdj5DHi/export?format=csv&gid=0";
+const SHEET_ID   = "16BD_BrNLYBaXviCzB8yDKBGS2Vdj5DHi"; // senin dosya ID’n
+const SHEET_NAME = "2025-2026"; // sekmenin adı (alt taraftaki isim)
 
+// JS içinde dinamik olarak CSV adresini üretelim:
+const SHEET_CSV_URL =
+  "https://docs.google.com/spreadsheets/d/" +
+  SHEET_ID +
+  "/gviz/tq?tqx=out:csv&sheet=" +
+  encodeURIComponent(SHEET_NAME);
     const STORAGE_KEY = "ogrenci_listesi_snapshot_v1";
 
     // Kolon tanımları (anahtarlar, etiketler)
@@ -1714,3 +1720,4 @@
   </script>
 </body>
 </html>
+
