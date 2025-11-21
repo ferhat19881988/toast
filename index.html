@@ -460,6 +460,37 @@
 
     .view-toggle button.active { background: #111827; color: #f9fafb; }
 
+    /* YENİ: Liste durum çubuğu */
+    .list-status-bar {
+      margin: 4px 0 10px;
+      padding: 6px 10px;
+      border-radius: 999px;
+      background: #f3f4f6;
+      border: 1px solid var(--border-soft);
+      font-size: 12px;
+      color: var(--text-soft);
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .list-status-bar .dot {
+      width: 8px;
+      height: 8px;
+      border-radius: 999px;
+      background: var(--success);
+    }
+
+    .list-status-bar strong {
+      color: var(--text-main);
+      font-weight: 600;
+    }
+
+    .list-status-bar .badge-soft {
+      font-size: 10px;
+    }
+
     .table-container {
       border-radius: 20px;
       background: #ffffff;
@@ -619,7 +650,8 @@
       .table-toolbar,
       .print-options .print-hint,
       .no-print,
-      .sheet-tabs { display: none !important; }
+      .sheet-tabs,
+      .list-status-bar { display: none !important; }
       .app-shell { max-width: none; margin: 0; }
       .panel { box-shadow: none; border-radius: 0; border: none; padding: 0; }
       .table-container { box-shadow: none; border-radius: 0; border: none; }
@@ -803,6 +835,12 @@
                 <span class="icon">🖨️</span>Yazdır
               </button>
             </div>
+          </div>
+
+          <!-- YENİ: Filtreye göre öğrenci sayısı durum çubuğu -->
+          <div class="list-status-bar no-print" id="listStatusBar">
+            <span class="dot"></span>
+            <span>Liste durumu yükleniyor…</span>
           </div>
 
           <input type="file" id="uploadTxtInput" accept=".txt,.json" style="display:none;" />
@@ -1094,6 +1132,7 @@
         if (!rows.length) {
           body.innerHTML =
             '<tr class="loading-row"><td>CSV içeriği boş görünüyor.</td></tr>';
+          updateListStatus([]); // boş liste
           return;
         }
 
@@ -1190,6 +1229,7 @@
           "</td></tr>";
         document.getElementById("lastLoadedInfo").textContent =
           "Veri yüklenirken hata oluştu.";
+        updateListStatus([]);
       }
     }
 
@@ -1305,6 +1345,40 @@
       });
     }
 
+    // YENİ: Filtrelenmiş liste için durum çubuğunu güncelle
+    function updateListStatus(filteredRows) {
+      const bar = document.getElementById("listStatusBar");
+      if (!bar) return;
+
+      const total = students.length;
+      const visible = filteredRows ? filteredRows.length : 0;
+
+      let newCountFiltered = 0;
+      let updatedCountFiltered = 0;
+      if (filteredRows && filteredRows.length) {
+        filteredRows.forEach(s => {
+          if (s.status === "new") newCountFiltered++;
+          else if (s.status === "updated") updatedCountFiltered++;
+        });
+      }
+
+      const recentOnly = document.getElementById("recentOnly").checked;
+
+      const parts = [];
+      parts.push(`<strong>${visible}</strong> öğrenci gösteriliyor`);
+      parts.push(`(toplam listede <strong>${total}</strong> öğrenci var)`);
+
+      if (newCountFiltered || updatedCountFiltered) {
+        parts.push(`— filtreye göre: yeni <strong>${newCountFiltered}</strong>, güncel <strong>${updatedCountFiltered}</strong>`);
+      }
+
+      if (recentOnly && visible >= 30) {
+        parts.push(`— <span class="badge-soft">"Yalnızca en yeni 30" aktif</span>`);
+      }
+
+      bar.innerHTML = `<span class="dot"></span><span>${parts.join(" ")}</span>`;
+    }
+
     function applyFilters(removedRecords = []) {
       const searchText = document.getElementById("searchInput").value.trim().toLowerCase();
       const genderVal = document.getElementById("genderFilter").value;
@@ -1379,6 +1453,7 @@
 
       renderTable(filtered);
       updateSummary(removedRecords);
+      updateListStatus(filtered);
     }
 
     function renderTable(rows) {
