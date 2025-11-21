@@ -353,14 +353,6 @@
 
     .change-lists summary::-webkit-details-marker { display: none; }
 
-    .change-lists summary .tag {
-      font-size: 10px;
-      padding: 2px 7px;
-      border-radius: 999px;
-      border: 1px solid var(--border-soft);
-      background: #ffffff;
-    }
-
     .change-lists ul {
       margin: 6px 0 0 0;
       padding-left: 14px;
@@ -460,7 +452,7 @@
 
     .view-toggle button.active { background: #111827; color: #f9fafb; }
 
-    /* YENİ: Liste durum çubuğu */
+    /* Liste durum çubuğu */
     .list-status-bar {
       margin: 4px 0 10px;
       padding: 6px 10px;
@@ -735,6 +727,16 @@
                 <input type="date" id="dateTo" />
               </div>
 
+              <!-- YENİ: Tarih sıralama -->
+              <div class="field-group">
+                <div class="field-label"><span>Tarih sıralama</span></div>
+                <select id="dateSortOrder">
+                  <option value="">Otomatik</option>
+                  <option value="desc">Yeniden → Eskiye</option>
+                  <option value="asc">Eskiden → Yeniye</option>
+                </select>
+              </div>
+
               <div class="field-group" style="grid-column:1/-1;">
                 <div class="field-label"><span>Sınıf (çoklu seçim)</span></div>
                 <div id="classFilterContainer" class="class-chips"></div>
@@ -837,7 +839,7 @@
             </div>
           </div>
 
-          <!-- YENİ: Filtreye göre öğrenci sayısı durum çubuğu -->
+          <!-- Filtreye göre öğrenci sayısı durum çubuğu -->
           <div class="list-status-bar no-print" id="listStatusBar">
             <span class="dot"></span>
             <span>Liste durumu yükleniyor…</span>
@@ -885,13 +887,8 @@
     const SHEET_ID = "16BD_BrNLYBaXviCzB8yDKBGS2Vdj5DHi";
 
     // Sadece burayı kendine göre düzenle:
-    // name  → Google Sheet içindeki sekme adı
-    // label → ekranda görünen ad
     const SHEET_TABS = [
       { name: "2025-2026", label: "2025-2026" }
-      // Örnek:
-      // { name: "2024-2025", label: "2024-2025" },
-      // { name: "2023-2024", label: "2023-2024" }
     ];
 
     let currentSheetName = SHEET_TABS[0].name;
@@ -1281,7 +1278,6 @@
     }
 
     function populateFilters() {
-      // Sınıf çoklu seçim için chip'ler
       const container = document.getElementById("classFilterContainer");
       const classes = Array.from(new Set(students.map(s => s.sinif).filter(Boolean))).sort();
       container.innerHTML = "";
@@ -1345,7 +1341,7 @@
       });
     }
 
-    // YENİ: Filtrelenmiş liste için durum çubuğunu güncelle
+    // Filtrelenmiş liste için durum çubuğunu güncelle
     function updateListStatus(filteredRows) {
       const bar = document.getElementById("listStatusBar");
       if (!bar) return;
@@ -1388,6 +1384,7 @@
       const dateFromVal = document.getElementById("dateFrom").value;
       const dateToVal = document.getElementById("dateTo").value;
       const selectedClasses = getSelectedClasses();
+      const dateSortOrder = document.getElementById("dateSortOrder").value; // YENİ
 
       let fromDate = null;
       let toDate = null;
@@ -1427,25 +1424,55 @@
         return true;
       });
 
-      // Sıralama: Yeni → Güncellenen → Normal, sonra tarih/yıl/okul no ile son eklenen üstte
+      // Sıralama
       const statusOrder = { new: 0, updated: 1, normal: 2 };
-      filtered.sort((a, b) => {
-        const sa = statusOrder[a.status] ?? 2;
-        const sb = statusOrder[b.status] ?? 2;
-        if (sa !== sb) return sa - sb;
 
-        const da = a.dateObj;
-        const db = b.dateObj;
-        if (da && db && da.getTime() !== db.getTime()) return db - da;
+      if (dateSortOrder === "desc" || dateSortOrder === "asc") {
+        // Tarihe göre sıralama (yeniden eskiye / eskiden yeniye)
+        filtered.sort((a, b) => {
+          const da = a.dateObj;
+          const db = b.dateObj;
 
-        const ya = parseInt(a.yil || "0", 10);
-        const yb = parseInt(b.yil || "0", 10);
-        if (ya !== yb) return yb - ya;
+          if (da && db && da.getTime() !== db.getTime()) {
+            return dateSortOrder === "desc" ? db - da : da - db;
+          } else if (da && !db) {
+            return -1;
+          } else if (!da && db) {
+            return 1;
+          }
 
-        const na = parseInt(a.okulNo || "0", 10);
-        const nb = parseInt(b.okulNo || "0", 10);
-        return nb - na;
-      });
+          const sa = statusOrder[a.status] ?? 2;
+          const sb = statusOrder[b.status] ?? 2;
+          if (sa !== sb) return sa - sb;
+
+          const ya = parseInt(a.yil || "0", 10);
+          const yb = parseInt(b.yil || "0", 10);
+          if (ya !== yb) return yb - ya;
+
+          const na = parseInt(a.okulNo || "0", 10);
+          const nb = parseInt(b.okulNo || "0", 10);
+          return nb - na;
+        });
+      } else {
+        // Eski davranış: Yeni → Güncellenen → Normal, sonra tarih/yıl/okul no
+        filtered.sort((a, b) => {
+          const sa = statusOrder[a.status] ?? 2;
+          const sb = statusOrder[b.status] ?? 2;
+          if (sa !== sb) return sa - sb;
+
+          const da = a.dateObj;
+          const db = b.dateObj;
+          if (da && db && da.getTime() !== db.getTime()) return db - da;
+
+          const ya = parseInt(a.yil || "0", 10);
+          const yb = parseInt(b.yil || "0", 10);
+          if (ya !== yb) return yb - ya;
+
+          const na = parseInt(a.okulNo || "0", 10);
+          const nb = parseInt(b.okulNo || "0", 10);
+          return nb - na;
+        });
+      }
 
       if (recentOnly && filtered.length > 30) {
         filtered = filtered.slice(0, 30);
@@ -1554,6 +1581,7 @@
       document.getElementById("dateFrom").addEventListener("change", () => applyFilters());
       document.getElementById("dateTo").addEventListener("change", () => applyFilters());
       document.getElementById("recentOnly").addEventListener("change", () => applyFilters());
+      document.getElementById("dateSortOrder").addEventListener("change", () => applyFilters()); // YENİ
 
       document.getElementById("classFilterContainer").addEventListener("change", () => applyFilters());
 
@@ -1565,6 +1593,7 @@
         document.getElementById("dateFrom").value = "";
         document.getElementById("dateTo").value = "";
         document.getElementById("recentOnly").checked = false;
+        document.getElementById("dateSortOrder").value = ""; // YENİ
         document.querySelectorAll("#classFilterContainer input[type='checkbox']").forEach(cb => cb.checked = false);
         applyFilters();
       });
