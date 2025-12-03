@@ -12,7 +12,7 @@
   <style>
     :root {
       /* Modern Renk Paleti */
-      --primary: #4f46e5;       /* Indigo 600 */
+      --primary: #4f46e5;        /* Indigo 600 */
       --primary-dark: #4338ca; /* Indigo 700 */
       --primary-light: #e0e7ff;/* Indigo 100 */
       
@@ -265,11 +265,17 @@
       font-weight: 500;
       cursor: pointer;
       border: none;
-      transition: all 0.2s;
+      transition: all 0.2s cubic-bezier(0.25, 0.8, 0.25, 1);
+    }
+
+    /* --- GÜNCELLEME 1: HOVER EFEKTLERİ --- */
+    .btn:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
     }
 
     .btn-primary { background: var(--primary); color: white; }
-    .btn-primary:hover { background: var(--primary-dark); box-shadow: 0 4px 12px rgba(79, 70, 229, 0.2); }
+    .btn-primary:hover { background: var(--primary-dark); box-shadow: 0 4px 12px rgba(79, 70, 229, 0.3); }
 
     .btn-secondary { background: white; border: 1px solid var(--border); color: var(--text-main); }
     .btn-secondary:hover { background: #f8fafc; border-color: #cbd5e1; }
@@ -341,8 +347,13 @@
       font-weight: 500;
       color: var(--text-muted);
       cursor: pointer;
+      transition: all 0.2s cubic-bezier(0.25, 0.8, 0.25, 1);
     }
-    .sheet-tab.active { background: white; color: var(--primary); box-shadow: var(--shadow-sm); }
+    .sheet-tab:hover {
+        transform: translateY(-2px);
+        background: #e2e8f0;
+    }
+    .sheet-tab.active { background: white; color: var(--primary); box-shadow: var(--shadow-sm); transform: none; }
 
     .view-toggles {
       display: flex;
@@ -359,6 +370,11 @@
       cursor: pointer;
       color: var(--text-muted);
       font-weight: 500;
+      transition: all 0.2s;
+    }
+    .view-toggles button:hover:not(.active) {
+        background: rgba(255,255,255,0.5);
+        color: var(--text-main);
     }
     .view-toggles button.active {
       background: white;
@@ -469,10 +485,19 @@
       background: #f8fafc;
     }
     .modal-title { font-size: 18px; font-weight: 700; color: var(--text-main); }
+    
+    /* MODAL KAPATMA BUTONU HOVER */
     .modal-close {
       background: none; border: none; font-size: 24px; cursor: pointer; color: var(--text-muted);
-      line-height: 1; padding: 0 4px;
+      line-height: 1; padding: 4px 8px; border-radius: 8px;
+      transition: all 0.2s ease;
     }
+    .modal-close:hover {
+        background-color: #fee2e2;
+        color: #991b1b;
+        transform: rotate(90deg);
+    }
+
     .modal-body { padding: 24px; max-height: 70vh; overflow-y: auto; }
     .detail-row { display: flex; justify-content: space-between; margin-bottom: 12px; font-size: 14px; border-bottom: 1px dashed #e2e8f0; padding-bottom: 4px; }
     .detail-label { color: var(--text-muted); font-weight: 500; }
@@ -957,17 +982,14 @@
     }
 
     function updateSnapshotLabels() {
-      const lastSavedInfo = document.getElementById("lastSavedInfo");
+      // Not: Artık "Son kayıt:..." metnini updateListStatus fonksiyonu yönetiyor.
+      // Sadece "Karşılaştırma" etiketini burada güncelliyoruz.
       const compareLabel = document.getElementById("compareSourceLabel");
 
       if (!snapshot) {
-        lastSavedInfo.textContent = "Son kaydedilen liste: Henüz yok";
         compareLabel.textContent = "Karşılaştırma: Yok";
         return;
       }
-
-      const count = Object.keys(snapshot.records || {}).length;
-      lastSavedInfo.textContent = "Son kayıt: " + formatDateTimeForBadge(snapshot.savedAt) + ` (${count} öğr.)`;
 
       if (snapshotSource === "firebase") {
         compareLabel.textContent = "Karşılaştırma: Firebase DB";
@@ -1121,7 +1143,7 @@
         updateSummary(removed);
         applyFilters(removed);
         document.getElementById("lastLoadedInfo").textContent = `${currentSheetName} | ${formatDateTimeForBadge(new Date().toISOString())}`;
-      
+        
       } catch (err) {
         console.error(err);
         body.innerHTML = `<tr class="loading-row"><td colspan="12" style="color:red">Hata: ${err.message}</td></tr>`;
@@ -1242,6 +1264,12 @@
       let msg = `Toplam <strong>${total}</strong> kayıt içinden <strong>${visible}</strong> tanesi görüntüleniyor.`;
       if (recentOnly && visible >= 30) msg += " (Son 30 kayıt filtresi aktif)";
       bar.innerHTML = msg;
+
+      // --- GÜNCELLEME 2: ALT BİLGİYİ GÜNCELLE ---
+      const bottomFooter = document.getElementById("lastSavedInfo");
+      if(bottomFooter) {
+         bottomFooter.textContent = `Şu an listede ${visible} sayıda öğrenci vardır.`;
+      }
     }
 
     function applyFilters(removedRecords = []) {
@@ -1258,7 +1286,7 @@
       let fromDate = null;
       let toDate = null;
       if (dateFromVal) fromDate = new Date(dateFromVal + "T00:00:00");
-      if (dateToVal)   toDate    = new Date(dateToVal    + "T23:59:59");
+      if (dateToVal)    toDate    = new Date(dateToVal    + "T23:59:59");
 
       let filtered = students.slice();
 
@@ -1348,11 +1376,11 @@
             }
             td.appendChild(span);
           } else {
-             if (col.key === "veliTelefon" && s[col.key]) {
-               td.innerHTML = `<span style="opacity:0.6">${s[col.key]}</span>`;
-             } else {
-               td.textContent = s[col.key] || "";
-             }
+              if (col.key === "veliTelefon" && s[col.key]) {
+                td.innerHTML = `<span style="opacity:0.6">${s[col.key]}</span>`;
+              } else {
+                td.textContent = s[col.key] || "";
+              }
           }
           tr.appendChild(td);
         });
@@ -1501,25 +1529,42 @@
       } else if (s.status === "updated") {
         statusHtml = `<span class="status-badge updated" style="font-size:14px; padding:6px 12px;">✏️ Bilgileri Güncellendi</span>`;
         
-        // Değişiklikleri bul
+        // --- GÜNCELLEME 3: AKILLI DEĞİŞİKLİK TARAMA ---
         if (snapshot && snapshot.records && snapshot.records[s.id]) {
             const oldData = snapshot.records[s.id].data;
             const changes = [];
+            // Tüm alanları kapsayan genişletilmiş harita
             const fields = {
-                isim: "İsim", soyisim: "Soyisim", sinif: "Sınıf", okulNo: "Okul No",
-                veliAdi: "Veli Adı", veliTelefon: "Veli Tel", burslu: "Burs Durumu"
+                isim: "İsim",
+                soyisim: "Soyisim",
+                sinif: "Sınıf",
+                okulNo: "Okul No",
+                cinsiyet: "Cinsiyet",
+                veliAdi: "Veli Adı",
+                veliSoyadi: "Veli Soyadı",
+                veliTelefon: "Veli Tel",
+                yil: "Yıl",
+                tarih: "Kayıt Tarihi",
+                burslu: "Burs Durumu"
             };
             
             for(let key in fields) {
-                if(s[key] !== oldData[key]) {
-                    changes.push(`<b>${fields[key]}:</b> "${oldData[key]}" ➞ "${s[key]}"`);
+                // Stringe çevirip trim yaparak karşılaştır (Hassas karşılaştırma)
+                const oldVal = String(oldData[key] || "").trim();
+                const newVal = String(s[key] || "").trim();
+                
+                if(oldVal !== newVal) {
+                    changes.push(`<b>${fields[key]}:</b> <br/> <span style="color:#b91c1c; text-decoration:line-through; font-size:12px;">${oldVal || '(Boş)'}</span> <span style="margin:0 4px">➞</span> <span style="color:#15803d; font-weight:600;">${newVal}</span>`);
                 }
             }
             if(changes.length > 0) {
                 diffHtml = `<div class="change-log-box">
-                    <div style="font-weight:700; margin-bottom:4px;">Değişiklikler:</div>
-                    <ul style="margin:0; padding-left:20px;">${changes.map(c => `<li>${c}</li>`).join('')}</ul>
+                    <div style="font-weight:700; margin-bottom:8px;">Tespit Edilen Değişiklikler:</div>
+                    <ul style="margin:0; padding-left:20px; display:flex; flex-direction:column; gap:6px;">${changes.map(c => `<li>${c}</li>`).join('')}</ul>
                 </div>`;
+            } else {
+                // Veri farklı görünse de trim yapınca aynı olabilir
+                diffHtml = `<div class="change-log-box">Görünürde değişiklik algılandı ancak biçimsel olabilir.</div>`;
             }
         }
       } else {
