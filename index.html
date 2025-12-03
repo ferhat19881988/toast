@@ -4,927 +4,711 @@
   <meta charset="UTF-8" />
   <title>Öğrenci Listesi Yöneticisi</title>
   <meta name="viewport" content="width=device-width, initial-scale=1" />
+  
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+
   <style>
     :root {
-      --bg: #f3f4f6;
-      --bg-alt: #ffffff;
-      --border: #d1d5db;
-      --border-soft: #e5e7eb;
-      --text-main: #111827;
-      --text-soft: #4b5563;
-      --accent: #1f2937;
-      --danger: #b91c1c;
-      --success: #047857;
-      --warning: #b45309;
-      --shadow-soft: 0 18px 45px rgba(15, 23, 42, 0.1);
-      --shadow-subtle: 0 6px 20px rgba(15, 23, 42, 0.06);
+      /* Modern Renk Paleti */
+      --primary: #4f46e5;      /* Indigo 600 */
+      --primary-dark: #4338ca; /* Indigo 700 */
+      --primary-light: #e0e7ff;/* Indigo 100 */
+      
+      --bg-body: #f1f5f9;      /* Slate 100 */
+      --bg-card: #ffffff;
+      
+      --text-main: #0f172a;    /* Slate 900 */
+      --text-muted: #64748b;   /* Slate 500 */
+      
+      --border: #e2e8f0;       /* Slate 200 */
+      
+      /* Durum Renkleri */
+      --success-bg: #dcfce7;
+      --success-text: #166534;
+      --warning-bg: #fef9c3;
+      --warning-text: #854d0e;
+      --danger-bg: #fee2e2;
+      --danger-text: #991b1b;
+
+      /* Gölgeler */
+      --shadow-sm: 0 1px 2px 0 rgb(0 0 0 / 0.05);
+      --shadow-md: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
+      --shadow-lg: 0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1);
     }
 
     * { box-sizing: border-box; }
 
     body {
       margin: 0;
-      padding: 24px;
-      font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
-      background: radial-gradient(circle at top left, #f9fafb, #e5e7eb);
+      padding: 0;
+      font-family: 'Inter', sans-serif;
+      background-color: var(--bg-body);
       color: var(--text-main);
+      -webkit-font-smoothing: antialiased;
+      line-height: 1.5;
     }
 
-    body, html { height: 100%; width: 100%; }
-
+    /* Layout & Shell */
     .app-shell {
-      max-width: 1500px;
+      max-width: 1600px;
       margin: 0 auto;
+      padding: 24px;
       display: flex;
       flex-direction: column;
-      gap: 20px;
+      gap: 24px;
     }
 
+    /* Header */
     header.app-header {
-      background: rgba(17, 24, 39, 0.96);
-      color: #f9fafb;
-      border-radius: 26px;
-      padding: 22px 26px;
+      background: var(--bg-card);
+      border-radius: 16px;
+      padding: 24px 32px;
       display: flex;
       flex-wrap: wrap;
       align-items: center;
       justify-content: space-between;
-      gap: 18px;
-      box-shadow: var(--shadow-soft);
-    }
-
-    .app-title-block {
-      display: flex;
-      flex-direction: column;
-      gap: 4px;
+      gap: 20px;
+      box-shadow: var(--shadow-sm);
+      border: 1px solid var(--border);
     }
 
     .app-title-block h1 {
       margin: 0;
-      font-size: 26px;
-      letter-spacing: 0.03em;
+      font-size: 28px;
+      font-weight: 700;
+      color: var(--text-main);
       display: flex;
       align-items: center;
-      gap: 8px;
+      gap: 12px;
     }
 
-    .app-title-block h1 span.icon { font-size: 24px; }
+    .app-title-block h1 span.icon { 
+      background: var(--primary-light);
+      color: var(--primary);
+      width: 48px;
+      height: 48px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      border-radius: 12px;
+      font-size: 24px;
+    }
 
     .app-title-block p {
-      margin: 0;
-      font-size: 13px;
-      color: #d1d5db;
+      margin: 4px 0 0 0;
+      font-size: 14px;
+      color: var(--text-muted);
     }
 
     .header-meta {
       display: flex;
-      flex-wrap: wrap;
-      gap: 10px;
-      font-size: 12px;
-      color: #d1d5db;
-      align-items: center;
-      justify-content: flex-end;
+      gap: 12px;
     }
 
     .chip {
-      border-radius: 999px;
-      padding: 6px 12px;
-      border: 1px solid rgba(209, 213, 219, 0.4);
-      display: inline-flex;
-      align-items: center;
-      gap: 6px;
-      background: rgba(15, 23, 42, 0.82);
-    }
-
-    .chip strong { color: #f9fafb; }
-    .chip span.icon { font-size: 14px; }
-
-    main.layout-main { display: flex; flex-direction: column; gap: 18px; }
-
-    .panel {
-      background: var(--bg-alt);
-      border-radius: 22px;
-      padding: 18px;
-      box-shadow: var(--shadow-subtle);
-      border: 1px solid var(--border-soft);
-    }
-
-    .panel-title-row {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      gap: 10px;
-      margin-bottom: 10px;
-    }
-
-    .panel-title-row h2 {
-      margin: 0;
-      font-size: 18px;
+      background: var(--bg-body);
+      border: 1px solid var(--border);
+      padding: 8px 16px;
+      border-radius: 99px;
+      font-size: 13px;
+      font-weight: 500;
+      color: var(--text-muted);
       display: flex;
       align-items: center;
       gap: 8px;
     }
 
-    .panel-title-row h2 span.icon { font-size: 18px; }
-
-    .top-layout {
+    /* Main Grid */
+    .dashboard-grid {
       display: grid;
-      grid-template-columns: minmax(0, 2.2fr) minmax(0, 1.5fr);
-      gap: 16px;
-      align-items: flex-start;
+      grid-template-columns: 350px 1fr;
+      gap: 24px;
+      align-items: start;
     }
 
-    @media (max-width: 980px) {
-      .top-layout { grid-template-columns: 1fr; }
+    @media (max-width: 1200px) {
+      .dashboard-grid { grid-template-columns: 1fr; }
     }
 
-    .filters-grid {
+    /* Panels */
+    .panel {
+      background: var(--bg-card);
+      border-radius: 16px;
+      padding: 24px;
+      box-shadow: var(--shadow-md);
+      border: 1px solid var(--border);
+      height: 100%;
+    }
+
+    .panel-title {
+      font-size: 18px;
+      font-weight: 600;
+      margin-bottom: 20px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    /* Stats Cards (Big & Bold) */
+    .stats-container {
       display: grid;
-      grid-template-columns: repeat(3, minmax(0, 1fr));
-      gap: 10px 12px;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 12px;
+      margin-bottom: 20px;
     }
 
-    @media (max-width: 900px) {
-      .filters-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
-    }
-
-    @media (max-width: 600px) {
-      .filters-grid { grid-template-columns: 1fr; }
-    }
-
-    .field-group {
+    .stat-card {
+      background: var(--bg-body);
+      border-radius: 12px;
+      padding: 16px;
       display: flex;
       flex-direction: column;
-      gap: 4px;
-      font-size: 12px;
+      border: 1px solid transparent;
+      transition: all 0.2s;
     }
 
+    .stat-card:hover { transform: translateY(-2px); }
+
+    .stat-card.total { background: #f8fafc; border-color: #cbd5e1; grid-column: 1 / -1; }
+    .stat-card.new { background: var(--success-bg); color: var(--success-text); }
+    .stat-card.updated { background: var(--warning-bg); color: var(--warning-text); }
+    .stat-card.removed { background: var(--danger-bg); color: var(--danger-text); }
+
+    .stat-label { font-size: 13px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px; opacity: 0.8; }
+    .stat-value { font-size: 32px; font-weight: 700; margin: 4px 0; line-height: 1; }
+    .stat-desc { font-size: 12px; opacity: 0.7; }
+
+    /* Filter Inputs */
+    .filters-stack {
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+    }
+
+    .field-group { display: flex; flex-direction: column; gap: 6px; }
+    
     .field-label {
+      font-size: 13px;
       font-weight: 500;
-      color: var(--text-soft);
+      color: var(--text-main);
       display: flex;
       justify-content: space-between;
-      align-items: center;
-    }
-
-    .field-label span.badge {
-      font-size: 10px;
-      padding: 2px 6px;
-      border-radius: 999px;
-      border: 1px solid var(--border);
-      color: var(--text-soft);
     }
 
     input[type="text"],
     input[type="date"],
     select {
-      border-radius: 12px;
+      width: 100%;
+      padding: 10px 14px;
+      border-radius: 8px;
       border: 1px solid var(--border);
-      padding: 7px 10px;
-      font-size: 13px;
-      background: #f9fafb;
-      color: var(--text-main);
-      min-height: 34px;
+      font-size: 14px;
+      font-family: inherit;
+      background: #fff;
+      transition: all 0.2s;
+    }
+
+    input:focus, select:focus {
       outline: none;
-      transition: border-color 0.15s ease, box-shadow 0.15s ease, background-color 0.15s ease;
+      border-color: var(--primary);
+      box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.1);
     }
 
-    input[type="text"]:focus,
-    input[type="date"]:focus,
-    select:focus {
-      border-color: var(--accent);
-      box-shadow: 0 0 0 1px rgba(15, 23, 42, 0.18);
-      background-color: #ffffff;
-    }
-
-    .checkbox-row {
-      display: flex;
-      align-items: center;
-      gap: 8px;
-      font-size: 12px;
-      color: var(--text-soft);
-    }
-
-    .checkbox-row input[type="checkbox"] {
-      width: 15px;
-      height: 15px;
-      border-radius: 4px;
-      border: 1px solid var(--border);
-      cursor: pointer;
-    }
-
+    /* Class Chips */
     .class-chips {
       display: flex;
       flex-wrap: wrap;
-      gap: 6px;
-      margin-top: 2px;
+      gap: 8px;
+      padding: 4px 0;
     }
 
     .class-chips label {
-      font-size: 11px;
-      border-radius: 999px;
-      padding: 4px 9px;
-      border: 1px solid var(--border-soft);
-      background: #f9fafb;
+      cursor: pointer;
+      user-select: none;
+    }
+    
+    .class-chips input[type="checkbox"] { display: none; }
+    
+    .class-chips span {
+      display: inline-block;
+      padding: 6px 12px;
+      background: var(--bg-body);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      font-size: 13px;
+      color: var(--text-muted);
+      transition: all 0.2s;
+    }
+
+    .class-chips input:checked + span {
+      background: var(--primary);
+      color: white;
+      border-color: var(--primary);
+      font-weight: 500;
+      box-shadow: 0 2px 4px rgba(79, 70, 229, 0.3);
+    }
+
+    /* Buttons */
+    .btn {
       display: inline-flex;
       align-items: center;
-      gap: 4px;
-      cursor: pointer;
-    }
-
-    .class-chips input[type="checkbox"] {
-      width: 12px;
-      height: 12px;
-    }
-
-    .controls-row {
-      margin-top: 10px;
-      display: flex;
-      flex-wrap: wrap;
-      gap: 10px;
-    }
-
-    button.btn {
-      border-radius: 999px;
-      border: 1px solid transparent;
-      padding: 9px 16px;
-      font-size: 13px;
+      justify-content: center;
+      gap: 8px;
+      padding: 10px 20px;
+      border-radius: 8px;
+      font-size: 14px;
       font-weight: 500;
       cursor: pointer;
-      display: inline-flex;
-      align-items: center;
-      gap: 8px;
-      background: #111827;
-      color: #f9fafb;
-      min-height: 36px;
-      transition: transform 0.12s ease, box-shadow 0.12s ease, background-color 0.12s, border-color 0.12s;
+      border: none;
+      transition: all 0.2s;
     }
 
-    button.btn span.icon { font-size: 14px; }
+    .btn-primary { background: var(--primary); color: white; }
+    .btn-primary:hover { background: var(--primary-dark); box-shadow: 0 4px 12px rgba(79, 70, 229, 0.2); }
 
-    button.btn:hover {
-      transform: translateY(-1px);
-      box-shadow: 0 10px 25px rgba(15, 23, 42, 0.38);
-      background: #030712;
-    }
+    .btn-secondary { background: white; border: 1px solid var(--border); color: var(--text-main); }
+    .btn-secondary:hover { background: #f8fafc; border-color: #cbd5e1; }
 
-    button.btn-subtle {
-      background: #f3f4f6;
-      color: var(--text-soft);
-      border-color: var(--border-soft);
-    }
+    .btn-sm { padding: 6px 12px; font-size: 13px; }
 
-    button.btn-subtle:hover {
-      background: #e5e7eb;
-      color: var(--text-main);
-    }
-
-    button.btn-ghost {
-      background: #ffffff;
-      color: #111827;
-      border-color: var(--border-soft);
-    }
-
-    button.btn-ghost:hover {
-      background: #111827;
-      color: #f9fafb;
-    }
-
-    button.btn-sm { padding: 7px 12px; font-size: 12px; min-height: 30px; }
-
-    button.btn:disabled {
-      opacity: 0.5;
-      cursor: default;
-      transform: none;
-      box-shadow: none;
-    }
-
-    .summary-grid {
-      display: grid;
-      grid-template-columns: repeat(2, minmax(0, 1fr));
-      gap: 8px;
-    }
-
-    .summary-card {
-      border-radius: 16px;
-      padding: 8px 10px;
-      background: #f9fafb;
-      border: 1px solid var(--border-soft);
-      display: flex;
-      flex-direction: column;
-      gap: 3px;
-      font-size: 11px;
-    }
-
-    .summary-title {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-    }
-
-    .summary-title span.icon { font-size: 14px; }
-
-    .summary-value { font-size: 18px; font-weight: 600; }
-
-    .summary-meta { font-size: 10px; color: var(--text-soft); }
-
-    .summary-card.new { border-color: rgba(4, 120, 87, 0.7); }
-    .summary-card.updated { border-color: rgba(180, 83, 9, 0.8); }
-    .summary-card.removed { border-color: rgba(185, 28, 28, 0.8); }
-    .summary-card.total { border-color: rgba(55, 65, 81, 0.8); }
-
-    .change-lists { margin-top: 8px; font-size: 12px; color: var(--text-soft); }
-
+    /* Changes Accordion */
     .change-lists details {
-      border-radius: 12px;
-      border: 1px dashed var(--border);
-      background: #f9fafb;
-      padding: 6px 8px;
-      margin-top: 4px;
+      background: var(--bg-body);
+      border-radius: 8px;
+      margin-bottom: 8px;
+      overflow: hidden;
     }
-
     .change-lists summary {
+      padding: 12px;
       cursor: pointer;
+      font-size: 13px;
+      font-weight: 600;
       list-style: none;
       display: flex;
-      align-items: center;
-      gap: 6px;
-    }
-
-    .change-lists summary::-webkit-details-marker { display: none; }
-
-    .change-lists ul {
-      margin: 6px 0 0 0;
-      padding-left: 14px;
-      max-height: 160px;
-      overflow: auto;
-    }
-
-    .change-lists li { margin-bottom: 3px; }
-
-    .change-lists .pill {
-      font-size: 11px;
-      border-radius: 999px;
-      padding: 2px 8px;
-      border: 1px solid var(--border-soft);
-      background: #ffffff;
-      margin-left: 4px;
-    }
-
-    .muted-tip {
-      font-size: 11px;
-      color: var(--text-soft);
-      margin-top: 6px;
-    }
-
-    .badge-soft {
-      font-size: 10px;
-      padding: 2px 8px;
-      border-radius: 999px;
-      border: 1px solid var(--border-soft);
-      background: #f9fafb;
-      color: var(--text-soft);
-    }
-
-    .sheet-tabs {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 6px;
-      background: #f3f4f6;
-      border-radius: 999px;
-      padding: 4px;
-      margin-bottom: 8px;
-    }
-
-    .sheet-tab {
-      border: none;
-      background: transparent;
-      border-radius: 999px;
-      padding: 7px 12px;
-      font-size: 12px;
-      cursor: pointer;
-      display: inline-flex;
-      align-items: center;
-      gap: 6px;
-      color: var(--text-soft);
-    }
-
-    .sheet-tab span.icon { font-size: 14px; }
-    .sheet-tab.active { background: #111827; color: #f9fafb; }
-
-    .table-toolbar {
-      display: flex;
-      flex-wrap: wrap;
-      align-items: center;
-      gap: 10px;
       justify-content: space-between;
-      margin-bottom: 6px;
-    }
-
-    .table-toolbar-left,
-    .table-toolbar-right {
-      display: flex;
-      flex-wrap: wrap;
       align-items: center;
-      gap: 10px;
+    }
+    .change-lists ul {
+      margin: 0;
+      padding: 12px;
+      background: #fff;
+      border-top: 1px solid var(--border);
+      list-style-type: none;
+      max-height: 200px;
+      overflow-y: auto;
+    }
+    .change-lists li {
+      font-size: 13px;
+      padding: 4px 0;
+      border-bottom: 1px solid #f1f5f9;
+      color: var(--text-muted);
     }
 
-    .view-toggle {
-      border-radius: 999px;
-      background: #f3f4f6;
-      padding: 3px;
-      display: inline-flex;
-      gap: 4px;
-    }
-
-    .view-toggle button {
-      border: none;
-      background: transparent;
-      border-radius: 999px;
-      padding: 6px 10px;
-      font-size: 11px;
-      cursor: pointer;
-      display: inline-flex;
-      align-items: center;
-      gap: 5px;
-      color: var(--text-soft);
-    }
-
-    .view-toggle button.active { background: #111827; color: #f9fafb; }
-
-    /* Liste durum çubuğu */
-    .list-status-bar {
-      margin: 4px 0 10px;
-      padding: 6px 10px;
-      border-radius: 999px;
-      background: #f3f4f6;
-      border: 1px solid var(--border-soft);
-      font-size: 12px;
-      color: var(--text-soft);
-      display: flex;
-      flex-wrap: wrap;
-      align-items: center;
-      gap: 8px;
-    }
-
-    .list-status-bar .dot {
-      width: 8px;
-      height: 8px;
-      border-radius: 999px;
-      background: var(--success);
-    }
-
-    .list-status-bar strong {
-      color: var(--text-main);
-      font-weight: 600;
-    }
-
-    .list-status-bar .badge-soft {
-      font-size: 10px;
-    }
-
-    .table-container {
-      border-radius: 20px;
-      background: #ffffff;
-      border: 1px solid var(--border-soft);
+    /* Table Toolbar */
+    .table-tools-container {
+      background: var(--bg-card);
+      border-radius: 16px;
+      border: 1px solid var(--border);
+      box-shadow: var(--shadow-md);
       overflow: hidden;
-      box-shadow: var(--shadow-subtle);
+      display: flex;
+      flex-direction: column;
     }
 
-    .table-scroll {
-      max-height: 650px;
+    .toolbar-header {
+      padding: 16px 24px;
+      border-bottom: 1px solid var(--border);
+      background: #f8fafc;
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: space-between;
+      align-items: center;
+      gap: 16px;
+    }
+
+    .sheet-tabs { display: flex; gap: 8px; }
+    .sheet-tab {
+      background: transparent;
+      border: none;
+      padding: 8px 16px;
+      border-radius: 6px;
+      font-size: 14px;
+      font-weight: 500;
+      color: var(--text-muted);
+      cursor: pointer;
+    }
+    .sheet-tab.active { background: white; color: var(--primary); box-shadow: var(--shadow-sm); }
+
+    .view-toggles {
+      display: flex;
+      background: #e2e8f0;
+      padding: 3px;
+      border-radius: 8px;
+    }
+    .view-toggles button {
+      background: transparent;
+      border: none;
+      padding: 6px 14px;
+      font-size: 13px;
+      border-radius: 6px;
+      cursor: pointer;
+      color: var(--text-muted);
+      font-weight: 500;
+    }
+    .view-toggles button.active {
+      background: white;
+      color: var(--text-main);
+      box-shadow: var(--shadow-sm);
+    }
+
+    /* Table */
+    .table-scroll-area {
+      max-height: 700px;
       overflow: auto;
-      scrollbar-width: thin;
     }
-
-    .table-scroll::-webkit-scrollbar { width: 7px; height: 7px; }
-    .table-scroll::-webkit-scrollbar-thumb { background: #d1d5db; border-radius: 999px; }
 
     table {
-      border-collapse: collapse;
       width: 100%;
-      min-width: 960px;
-      font-size: 13px;
+      border-collapse: collapse;
+      font-size: 14px;
     }
-
-    thead { position: sticky; top: 0; z-index: 1; }
 
     thead th {
+      background: #f8fafc;
       position: sticky;
       top: 0;
-      background: #f3f4f6;
-      border-bottom: 1px solid var(--border);
-      padding: 10px 8px;
       text-align: left;
+      padding: 14px 16px;
       font-weight: 600;
-      color: #4b5563;
-      white-space: nowrap;
-    }
-
-    tbody tr:nth-child(even) { background: #f9fafb; }
-    tbody tr:nth-child(odd) { background: #ffffff; }
-
-    tbody td {
-      padding: 7px 8px;
-      border-bottom: 1px solid #e5e7eb;
-      white-space: nowrap;
-      cursor: default;
-    }
-
-    tbody td span.muted {
-      color: var(--text-soft);
+      color: var(--text-muted);
       font-size: 12px;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      border-bottom: 1px solid var(--border);
+      white-space: nowrap;
+      z-index: 10;
     }
 
-    tbody tr.new-row { background: #ecfdf5; }
-    tbody tr.updated-row { background: #fffbeb; }
-
-    .status-pill {
-      display: inline-flex;
-      align-items: center;
-      gap: 4px;
-      padding: 3px 8px;
-      border-radius: 999px;
-      font-size: 11px;
-      border: 1px solid transparent;
+    tbody tr { transition: background 0.1s; }
+    tbody tr:hover { background-color: #f1f5f9; }
+    
+    tbody td {
+      padding: 14px 16px;
+      border-bottom: 1px solid var(--border);
+      color: var(--text-main);
+      white-space: nowrap;
     }
 
-    .status-pill.new {
-      border-color: rgba(4, 120, 87, 0.7);
-      color: var(--success);
-      background: #f0fdf4;
-    }
-
-    .status-pill.updated {
-      border-color: rgba(180, 83, 9, 0.7);
-      color: var(--warning);
-      background: #fffbeb;
-    }
-
-    .status-pill.normal {
-      border-color: var(--border-soft);
-      color: var(--text-soft);
-      background: #f9fafb;
-    }
-
-    .status-pill span.icon { font-size: 14px; }
-    .status-pill span.label { text-transform: uppercase; letter-spacing: 0.08em; }
-
-    .print-options {
-      margin-bottom: 6px;
-      padding: 8px 10px;
-      background: #f9fafb;
-      border-radius: 16px;
-      border: 1px dashed var(--border);
-      font-size: 11px;
-      color: var(--text-soft);
-    }
-
-    .print-options .cols {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 8px 14px;
-      margin-top: 4px;
-    }
-
-    .print-options label {
+    /* Status Pills in Table */
+    .status-badge {
       display: inline-flex;
       align-items: center;
       gap: 6px;
-      cursor: pointer;
+      padding: 4px 10px;
+      border-radius: 99px;
+      font-size: 11px;
+      font-weight: 600;
+      text-transform: uppercase;
     }
+    .status-badge.normal { background: #f1f5f9; color: var(--text-muted); border: 1px solid #e2e8f0; }
+    .status-badge.new { background: var(--success-bg); color: var(--success-text); }
+    .status-badge.updated { background: var(--warning-bg); color: var(--warning-text); }
 
-    .print-options input[type="checkbox"] {
-      width: 14px;
-      height: 14px;
-      border-radius: 4px;
-      border: 1px solid var(--border);
-    }
+    /* New/Updated Row Highlights */
+    tr.new-row td { background-color: #f0fdf4; }
+    tr.updated-row td { background-color: #fefce8; }
+    tr.new-row:hover td { background-color: #dcfce7; }
+    tr.updated-row:hover td { background-color: #fef08a; }
 
-    .print-hint { font-size: 10px; margin-top: 3px; }
-
-    .col-hidden { display: none; }
-
-    .loading-row td {
-      text-align: center;
-      padding: 20px 0;
-      font-size: 13px;
-      color: var(--text-soft);
-    }
-
+    /* Toast */
     .toast {
       position: fixed;
-      bottom: 20px;
-      right: 20px;
-      border-radius: 999px;
-      background: #111827;
-      color: #f9fafb;
-      padding: 9px 15px;
-      font-size: 12px;
+      bottom: 30px;
+      right: 30px;
+      background: var(--text-main);
+      color: white;
+      padding: 12px 24px;
+      border-radius: 12px;
+      box-shadow: var(--shadow-lg);
+      font-size: 14px;
       display: flex;
       align-items: center;
-      gap: 8px;
+      gap: 12px;
       opacity: 0;
+      transform: translateY(20px);
+      transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
       pointer-events: none;
-      transform: translateY(10px);
-      transition: opacity 0.2s ease, transform 0.2s ease;
-      box-shadow: 0 10px 30px rgba(15, 23, 42, 0.4);
-      z-index: 50;
+      z-index: 100;
     }
+    .toast.visible { opacity: 1; transform: translateY(0); }
 
-    .toast.visible { opacity: 1; pointer-events: auto; transform: translateY(0); }
-    .toast span.icon { font-size: 14px; }
-
+    /* Print Logic */
     @media print {
-      body { background: #ffffff; padding: 0; }
-      header.app-header,
-      .top-layout,
-      .table-toolbar,
-      .print-options .print-hint,
-      .no-print,
-      .sheet-tabs,
-      .list-status-bar { display: none !important; }
-      .app-shell { max-width: none; margin: 0; }
-      .panel { box-shadow: none; border-radius: 0; border: none; padding: 0; }
-      .table-container { box-shadow: none; border-radius: 0; border: none; }
-      .table-scroll { max-height: none; }
-      thead th { background: #f3f4f6 !important; }
+      body { background: white; padding: 0; }
+      .app-shell { max-width: none; padding: 0; }
+      header, .panel:not(.table-container-wrap), .table-toolbar, .no-print { display: none !important; }
+      .panel { box-shadow: none; border: none; padding: 0; }
+      .table-tools-container { border: none; box-shadow: none; overflow: visible; }
+      .toolbar-header { display: none; }
+      .table-scroll-area { max-height: none; overflow: visible; }
     }
+
+    .muted-text { color: var(--text-muted); font-size: 12px; }
   </style>
 </head>
 <body>
+
   <div class="app-shell">
+    
     <header class="app-header">
       <div class="app-title-block">
-        <h1><span class="icon">📋</span>Öğrenci Listesi Yöneticisi</h1>
-        <p>Google E‑Tablo verisi + TXT + Firebase ile değişiklik takibi.</p>
+        <h1><span class="icon">🎓</span> Öğrenci Listesi Yöneticisi</h1>
+        <p>Google E‑Tablo Entegrasyonu + Firebase Takip Sistemi</p>
       </div>
       <div class="header-meta">
         <div class="chip">
-          <span class="icon">⬛</span><strong>Siyah / beyaz / gri tema</strong>
+          <span id="lastLoadedInfo">Veri bekleniyor...</span>
         </div>
         <div class="chip">
-          <span class="icon">🧠</span><span>Firebase + TXT karşılaştırma</span>
+           <span id="compareSourceLabel">Karşılaştırma: Yok</span>
         </div>
       </div>
     </header>
 
-    <main class="layout-main">
-      <section class="panel">
-        <div class="panel-title-row">
-          <h2><span class="icon">🎛️</span>Filtreler, Özet ve Tablo</h2>
-          <span class="badge-soft" id="lastLoadedInfo">Veri yükleniyor…</span>
-        </div>
+    <div class="dashboard-grid">
+      
+      <div style="display: flex; flex-direction: column; gap: 24px;">
+        
+        <section>
+          <div class="stats-container">
+            <div class="stat-card total">
+              <div class="stat-label">Toplam Öğrenci</div>
+              <div class="stat-value" id="totalCount">–</div>
+              <div class="stat-desc">Aktif listedeki kayıt sayısı</div>
+            </div>
+            <div class="stat-card new">
+              <div class="stat-label">Yeni</div>
+              <div class="stat-value" id="newCount">–</div>
+              <div class="stat-desc">Önceki listeye göre</div>
+            </div>
+            <div class="stat-card updated">
+              <div class="stat-label">Güncel</div>
+              <div class="stat-value" id="updatedCount">–</div>
+              <div class="stat-desc">Bilgisi değişenler</div>
+            </div>
+            <div class="stat-card removed">
+              <div class="stat-label">Silinen</div>
+              <div class="stat-value" id="removedCount">–</div>
+              <div class="stat-desc">Listeden düşenler</div>
+            </div>
+          </div>
+          
+          <div class="change-lists">
+            <details>
+              <summary>🆕 Yeni Kayıtlar <span class="status-badge new" id="newTagCount" style="margin-left:auto">0</span></summary>
+              <ul id="newList"></ul>
+            </details>
+            <details>
+              <summary>✏️ Güncellenenler <span class="status-badge updated" id="updatedTagCount" style="margin-left:auto">0</span></summary>
+              <ul id="updatedList"></ul>
+            </details>
+            <details>
+              <summary>🗑️ Silinenler <span class="status-badge normal" id="removedTagCount" style="margin-left:auto">0</span></summary>
+              <ul id="removedList"></ul>
+            </details>
+          </div>
+        </section>
 
-        <!-- Üst satır: solda filtreler, sağda özet -->
-        <div class="top-layout">
-          <!-- FİLTRELER -->
-          <div>
-            <div class="filters-grid">
-              <div class="field-group" style="grid-column:1/-1;">
-                <div class="field-label">
-                  <span>Genel arama</span>
-                  <span class="badge">isim, veli, numara…</span>
-                </div>
-                <input type="text" id="searchInput" placeholder="Örn: 8D, ZEHRA, 9220, KAYA…" />
-              </div>
+        <section class="panel">
+          <div class="panel-title">
+            <span>🔍 Filtreleme</span>
+            <button class="btn btn-secondary btn-sm" id="clearFiltersBtn" type="button">Temizle</button>
+          </div>
+          
+          <div class="filters-stack">
+            <div class="field-group">
+              <div class="field-label">Genel Arama</div>
+              <input type="text" id="searchInput" placeholder="İsim, No, Veli..." />
+            </div>
 
+            <div style="display:grid; grid-template-columns: 1fr 1fr; gap:10px;">
               <div class="field-group">
-                <div class="field-label"><span>Cinsiyet</span></div>
+                <div class="field-label">Cinsiyet</div>
                 <select id="genderFilter">
                   <option value="">Tümü</option>
                   <option value="KIZ">Kız</option>
                   <option value="ERKEK">Erkek</option>
                 </select>
               </div>
-
               <div class="field-group">
-                <div class="field-label"><span>Burs durumu</span></div>
+                <div class="field-label">Burs</div>
                 <select id="scholarFilter">
                   <option value="">Tümü</option>
-                  <option value="nonempty">Burslu (dolu)</option>
-                  <option value="empty">Boş</option>
+                  <option value="nonempty">Burslu</option>
+                  <option value="empty">Burssuz</option>
                 </select>
               </div>
+            </div>
 
-              <div class="field-group">
-                <div class="field-label"><span>Durum</span></div>
-                <select id="statusFilter">
-                  <option value="">Hepsi</option>
-                  <option value="new">Sadece yeni</option>
-                  <option value="updated">Güncellenenler</option>
-                  <option value="normal">Normal kayıtlar</option>
-                </select>
-              </div>
+            <div class="field-group">
+              <div class="field-label">Kayıt Durumu</div>
+              <select id="statusFilter">
+                <option value="">Tüm Durumlar</option>
+                <option value="new">Sadece Yeni</option>
+                <option value="updated">Güncellenenler</option>
+                <option value="normal">Değişiklik Yok</option>
+              </select>
+            </div>
 
+            <div style="display:grid; grid-template-columns: 1fr 1fr; gap:10px;">
               <div class="field-group">
-                <div class="field-label"><span>Tarih &ge;</span></div>
+                <div class="field-label">Başlangıç Tarihi</div>
                 <input type="date" id="dateFrom" />
               </div>
-
               <div class="field-group">
-                <div class="field-label"><span>Tarih &le;</span></div>
+                <div class="field-label">Bitiş Tarihi</div>
                 <input type="date" id="dateTo" />
               </div>
+            </div>
 
-              <!-- YENİ: Tarih sıralama -->
-              <div class="field-group">
-                <div class="field-label"><span>Tarih sıralama</span></div>
+            <div class="field-group">
+                <div class="field-label">Tarih Sıralama</div>
                 <select id="dateSortOrder">
-                  <option value="">Otomatik</option>
-                  <option value="desc">Yeniden → Eskiye</option>
-                  <option value="asc">Eskiden → Yeniye</option>
+                    <option value="">Otomatik (Öncelikli Durum)</option>
+                    <option value="desc">Yeniden → Eskiye</option>
+                    <option value="asc">Eskiden → Yeniye</option>
                 </select>
-              </div>
-
-              <div class="field-group" style="grid-column:1/-1;">
-                <div class="field-label"><span>Sınıf (çoklu seçim)</span></div>
-                <div id="classFilterContainer" class="class-chips"></div>
-              </div>
-
-              <div class="field-group" style="grid-column:1/-1;">
-                <label class="checkbox-row">
-                  <input type="checkbox" id="recentOnly" />
-                  <span>Yalnızca en yeni kayıtları göster (ilk 30)</span>
-                </label>
-              </div>
             </div>
 
-            <div class="controls-row">
-              <button class="btn btn-subtle" id="clearFiltersBtn" type="button">
-                <span class="icon">🧹</span>Filtreleri temizle
-              </button>
-              <button class="btn btn-ghost" id="reloadBtn" type="button">
-                <span class="icon">🔄</span>Bu sekmeyi yeniden yükle
-              </button>
+            <div class="field-group">
+              <div class="field-label">Sınıflar</div>
+              <div id="classFilterContainer" class="class-chips"></div>
             </div>
 
-            <p class="muted-tip">Herhangi bir hücreye çift tıklayarak metni panoya kopyalayabilirsin.</p>
+            <div class="field-group">
+              <label style="display:flex; gap:8px; align-items:center; font-size:13px; cursor:pointer;">
+                <input type="checkbox" id="recentOnly" style="width:16px; height:16px;" />
+                <span>Sadece son 30 kayıt</span>
+              </label>
+            </div>
+            
+            <hr style="border:0; border-top:1px solid var(--border); width:100%;">
+            
+            <div style="display:flex; flex-direction:column; gap:8px;">
+               <button class="btn btn-secondary" id="reloadBtn" type="button">
+                 🔄 Verileri Yenile
+               </button>
+            </div>
           </div>
+        </section>
 
-          <!-- ÖZET -->
-          <div>
-            <div class="summary-grid">
-              <div class="summary-card total">
-                <div class="summary-title"><span>Toplam</span><span class="icon">⬜</span></div>
-                <div class="summary-value" id="totalCount">–</div>
-                <div class="summary-meta">Tablodaki öğrenci sayısı.</div>
-              </div>
-              <div class="summary-card new">
-                <div class="summary-title"><span>Yeni</span><span class="icon">🆕</span></div>
-                <div class="summary-value" id="newCount">–</div>
-                <div class="summary-meta">Önceki listeye göre yeni.</div>
-              </div>
-              <div class="summary-card updated">
-                <div class="summary-title"><span>Güncellendi</span><span class="icon">✏️</span></div>
-                <div class="summary-value" id="updatedCount">–</div>
-                <div class="summary-meta">Bilgileri değişenler.</div>
-              </div>
-              <div class="summary-card removed">
-                <div class="summary-title"><span>Silinen</span><span class="icon">🗑️</span></div>
-                <div class="summary-value" id="removedCount">–</div>
-                <div class="summary-meta">Eski listede olup şu an olmayanlar.</div>
-              </div>
-            </div>
+      </div>
 
-            <div class="change-lists">
-              <details>
-                <summary><span>🆕 Yeni öğrenciler</span><span class="tag" id="newTagCount">0</span></summary>
-                <ul id="newList"></ul>
-              </details>
-              <details>
-                <summary><span>✏️ Güncellenen öğrenciler</span><span class="tag" id="updatedTagCount">0</span></summary>
-                <ul id="updatedList"></ul>
-              </details>
-              <details>
-                <summary><span>🗑️ Silinen öğrenciler</span><span class="tag" id="removedTagCount">0</span></summary>
-                <ul id="removedList"></ul>
-              </details>
-              <p class="muted-tip">
-                <span class="badge-soft" id="lastSavedInfo">Son kaydedilen liste: –</span>
-                <span class="badge-soft" id="compareSourceLabel">Karşılaştırma kaynağı: Yok</span>
-              </p>
+      <div class="table-tools-container">
+        
+        <div class="toolbar-header">
+          <div class="table-toolbar-left" style="display:flex; flex-direction:column; gap:8px;">
+            <div class="sheet-tabs" id="sheetTabs"></div>
+            <div class="view-toggles">
+              <button type="button" data-view="all" class="active" id="viewAllBtn">Tüm Liste</button>
+              <button type="button" data-view="new-updated" id="viewNewUpdatedBtn">✨ Değişiklikler</button>
             </div>
+          </div>
+          
+          <div class="table-toolbar-right" style="display:flex; gap:8px; flex-wrap:wrap;">
+            <button class="btn btn-primary btn-sm no-print" id="saveSnapshotBtn">
+              💾 Kaydet
+            </button>
+            <button class="btn btn-secondary btn-sm no-print" id="downloadTxtBtn">
+              📥 İndir (TXT)
+            </button>
+            <button class="btn btn-secondary btn-sm no-print" id="uploadTxtBtn">
+              📤 Karşılaştır
+            </button>
+            <button class="btn btn-secondary btn-sm no-print" id="printBtn">
+              🖨️ Yazdır
+            </button>
           </div>
         </div>
 
-        <!-- TABLO ARAÇLARI + TABLONUN KENDİSİ -->
-        <div style="margin-top: 14px;">
-          <div class="sheet-tabs no-print" id="sheetTabs"></div>
-
-          <div class="table-toolbar">
-            <div class="table-toolbar-left">
-              <div class="view-toggle">
-                <button type="button" data-view="all" class="active" id="viewAllBtn">
-                  <span class="icon">⬜</span><span>Tüm kayıtlar</span>
-                </button>
-                <button type="button" data-view="new-updated" id="viewNewUpdatedBtn">
-                  <span class="icon">✨</span><span>Yeni + Güncellenen</span>
-                </button>
-              </div>
-            </div>
-            <div class="table-toolbar-right">
-              <button class="btn btn-subtle btn-sm no-print" id="saveSnapshotBtn" type="button">
-                <span class="icon">💾</span>Bu listeyi Firebase'e kaydet
-              </button>
-              <button class="btn btn-subtle btn-sm no-print" id="downloadTxtBtn" type="button">
-                <span class="icon">📥</span>TXT indir
-              </button>
-              <button class="btn btn-subtle btn-sm no-print" id="uploadTxtBtn" type="button">
-                <span class="icon">📤</span>TXT yükle & karşılaştır
-              </button>
-              <button class="btn btn-ghost btn-sm no-print" id="printBtn" type="button">
-                <span class="icon">🖨️</span>Yazdır
-              </button>
-            </div>
-          </div>
-
-          <!-- Filtreye göre öğrenci sayısı durum çubuğu -->
-          <div class="list-status-bar no-print" id="listStatusBar">
-            <span class="dot"></span>
-            <span>Liste durumu yükleniyor…</span>
-          </div>
-
-          <input type="file" id="uploadTxtInput" accept=".txt,.json" style="display:none;" />
-
-          <div class="print-options no-print">
-            <div><strong>Yazdırma seçenekleri</strong> 🖨️</div>
-            <div class="print-hint">
-              Yazdır'a bastığında sadece seçili kolonlar görünür. Filtreler ne görüyorsan ona göre uygulanır.
-            </div>
-            <div class="cols" id="printColsContainer"></div>
-          </div>
-
-          <div class="table-container">
-            <div class="table-scroll">
-              <table id="studentsTable">
-                <thead>
-                  <tr id="tableHeaderRow"></tr>
-                </thead>
-                <tbody id="tableBody">
-                  <tr class="loading-row">
-                    <td>Veri yükleniyor…</td>
-                  </tr>
-                </tbody>
-              </table>
-            </div>
-          </div>
+        <div style="padding: 8px 24px; background: #fff; border-bottom: 1px solid var(--border); font-size:12px; color:var(--text-muted);" id="listStatusBar">
+          Yükleniyor...
         </div>
-      </section>
-    </main>
+
+        <input type="file" id="uploadTxtInput" accept=".txt,.json" style="display:none;" />
+        
+        <div class="no-print" style="padding: 10px 24px; background: #f8fafc; border-bottom: 1px solid var(--border);">
+            <details>
+                <summary style="font-size:12px; color:var(--text-muted); cursor:pointer;">🖨️ Yazdırma Sütunlarını Seç</summary>
+                <div class="cols" id="printColsContainer" style="display:flex; flex-wrap:wrap; gap:12px; padding-top:8px; font-size:13px;"></div>
+            </details>
+        </div>
+
+        <div class="table-scroll-area">
+          <table id="studentsTable">
+            <thead>
+              <tr id="tableHeaderRow"></tr>
+            </thead>
+            <tbody id="tableBody">
+              <tr class="loading-row">
+                <td colspan="12" style="text-align:center; padding: 40px;">Veriler yükleniyor...</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+        
+        <div style="padding: 12px 24px; background: #f8fafc; border-top: 1px solid var(--border); font-size:12px; color:var(--text-muted); text-align:center;">
+          <span id="lastSavedInfo">Son kayıt: Yok</span> • Hücrelere çift tıklayarak kopyalayabilirsiniz.
+        </div>
+
+      </div>
+
+    </div>
   </div>
 
-  <!-- Toast -->
   <div class="toast" id="toast">
-    <span class="icon">📎</span>
-    <span id="toastMessage">Metin kopyalandı.</span>
+    <span style="font-size: 18px;">✅</span>
+    <span id="toastMessage">İşlem başarılı.</span>
   </div>
 
-  <!--
-    This script has been converted into an ES module so that we can
-    import Firebase libraries and remove all usages of browser localStorage.
-    Snapshot persistence is now handled via Firebase Realtime Database.
-  -->
   <script type="module">
     // =======================
     // KONFİGÜRASYON
     // =======================
     const SHEET_ID = "16BD_BrNLYBaXviCzB8yDKBGS2Vdj5DHi";
 
-    // Sadece burayı kendine göre düzenle:
     const SHEET_TABS = [
-      { name: "2025-2026", label: "2025-2026" }
+      { name: "2025-2026", label: "2025-2026 Dönemi" }
     ];
 
     let currentSheetName = SHEET_TABS[0].name;
     const STORAGE_KEY_BASE = "ogrenci_listesi_snapshot_v3_";
 
     const COLUMNS = [
-      { key: "status",   label: "Durum" },
-      { key: "isim",     label: "İsim" },
-      { key: "soyisim",  label: "Soyisim" },
-      { key: "cinsiyet", label: "Cinsiyet" },
-      { key: "sinif",    label: "Sınıf" },
-      { key: "okulNo",   label: "Okul Numarası" },
-      { key: "veliAdi",  label: "Veli Adı" },
-      { key: "veliSoyadi", label: "Veli Soyadı" },
-      { key: "veliTelefon", label: "Veli Telefon" },
-      { key: "yil",      label: "Yıl" },
-      { key: "tarih",    label: "Tarih" },
-      { key: "burslu",   label: "Burslu mu?" }
+      { key: "status",   label: "DURUM" },
+      { key: "isim",     label: "İSİM" },
+      { key: "soyisim",  label: "SOYİSİM" },
+      { key: "cinsiyet", label: "CİNSİYET" },
+      { key: "sinif",    label: "SINIF" },
+      { key: "okulNo",   label: "OKUL NO" },
+      { key: "veliAdi",  label: "VELİ ADI" },
+      { key: "veliSoyadi", label: "VELİ SOYADI" },
+      { key: "veliTelefon", label: "VELİ TELEFON" },
+      { key: "yil",      label: "YIL" },
+      { key: "tarih",    label: "TARİH" },
+      { key: "burslu",   label: "BURSLU MU?" }
     ];
 
     let students = [];
     let snapshot = null;
-let snapshotSource = "none"; // none | firebase | file
-    let activeViewMode = "all";  // all | new-updated
+    let snapshotSource = "none"; 
+    let activeViewMode = "all";  
 
     // =======================
-    // FIREBASE KURULUMU
+    // FIREBASE
     // =======================
-    // Firebase modüllerini dışarıdan import ediyoruz.  Versiyonlar
-    // Firebase JS SDK 9.0+ ile uyumludur.  Proje yapılandırması
-    // kullanıcı tarafından sağlanmıştır.
     import { initializeApp } from 'https://www.gstatic.com/firebasejs/9.23.0/firebase-app.js';
     import { getAnalytics } from 'https://www.gstatic.com/firebasejs/9.23.0/firebase-analytics.js';
     import { getDatabase, ref, get, set } from 'https://www.gstatic.com/firebasejs/9.23.0/firebase-database.js';
@@ -940,18 +724,13 @@ let snapshotSource = "none"; // none | firebase | file
       measurementId: "G-4Q99NQRB38"
     };
 
-    // Uygulamayı başlat ve servisleri al.  Bu satırlar, uygulamanın
-    // ilk yüklenme sırasında yalnızca bir kez çalıştırılacaktır.
     const firebaseApp = initializeApp(firebaseConfig);
     const firebaseAnalytics = getAnalytics(firebaseApp);
     const firebaseDb = getDatabase(firebaseApp);
-
-    // Firebase içerisinde snapshot'ların tutulduğu temel yol.  Her sekme
-    // ismi bu yolun altına encode edilerek kaydedilecektir.
     const FIREBASE_BASE_PATH = 'snapshots';
 
     // =======================
-    // ARAÇ FONKSİYONLAR
+    // ARAÇLAR
     // =======================
     function getSheetCsvUrl(sheetName) {
       return "https://docs.google.com/spreadsheets/d/" +
@@ -960,21 +739,8 @@ let snapshotSource = "none"; // none | firebase | file
         encodeURIComponent(sheetName);
     }
 
-    function getStorageKey() {
-      return STORAGE_KEY_BASE + (currentSheetName || "default");
-    }
-
-    /**
-     * Aktif sekme için Firebase Realtime Database referansını döndürür.
-     * Sekme isimlerini güvenli bir URL parçası haline getirmek için
-     * encodeURIComponent kullanılır.  Eğer sekme adı boş veya tanımlı
-     * değilse "default" kullanılır.
-     */
     function getSnapshotRef() {
       const name = currentSheetName || 'default';
-      // Firebase yol ayracı olarak "/" kullandığından, encode edilmiş
-      // bir isim kullanmak önemlidir.  encodeURIComponent ayrıca boşluk
-      // ve özel karakterleri de kaçırır.
       const safeName = encodeURIComponent(name);
       return ref(firebaseDb, `${FIREBASE_BASE_PATH}/${safeName}`);
     }
@@ -983,7 +749,7 @@ let snapshotSource = "none"; // none | firebase | file
       const toast = document.getElementById("toast");
       document.getElementById("toastMessage").textContent = message;
       toast.classList.add("visible");
-      setTimeout(() => toast.classList.remove("visible"), 2000);
+      setTimeout(() => toast.classList.remove("visible"), 3000);
     }
 
     function parseCSV(text) {
@@ -991,11 +757,9 @@ let snapshotSource = "none"; // none | firebase | file
       let currentRow = [];
       let current = "";
       let inQuotes = false;
-
       for (let i = 0; i < text.length; i++) {
         const c = text[i];
         const next = text[i + 1];
-
         if (c === '"' && inQuotes && next === '"') {
           current += '"';
           i++;
@@ -1035,13 +799,7 @@ let snapshotSource = "none"; // none | firebase | file
       if (!isoString) return "–";
       const d = new Date(isoString);
       if (isNaN(d.getTime())) return "–";
-      const datePart = d.toLocaleDateString("tr-TR", {
-        year: "numeric", month: "2-digit", day: "2-digit"
-      });
-      const timePart = d.toLocaleTimeString("tr-TR", {
-        hour: "2-digit", minute: "2-digit"
-      });
-      return `${datePart} ${timePart}`;
+      return d.toLocaleDateString("tr-TR", { year: "numeric", month: "2-digit", day: "2-digit", hour: "2-digit", minute: "2-digit" });
     }
 
     function createStudentId(row) {
@@ -1052,19 +810,7 @@ let snapshotSource = "none"; // none | firebase | file
       return `${name}__${surname}`;
     }
 
-    /**
-     * Derin eşitlik kontrolü, JSON.stringify kullanmak yerine anahtar
-     * sıralamasını ve değerleri tek tek karşılaştırır.  Firebase'den gelen
-     * nesnelerde anahtarların sırası farklı olabildiği için eski yöntem
-     * tüm kayıtları "güncellendi" şeklinde işaretliyordu.  Bu fonksiyon
-     * anahtarları alfabetik olarak sıralayıp her birinin değerini karşılaştırır.
-     *
-     * @param {Object} a İlk nesne
-     * @param {Object} b İkinci nesne
-     * @returns {boolean} Nesneler eşitse true, değilse false
-     */
     function deepEqual(a, b) {
-      // Her iki nesne de tanımlı olmalı
       if (a === null || b === null || typeof a !== 'object' || typeof b !== 'object') {
         return a === b;
       }
@@ -1077,11 +823,9 @@ let snapshotSource = "none"; // none | firebase | file
         if (keyA !== keyB) return false;
         const valA = a[keyA];
         const valB = b[keyB];
-        // Basit tipler veya null/undefined için doğrudan eşitlik
         if (valA === null || valB === null || typeof valA !== 'object' || typeof valB !== 'object') {
           if (valA !== valB) return false;
         } else {
-          // Özyinelemeli karşılaştırma
           if (!deepEqual(valA, valB)) return false;
         }
       }
@@ -1089,7 +833,7 @@ let snapshotSource = "none"; // none | firebase | file
     }
 
     // =======================
-    // SNAPSHOT YAPISI
+    // SNAPSHOT LOGIC
     // =======================
     function buildSnapshotObject(currentStudents) {
       const records = {};
@@ -1097,17 +841,10 @@ let snapshotSource = "none"; // none | firebase | file
         records[s.id] = {
           id: s.id,
           data: {
-            isim: s.isim,
-            soyisim: s.soyisim,
-            cinsiyet: s.cinsiyet,
-            sinif: s.sinif,
-            okulNo: s.okulNo,
-            veliAdi: s.veliAdi,
-            veliSoyadi: s.veliSoyadi,
-            veliTelefon: s.veliTelefon,
-            yil: s.yil,
-            tarih: s.tarih,
-            burslu: s.burslu
+            isim: s.isim, soyisim: s.soyisim, cinsiyet: s.cinsiyet,
+            sinif: s.sinif, okulNo: s.okulNo, veliAdi: s.veliAdi,
+            veliSoyadi: s.veliSoyadi, veliTelefon: s.veliTelefon,
+            yil: s.yil, tarih: s.tarih, burslu: s.burslu
           }
         };
       });
@@ -1124,36 +861,22 @@ let snapshotSource = "none"; // none | firebase | file
 
       if (!snapshot) {
         lastSavedInfo.textContent = "Son kaydedilen liste: Henüz yok";
-        compareLabel.textContent = "Karşılaştırma kaynağı: Yok";
+        compareLabel.textContent = "Karşılaştırma: Yok";
         return;
       }
 
       const count = Object.keys(snapshot.records || {}).length;
-      lastSavedInfo.textContent =
-        "Son kaydedilen liste: " +
-        formatDateTimeForBadge(snapshot.savedAt) +
-        ` (${count} öğrenci, sekme: ${snapshot.sheetName || "-"})`;
+      lastSavedInfo.textContent = "Son kayıt: " + formatDateTimeForBadge(snapshot.savedAt) + ` (${count} öğr.)`;
 
       if (snapshotSource === "firebase") {
-        compareLabel.textContent = "Karşılaştırma kaynağı: Firebase veritabanı";
-      } else if (snapshotSource === "local") {
-        // localStorage sürümü artık kullanılmıyor ancak eski
-        // kayıtları açıklamak için bu koşul bırakılmıştır.
-        compareLabel.textContent = "Karşılaştırma kaynağı: Tarayıcı hafızası (localStorage)";
+        compareLabel.textContent = "Karşılaştırma: Firebase DB";
       } else if (snapshotSource === "file") {
-        compareLabel.textContent = "Karşılaştırma kaynağı: Yüklenen TXT dosyası";
+        compareLabel.textContent = "Karşılaştırma: TXT Dosyası";
       } else {
-        compareLabel.textContent = "Karşılaştırma kaynağı: Yok";
+        compareLabel.textContent = "Karşılaştırma: Yok";
       }
     }
 
-    /**
-     * Firebase üzerinden mevcut sekmenin snapshot bilgisini okur.  Eğer
-     * veritabanında kayıt yoksa snapshot ve snapshotSource "none" olarak
-     * ayarlanır.  Başarılı okuma sonrasında snapshotSource "firebase"
-     * olur.  Hata durumunda önceki veriler silinir ve kullanıcıya
-     * bildirilecek şekilde etiketler güncellenir.
-     */
     async function loadSnapshot() {
       try {
         const snapRef = getSnapshotRef();
@@ -1175,11 +898,6 @@ let snapshotSource = "none"; // none | firebase | file
       }
     }
 
-    /**
-     * Verilen öğrenci listesine göre snapshot oluşturur ve Firebase'e
-     * kaydeder.  Kayıt tamamlandıktan sonra snapshot ve snapshotSource
-     * güncellenir.  Hata durumunda kullanıcıya bilgi verilir.
-     */
     async function saveSnapshot(currentStudents) {
       const snap = buildSnapshotObject(currentStudents);
       try {
@@ -1188,23 +906,23 @@ let snapshotSource = "none"; // none | firebase | file
         snapshot = snap;
         snapshotSource = "firebase";
         updateSnapshotLabels();
-        showToast("Bu sekmenin listesi Firebase'e kaydedildi.");
+        showToast("Liste Firebase'e başarıyla kaydedildi.");
       } catch (e) {
         console.error("Snapshot kaydedilemedi", e);
-        showToast("Liste kaydedilirken bir hata oluştu.");
+        showToast("Hata: Kayıt yapılamadı.");
       }
     }
 
     function applySnapshotFromFile(obj) {
       if (!obj || !obj.records) {
-        showToast("TXT içeriği beklenen formatta değil.");
+        showToast("Hatalı dosya formatı.");
         return;
       }
       snapshot = obj;
       snapshotSource = "file";
       updateSnapshotLabels();
-      showToast("TXT dosyası yüklendi, karşılaştırma bu dosyaya göre yapılıyor.");
-      loadData(); // tekrar oku ve bu snapshot ile karşılaştır
+      showToast("TXT yüklendi, karşılaştırma yapılıyor.");
+      loadData();
     }
 
     // =======================
@@ -1212,9 +930,8 @@ let snapshotSource = "none"; // none | firebase | file
     // =======================
     async function loadData() {
       const body = document.getElementById("tableBody");
-      body.innerHTML =
-        '<tr class="loading-row"><td>Google E-Tablo → CSV verisi okunuyor…</td></tr>';
-      document.getElementById("lastLoadedInfo").textContent = "Veri yükleniyor…";
+      body.innerHTML = '<tr class="loading-row"><td colspan="12" style="text-align:center; padding:40px;">Google Tablo\'dan veriler alınıyor...</td></tr>';
+      document.getElementById("lastLoadedInfo").textContent = "Yükleniyor...";
 
       try {
         const url = getSheetCsvUrl(currentSheetName);
@@ -1222,50 +939,44 @@ let snapshotSource = "none"; // none | firebase | file
         if (!res.ok) throw new Error("Ağ hatası: " + res.status);
         const text = await res.text();
 
-        if (text.startsWith("<")) {
-          throw new Error("CSV yerine HTML döndü. Paylaşım ayarlarını kontrol et.");
-        }
+        if (text.startsWith("<")) throw new Error("CSV yerine HTML geldi. Tablo yayın ayarlarını kontrol edin.");
 
         const rows = parseCSV(text);
         if (!rows.length) {
-          body.innerHTML =
-            '<tr class="loading-row"><td>CSV içeriği boş görünüyor.</td></tr>';
-          updateListStatus([]); // boş liste
+          body.innerHTML = '<tr class="loading-row"><td colspan="12">Tablo boş.</td></tr>';
+          updateListStatus([]);
           return;
         }
 
         const header = rows[0].map(h => h.trim());
-        const dataRows = rows.slice(1).filter(r =>
-          r.some(cell => cell.trim() !== "")
-        );
+        const dataRows = rows.slice(1).filter(r => r.some(cell => cell.trim() !== ""));
 
         const headerIndex = name => header.indexOf(name);
-
-        const idxIsim    = headerIndex("İsim") === -1 ? 0 : headerIndex("İsim");
-        const idxSoy     = headerIndex("Soyisim*");
-        const idxCins    = headerIndex("Cinsiyet*");
-        const idxSinif   = headerIndex("Sınıf");
-        const idxOkulNo  = headerIndex("Okul Numarası");
-        const idxVeliAd  = headerIndex("Veli Adı");
+        const idxIsim = headerIndex("İsim") === -1 ? 0 : headerIndex("İsim");
+        const idxSoy = headerIndex("Soyisim*");
+        const idxCins = headerIndex("Cinsiyet*");
+        const idxSinif = headerIndex("Sınıf");
+        const idxOkulNo = headerIndex("Okul Numarası");
+        const idxVeliAd = headerIndex("Veli Adı");
         const idxVeliSoy = headerIndex("Veli Soyadı");
         const idxVeliTel = headerIndex("Veli Telefon");
-        const idxYil     = headerIndex("YIL");
-        const idxTarih   = headerIndex("Tarih");
-        const idxBurs    = headerIndex("Burslu mu?");
+        const idxYil = headerIndex("YIL");
+        const idxTarih = headerIndex("Tarih");
+        const idxBurs = headerIndex("Burslu mu?");
 
         const parsed = dataRows.map(row => {
           const s = {
-            isim:        (row[idxIsim]    || "").trim(),
-            soyisim:     (row[idxSoy]     || "").trim(),
-            cinsiyet:    (row[idxCins]    || "").trim().toUpperCase(),
-            sinif:       (row[idxSinif]   || "").trim(),
-            okulNo:      (row[idxOkulNo]  || "").trim(),
-            veliAdi:     (row[idxVeliAd]  || "").trim(),
-            veliSoyadi:  (row[idxVeliSoy] || "").trim(),
+            isim: (row[idxIsim] || "").trim(),
+            soyisim: (row[idxSoy] || "").trim(),
+            cinsiyet: (row[idxCins] || "").trim().toUpperCase(),
+            sinif: (row[idxSinif] || "").trim(),
+            okulNo: (row[idxOkulNo] || "").trim(),
+            veliAdi: (row[idxVeliAd] || "").trim(),
+            veliSoyadi: (row[idxVeliSoy] || "").trim(),
             veliTelefon: (row[idxVeliTel] || "").trim(),
-            yil:         (row[idxYil]     || "").trim(),
-            tarih:       (row[idxTarih]   || "").trim(),
-            burslu:      (row[idxBurs]    || "").trim()
+            yil: (row[idxYil] || "").trim(),
+            tarih: (row[idxTarih] || "").trim(),
+            burslu: (row[idxBurs] || "").trim()
           };
           s.id = createStudentId(s);
           s.dateObj = parseDateTR(s.tarih);
@@ -1285,17 +996,10 @@ let snapshotSource = "none"; // none | firebase | file
             } else {
               const prevData = prev.data;
               const currentSlim = {
-                isim: s.isim,
-                soyisim: s.soyisim,
-                cinsiyet: s.cinsiyet,
-                sinif: s.sinif,
-                okulNo: s.okulNo,
-                veliAdi: s.veliAdi,
-                veliSoyadi: s.veliSoyadi,
-                veliTelefon: s.veliTelefon,
-                yil: s.yil,
-                tarih: s.tarih,
-                burslu: s.burslu
+                isim: s.isim, soyisim: s.soyisim, cinsiyet: s.cinsiyet,
+                sinif: s.sinif, okulNo: s.okulNo, veliAdi: s.veliAdi,
+                veliSoyadi: s.veliSoyadi, veliTelefon: s.veliTelefon,
+                yil: s.yil, tarih: s.tarih, burslu: s.burslu
               };
               if (!deepEqual(prevData, currentSlim)) {
                 s.status = "updated";
@@ -1311,28 +1015,22 @@ let snapshotSource = "none"; // none | firebase | file
         }
 
         students = parsed;
-
         renderHeader();
         populateFilters();
         updateSummary(removed);
         applyFilters(removed);
-
-        document.getElementById("lastLoadedInfo").textContent =
-          `Sekme: ${currentSheetName} | Son yükleme: ${formatDateTimeForBadge(new Date().toISOString())}`;
+        document.getElementById("lastLoadedInfo").textContent = `${currentSheetName} | ${formatDateTimeForBadge(new Date().toISOString())}`;
+      
       } catch (err) {
         console.error(err);
-        body.innerHTML =
-          '<tr class="loading-row"><td>Veri yüklenirken hata oluştu: ' +
-          (err.message || err) +
-          "</td></tr>";
-        document.getElementById("lastLoadedInfo").textContent =
-          "Veri yüklenirken hata oluştu.";
+        body.innerHTML = `<tr class="loading-row"><td colspan="12" style="color:red">Hata: ${err.message}</td></tr>`;
+        document.getElementById("lastLoadedInfo").textContent = "Hata oluştu.";
         updateListStatus([]);
       }
     }
 
     // =======================
-    // ARAYÜZ OLUŞTURMA
+    // UI RENDER
     // =======================
     function renderSheetTabs() {
       const container = document.getElementById("sheetTabs");
@@ -1342,10 +1040,7 @@ let snapshotSource = "none"; // none | firebase | file
         btn.type = "button";
         btn.className = "sheet-tab";
         if (tab.name === currentSheetName) btn.classList.add("active");
-        btn.innerHTML = `<span class="icon">📑</span><span>${tab.label}</span>`;
-        // Sekme butonuna tıklandığında önce Firebase'den snapshot
-        // yüklenir, ardından arayüz ve veri listesi yenilenir.  Bu
-        // işlemler sırayla yapılabilmesi için handler async tanımlanır.
+        btn.textContent = tab.label;
         btn.addEventListener("click", async () => {
           if (currentSheetName === tab.name) return;
           currentSheetName = tab.name;
@@ -1364,7 +1059,6 @@ let snapshotSource = "none"; // none | firebase | file
         const th = document.createElement("th");
         th.textContent = col.label;
         th.dataset.field = col.key;
-        th.dataset.colIndex = index;
         headerRow.appendChild(th);
       });
 
@@ -1373,6 +1067,9 @@ let snapshotSource = "none"; // none | firebase | file
       COLUMNS.forEach(col => {
         const id = "print-col-" + col.key;
         const label = document.createElement("label");
+        label.style.display = "flex";
+        label.style.alignItems = "center";
+        label.style.gap = "6px";
         label.innerHTML = `
           <input type="checkbox" id="${id}" data-field="${col.key}" checked />
           <span>${col.label}</span>
@@ -1418,65 +1115,32 @@ let snapshotSource = "none"; // none | firebase | file
       document.getElementById("updatedTagCount").textContent = updatedCount;
       document.getElementById("removedTagCount").textContent = removedCount;
 
-      const newList = document.getElementById("newList");
-      const updatedList = document.getElementById("updatedList");
-      const removedList = document.getElementById("removedList");
-      newList.innerHTML = "";
-      updatedList.innerHTML = "";
-      removedList.innerHTML = "";
+      const fillList = (listId, items, isRemoved = false) => {
+        const el = document.getElementById(listId);
+        el.innerHTML = "";
+        items.forEach(s => {
+          const d = isRemoved ? (s.data || {}) : s;
+          const li = document.createElement("li");
+          li.innerHTML = `<b>${d.okulNo || "?"}</b> ${d.isim} ${d.soyisim} <small>(${d.sinif})</small>`;
+          el.appendChild(li);
+        });
+      };
 
-      students.filter(s => s.status === "new").forEach(s => {
-        const li = document.createElement("li");
-        li.textContent = `${s.okulNo || "–"} • ${s.isim} ${s.soyisim} (${s.sinif})`;
-        newList.appendChild(li);
-      });
-
-      students.filter(s => s.status === "updated").forEach(s => {
-        const li = document.createElement("li");
-        li.textContent = `${s.okulNo || "–"} • ${s.isim} ${s.soyisim} (${s.sinif})`;
-        updatedList.appendChild(li);
-      });
-
-      removedRecords.forEach(r => {
-        const d = r.data || {};
-        const li = document.createElement("li");
-        li.innerHTML = `${d.okulNo || "–"} • ${d.isim || ""} ${d.soyisim || ""} <span class="pill">${d.sinif || ""}</span>`;
-        removedList.appendChild(li);
-      });
+      fillList("newList", students.filter(s => s.status === "new"));
+      fillList("updatedList", students.filter(s => s.status === "updated"));
+      fillList("removedList", removedRecords, true);
     }
 
-    // Filtrelenmiş liste için durum çubuğunu güncelle
     function updateListStatus(filteredRows) {
       const bar = document.getElementById("listStatusBar");
       if (!bar) return;
-
-      const total = students.length;
       const visible = filteredRows ? filteredRows.length : 0;
-
-      let newCountFiltered = 0;
-      let updatedCountFiltered = 0;
-      if (filteredRows && filteredRows.length) {
-        filteredRows.forEach(s => {
-          if (s.status === "new") newCountFiltered++;
-          else if (s.status === "updated") updatedCountFiltered++;
-        });
-      }
-
+      const total = students.length;
       const recentOnly = document.getElementById("recentOnly").checked;
-
-      const parts = [];
-      parts.push(`<strong>${visible}</strong> öğrenci gösteriliyor`);
-      parts.push(`(toplam listede <strong>${total}</strong> öğrenci var)`);
-
-      if (newCountFiltered || updatedCountFiltered) {
-        parts.push(`— filtreye göre: yeni <strong>${newCountFiltered}</strong>, güncel <strong>${updatedCountFiltered}</strong>`);
-      }
-
-      if (recentOnly && visible >= 30) {
-        parts.push(`— <span class="badge-soft">"Yalnızca en yeni 30" aktif</span>`);
-      }
-
-      bar.innerHTML = `<span class="dot"></span><span>${parts.join(" ")}</span>`;
+      
+      let msg = `Toplam <strong>${total}</strong> kayıt içinden <strong>${visible}</strong> tanesi görüntüleniyor.`;
+      if (recentOnly && visible >= 30) msg += " (Son 30 kayıt filtresi aktif)";
+      bar.innerHTML = msg;
     }
 
     function applyFilters(removedRecords = []) {
@@ -1488,99 +1152,63 @@ let snapshotSource = "none"; // none | firebase | file
       const dateFromVal = document.getElementById("dateFrom").value;
       const dateToVal = document.getElementById("dateTo").value;
       const selectedClasses = getSelectedClasses();
-      const dateSortOrder = document.getElementById("dateSortOrder").value; // YENİ
+      const dateSortOrder = document.getElementById("dateSortOrder").value;
 
       let fromDate = null;
       let toDate = null;
       if (dateFromVal) fromDate = new Date(dateFromVal + "T00:00:00");
-      if (dateToVal)   toDate   = new Date(dateToVal   + "T23:59:59");
+      if (dateToVal)   toDate    = new Date(dateToVal    + "T23:59:59");
 
       let filtered = students.slice();
 
       filtered = filtered.filter(s => {
-        if (activeViewMode === "new-updated" && !(s.status === "new" || s.status === "updated")) {
-          return false;
-        }
-
+        if (activeViewMode === "new-updated" && !(s.status === "new" || s.status === "updated")) return false;
         if (statusVal) {
           if (statusVal === "normal" && s.status !== "normal") return false;
           if (statusVal === "new" && s.status !== "new") return false;
           if (statusVal === "updated" && s.status !== "updated") return false;
         }
-
         if (selectedClasses.length && !selectedClasses.includes(s.sinif)) return false;
         if (genderVal && s.cinsiyet !== genderVal) return false;
-
         if (scholarVal === "nonempty" && !s.burslu) return false;
         if (scholarVal === "empty" && s.burslu) return false;
-
         if (fromDate && s.dateObj && s.dateObj < fromDate) return false;
         if (toDate && s.dateObj && s.dateObj > toDate) return false;
-
+        
         if (searchText) {
-          const combined = [
-            s.isim, s.soyisim, s.cinsiyet, s.sinif,
-            s.okulNo, s.veliAdi, s.veliSoyadi, s.veliTelefon,
-            s.yil, s.tarih, s.burslu
-          ].join(" ").toLowerCase();
+          const combined = Object.values(s).join(" ").toLowerCase();
           if (!combined.includes(searchText)) return false;
         }
         return true;
       });
 
-      // Sıralama
+      // SIRALAMA
       const statusOrder = { new: 0, updated: 1, normal: 2 };
-
       if (dateSortOrder === "desc" || dateSortOrder === "asc") {
-        // Tarihe göre sıralama (yeniden eskiye / eskiden yeniye)
         filtered.sort((a, b) => {
-          const da = a.dateObj;
-          const db = b.dateObj;
-
+          const da = a.dateObj, db = b.dateObj;
           if (da && db && da.getTime() !== db.getTime()) {
             return dateSortOrder === "desc" ? db - da : da - db;
-          } else if (da && !db) {
-            return -1;
-          } else if (!da && db) {
-            return 1;
-          }
-
+          } else if (da && !db) return -1;
+          else if (!da && db) return 1;
+          
           const sa = statusOrder[a.status] ?? 2;
           const sb = statusOrder[b.status] ?? 2;
           if (sa !== sb) return sa - sb;
-
-          const ya = parseInt(a.yil || "0", 10);
-          const yb = parseInt(b.yil || "0", 10);
-          if (ya !== yb) return yb - ya;
-
-          const na = parseInt(a.okulNo || "0", 10);
-          const nb = parseInt(b.okulNo || "0", 10);
-          return nb - na;
+          return parseInt(b.okulNo || "0") - parseInt(a.okulNo || "0");
         });
       } else {
-        // Eski davranış: Yeni → Güncellenen → Normal, sonra tarih/yıl/okul no
         filtered.sort((a, b) => {
           const sa = statusOrder[a.status] ?? 2;
           const sb = statusOrder[b.status] ?? 2;
           if (sa !== sb) return sa - sb;
-
-          const da = a.dateObj;
-          const db = b.dateObj;
+          const da = a.dateObj, db = b.dateObj;
           if (da && db && da.getTime() !== db.getTime()) return db - da;
-
-          const ya = parseInt(a.yil || "0", 10);
-          const yb = parseInt(b.yil || "0", 10);
-          if (ya !== yb) return yb - ya;
-
-          const na = parseInt(a.okulNo || "0", 10);
-          const nb = parseInt(b.okulNo || "0", 10);
-          return nb - na;
+          return parseInt(b.okulNo || "0") - parseInt(a.okulNo || "0");
         });
       }
 
-      if (recentOnly && filtered.length > 30) {
-        filtered = filtered.slice(0, 30);
-      }
+      if (recentOnly && filtered.length > 30) filtered = filtered.slice(0, 30);
 
       renderTable(filtered);
       updateSummary(removedRecords);
@@ -1592,13 +1220,7 @@ let snapshotSource = "none"; // none | firebase | file
       body.innerHTML = "";
 
       if (!rows.length) {
-        const tr = document.createElement("tr");
-        tr.className = "loading-row";
-        const td = document.createElement("td");
-        td.colSpan = COLUMNS.length;
-        td.textContent = "Filtre sonuçlarına göre gösterilecek öğrenci yok.";
-        tr.appendChild(td);
-        body.appendChild(tr);
+        body.innerHTML = '<tr><td colspan="12" style="text-align:center; padding:30px; color:var(--text-muted)">Eşleşen kayıt bulunamadı.</td></tr>';
         return;
       }
 
@@ -1610,175 +1232,119 @@ let snapshotSource = "none"; // none | firebase | file
         COLUMNS.forEach((col, index) => {
           const td = document.createElement("td");
           td.dataset.field = col.key;
-          td.dataset.colIndex = index;
-
+          
           if (col.key === "status") {
-            const pill = document.createElement("span");
-            pill.className = "status-pill normal";
-            let icon = "⬜";
-            let text = "NORMAL";
+            const span = document.createElement("span");
             if (s.status === "new") {
-              pill.className = "status-pill new";
-              icon = "🆕";
-              text = "YENİ";
+              span.className = "status-badge new";
+              span.innerHTML = `✨ YENİ`;
             } else if (s.status === "updated") {
-              pill.className = "status-pill updated";
-              icon = "✏️";
-              text = "GÜNCEL";
-            }
-            pill.innerHTML = `<span class="icon">${icon}</span><span class="label">${text}</span>`;
-            td.appendChild(pill);
-          } else {
-            let value = s[col.key] || "";
-            if (col.key === "veliTelefon" && value) {
-              const span = document.createElement("span");
-              span.textContent = value;
-              span.className = "muted";
-              td.appendChild(span);
+              span.className = "status-badge updated";
+              span.innerHTML = `📝 GÜNCEL`;
             } else {
-              td.textContent = value;
+              span.className = "status-badge normal";
+              span.innerHTML = `NORMAL`;
             }
+            td.appendChild(span);
+          } else {
+             if (col.key === "veliTelefon" && s[col.key]) {
+               td.innerHTML = `<span style="opacity:0.6">${s[col.key]}</span>`;
+             } else {
+               td.textContent = s[col.key] || "";
+             }
           }
-
           tr.appendChild(td);
         });
-
         body.appendChild(tr);
       });
-
       syncPrintColumnVisibility();
     }
 
     function syncPrintColumnVisibility() {
       const rows = document.querySelectorAll("#studentsTable tr");
-      const checkboxes = document.querySelectorAll(
-        "#printColsContainer input[type='checkbox']"
-      );
-
+      const checkboxes = document.querySelectorAll("#printColsContainer input[type='checkbox']");
       const hiddenFields = new Set();
       checkboxes.forEach(cb => {
-        const field = cb.dataset.field;
-        if (!cb.checked) hiddenFields.add(field);
+        if (!cb.checked) hiddenFields.add(cb.dataset.field);
       });
 
       rows.forEach(tr => {
         Array.from(tr.children).forEach(cell => {
           const field = cell.dataset.field;
           if (!field) return;
-          if (hiddenFields.has(field)) {
-            cell.classList.add("col-hidden");
-          } else {
-            cell.classList.remove("col-hidden");
-          }
+          cell.style.display = hiddenFields.has(field) ? "none" : "";
         });
       });
     }
 
     // =======================
-    // ETKİNLİKLER
+    // INIT & EVENTS
     // =======================
     function setupEventListeners() {
-      document.getElementById("searchInput").addEventListener("input", () => applyFilters());
-      document.getElementById("genderFilter").addEventListener("change", () => applyFilters());
-      document.getElementById("scholarFilter").addEventListener("change", () => applyFilters());
-      document.getElementById("statusFilter").addEventListener("change", () => applyFilters());
-      document.getElementById("dateFrom").addEventListener("change", () => applyFilters());
-      document.getElementById("dateTo").addEventListener("change", () => applyFilters());
-      document.getElementById("recentOnly").addEventListener("change", () => applyFilters());
-      document.getElementById("dateSortOrder").addEventListener("change", () => applyFilters()); // YENİ
-
+      const ids = ["searchInput", "genderFilter", "scholarFilter", "statusFilter", "dateFrom", "dateTo", "recentOnly", "dateSortOrder"];
+      ids.forEach(id => document.getElementById(id).addEventListener("input", () => applyFilters()));
+      
       document.getElementById("classFilterContainer").addEventListener("change", () => applyFilters());
 
       document.getElementById("clearFiltersBtn").addEventListener("click", () => {
-        document.getElementById("searchInput").value = "";
-        document.getElementById("genderFilter").value = "";
-        document.getElementById("scholarFilter").value = "";
-        document.getElementById("statusFilter").value = "";
-        document.getElementById("dateFrom").value = "";
-        document.getElementById("dateTo").value = "";
-        document.getElementById("recentOnly").checked = false;
-        document.getElementById("dateSortOrder").value = ""; // YENİ
-        document.querySelectorAll("#classFilterContainer input[type='checkbox']").forEach(cb => cb.checked = false);
+        ids.forEach(id => {
+            const el = document.getElementById(id);
+            if(el.type==='checkbox') el.checked=false; else el.value="";
+        });
+        document.querySelectorAll("#classFilterContainer input").forEach(cb => cb.checked=false);
         applyFilters();
       });
 
       document.getElementById("reloadBtn").addEventListener("click", () => loadData());
-
-      document.getElementById("saveSnapshotBtn").addEventListener("click", async () => {
-        // Kaydetme işlemini bekleyerek kullanıcıya doğru geri bildirim ver.
-        await saveSnapshot(students);
-      });
-
+      document.getElementById("saveSnapshotBtn").addEventListener("click", () => saveSnapshot(students));
       document.getElementById("printBtn").addEventListener("click", () => {
         syncPrintColumnVisibility();
         window.print();
       });
+      document.getElementById("printColsContainer").addEventListener("change", syncPrintColumnVisibility);
 
-      document.getElementById("printColsContainer").addEventListener("change", () => {
-        syncPrintColumnVisibility();
-      });
-
-      document.getElementById("viewAllBtn").addEventListener("click", () => {
+      document.getElementById("viewAllBtn").addEventListener("click", (e) => {
         activeViewMode = "all";
-        document.getElementById("viewAllBtn").classList.add("active");
-        document.getElementById("viewNewUpdatedBtn").classList.remove("active");
+        document.querySelectorAll(".view-toggles button").forEach(b => b.classList.remove("active"));
+        e.target.classList.add("active");
         applyFilters();
       });
 
-      document.getElementById("viewNewUpdatedBtn").addEventListener("click", () => {
+      document.getElementById("viewNewUpdatedBtn").addEventListener("click", (e) => {
         activeViewMode = "new-updated";
-        document.getElementById("viewNewUpdatedBtn").classList.add("active");
-        document.getElementById("viewAllBtn").classList.remove("active");
+        document.querySelectorAll(".view-toggles button").forEach(b => b.classList.remove("active"));
+        e.target.classList.add("active");
         applyFilters();
       });
 
-      // Çift tıklama ile hücre kopyalama
+      // Çift tıklama ile kopyalama
       document.getElementById("tableBody").addEventListener("dblclick", async e => {
         const cell = e.target.closest("td");
         if (!cell) return;
         const text = cell.innerText.trim();
         if (!text) return;
         try {
-          if (navigator.clipboard && navigator.clipboard.writeText) {
-            await navigator.clipboard.writeText(text);
-          } else {
-            const tmp = document.createElement("textarea");
-            tmp.value = text;
-            document.body.appendChild(tmp);
-            tmp.select();
-            document.execCommand("copy");
-            document.body.removeChild(tmp);
-          }
-          showToast("Metin panoya kopyalandı.");
-        } catch (err) {
-          console.error(err);
-          showToast("Kopyalama sırasında hata oluştu.");
-        }
+          await navigator.clipboard.writeText(text);
+          showToast("Kopyalandı: " + text);
+        } catch(err) { console.error(err); }
       });
 
-      // TXT indir
+      // TXT İndir
       document.getElementById("downloadTxtBtn").addEventListener("click", () => {
-        if (!students.length) {
-          showToast("İndirilecek liste yok.");
-          return;
-        }
+        if (!students.length) return showToast("Liste boş.");
         const snap = buildSnapshotObject(students);
-        const blob = new Blob([JSON.stringify(snap, null, 2)], {
-          type: "text/plain;charset=utf-8"
-        });
+        const blob = new Blob([JSON.stringify(snap, null, 2)], { type: "text/plain;charset=utf-8" });
         const url = URL.createObjectURL(blob);
         const a = document.createElement("a");
-        const safeName = (currentSheetName || "liste").replace(/[^0-9A-Za-z_-]/g, "_");
         a.href = url;
-        a.download = `ogrenci_listesi_${safeName}.txt`;
+        a.download = `liste_${currentSheetName}.txt`;
         document.body.appendChild(a);
         a.click();
         document.body.removeChild(a);
-        URL.revokeObjectURL(url);
-        showToast("TXT dosyası indirildi.");
+        showToast("TXT İndirildi.");
       });
 
-      // TXT yükle
+      // TXT Yükle
       const uploadInput = document.getElementById("uploadTxtInput");
       document.getElementById("uploadTxtBtn").addEventListener("click", () => {
         uploadInput.value = "";
@@ -1790,25 +1356,16 @@ let snapshotSource = "none"; // none | firebase | file
         const reader = new FileReader();
         reader.onload = () => {
           try {
-            const obj = JSON.parse(reader.result);
-            applySnapshotFromFile(obj);
-          } catch (err) {
-            console.error(err);
-            showToast("TXT içeriği okunamadı (JSON parse hatası).");
-          }
+            applySnapshotFromFile(JSON.parse(reader.result));
+          } catch(err) { showToast("Dosya okunamadı."); }
         };
-        reader.readAsText(file, "utf-8");
+        reader.readAsText(file);
       });
     }
 
-    // =======================
-    // BAŞLAT
-    // =======================
     document.addEventListener("DOMContentLoaded", async () => {
-      // Sayfa yüklendiğinde sekmeleri ve olay dinleyicilerini hazırla.
       renderSheetTabs();
       setupEventListeners();
-      // Snapshot'ı Firebase'den yüklemeden önce bekleyerek ardından veriyi yükle.
       await loadSnapshot();
       await loadData();
     });
