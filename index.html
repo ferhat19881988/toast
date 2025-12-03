@@ -7,22 +7,22 @@
   
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
 
   <style>
     :root {
       /* Modern Renk Paleti */
-      --primary: #4f46e5;      /* Indigo 600 */
+      --primary: #4f46e5;       /* Indigo 600 */
       --primary-dark: #4338ca; /* Indigo 700 */
       --primary-light: #e0e7ff;/* Indigo 100 */
       
-      --bg-body: #f1f5f9;      /* Slate 100 */
+      --bg-body: #f1f5f9;       /* Slate 100 */
       --bg-card: #ffffff;
       
-      --text-main: #0f172a;    /* Slate 900 */
-      --text-muted: #64748b;   /* Slate 500 */
+      --text-main: #0f172a;     /* Slate 900 */
+      --text-muted: #64748b;    /* Slate 500 */
       
-      --border: #e2e8f0;       /* Slate 200 */
+      --border: #e2e8f0;        /* Slate 200 */
       
       /* Durum Renkleri */
       --success-bg: #dcfce7;
@@ -120,6 +120,9 @@
       gap: 8px;
     }
 
+    /* Print Header (Varsayılan Gizli) */
+    .print-title-block { display: none; }
+
     /* Main Grid */
     .dashboard-grid {
       display: grid;
@@ -151,7 +154,7 @@
       justify-content: space-between;
     }
 
-    /* Stats Cards (Big & Bold) */
+    /* Stats Cards */
     .stats-container {
       display: grid;
       grid-template-columns: repeat(2, 1fr);
@@ -375,15 +378,16 @@
       font-size: 14px;
     }
 
+    /* --- GÜNCELLENEN TABLO STİLLERİ (DAHA SIKI) --- */
     thead th {
       background: #f8fafc;
       position: sticky;
       top: 0;
       text-align: left;
-      padding: 14px 16px;
+      padding: 8px 10px; /* Yaklaştırıldı */
       font-weight: 600;
       color: var(--text-muted);
-      font-size: 12px;
+      font-size: 11px; /* Font küçüldü */
       text-transform: uppercase;
       letter-spacing: 0.05em;
       border-bottom: 1px solid var(--border);
@@ -391,14 +395,15 @@
       z-index: 10;
     }
 
-    tbody tr { transition: background 0.1s; }
+    tbody tr { transition: background 0.1s; cursor: pointer; }
     tbody tr:hover { background-color: #f1f5f9; }
     
     tbody td {
-      padding: 14px 16px;
+      padding: 8px 10px; /* Yaklaştırıldı */
       border-bottom: 1px solid var(--border);
       color: var(--text-main);
       white-space: nowrap;
+      font-size: 13px;
     }
 
     /* Status Pills in Table */
@@ -444,15 +449,91 @@
     }
     .toast.visible { opacity: 1; transform: translateY(0); }
 
-    /* Print Logic */
+    /* --- MODAL STİLLERİ --- */
+    .modal-overlay {
+      position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+      background: rgba(0,0,0,0.5); z-index: 2000;
+      display: none; align-items: center; justify-content: center;
+      backdrop-filter: blur(2px);
+    }
+    .modal-overlay.active { display: flex; }
+    .modal-card {
+      background: white; width: 100%; max-width: 500px;
+      border-radius: 16px; box-shadow: var(--shadow-lg);
+      overflow: hidden; animation: modalSlide 0.3s ease;
+    }
+    @keyframes modalSlide { from {transform: translateY(20px); opacity: 0;} to {transform: translateY(0); opacity: 1;} }
+    .modal-header {
+      padding: 16px 24px; border-bottom: 1px solid var(--border);
+      display: flex; justify-content: space-between; align-items: center;
+      background: #f8fafc;
+    }
+    .modal-title { font-size: 18px; font-weight: 700; color: var(--text-main); }
+    .modal-close {
+      background: none; border: none; font-size: 24px; cursor: pointer; color: var(--text-muted);
+      line-height: 1; padding: 0 4px;
+    }
+    .modal-body { padding: 24px; max-height: 70vh; overflow-y: auto; }
+    .detail-row { display: flex; justify-content: space-between; margin-bottom: 12px; font-size: 14px; border-bottom: 1px dashed #e2e8f0; padding-bottom: 4px; }
+    .detail-label { color: var(--text-muted); font-weight: 500; }
+    .detail-val { font-weight: 600; color: var(--text-main); text-align: right; }
+    .change-log-box {
+      margin-top: 16px; padding: 12px; background: #fffbeb; border: 1px solid #fcd34d;
+      border-radius: 8px; font-size: 13px; color: #92400e;
+    }
+
+    /* --- YAZDIRMA STİLLERİ (YENİLENMİŞ) --- */
     @media print {
       body { background: white; padding: 0; }
       .app-shell { max-width: none; padding: 0; }
-      header, .panel:not(.table-container-wrap), .table-toolbar, .no-print { display: none !important; }
-      .panel { box-shadow: none; border: none; padding: 0; }
-      .table-tools-container { border: none; box-shadow: none; overflow: visible; }
-      .toolbar-header { display: none; }
+      
+      /* Gizlenecek Alanlar */
+      header.app-header, 
+      .dashboard-grid > div:first-child, /* Sol panel */
+      .table-tools-container .toolbar-header, 
+      .table-tools-container #listStatusBar,
+      .table-tools-container input,
+      .no-print, 
+      .toast,
+      .modal-overlay { 
+        display: none !important; 
+      }
+
+      /* Düzen */
+      .dashboard-grid { display: block; grid-template-columns: 1fr; }
+      .table-tools-container { 
+        border: none; box-shadow: none; overflow: visible; 
+      }
       .table-scroll-area { max-height: none; overflow: visible; }
+      .panel { padding: 0; border: none; box-shadow: none; }
+
+      /* Liste Modernizasyonu */
+      table { width: 100%; border-collapse: collapse; font-family: 'Inter', sans-serif; }
+      thead th { 
+        background-color: #f1f5f9 !important; 
+        color: #0f172a !important; 
+        border: 2px solid #000; /* Belirgin başlık */
+        font-weight: 800;
+        font-size: 12px;
+      }
+      tbody td { 
+        border: 1px solid #cbd5e1; 
+        font-size: 11px;
+        padding: 6px 8px;
+        color: #000;
+      }
+      tr:nth-child(even) { background-color: #f8fafc !important; }
+
+      /* Özel Yazdırma Başlığı */
+      .print-title-block {
+        display: block !important;
+        text-align: center;
+        margin-bottom: 30px;
+        border-bottom: 2px solid #000;
+        padding-bottom: 10px;
+      }
+      .print-title-block h1 { font-size: 32px; margin: 0; text-transform: uppercase; letter-spacing: 2px; }
+      .print-title-block p { font-size: 14px; margin: 5px 0 0 0; color: #666; }
     }
 
     .muted-text { color: var(--text-muted); font-size: 12px; }
@@ -462,6 +543,11 @@
 
   <div class="app-shell">
     
+    <div class="print-title-block">
+        <h1>ÖĞRENCİ LİSTESİ</h1>
+        <p id="printDateInfo">Rapor Tarihi: -</p>
+    </div>
+
     <header class="app-header">
       <div class="app-title-block">
         <h1><span class="icon">🎓</span> Öğrenci Listesi Yöneticisi</h1>
@@ -574,11 +660,15 @@
             </div>
 
             <div class="field-group">
-                <div class="field-label">Tarih Sıralama</div>
-                <select id="dateSortOrder">
-                    <option value="">Otomatik (Öncelikli Durum)</option>
-                    <option value="desc">Yeniden → Eskiye</option>
-                    <option value="asc">Eskiden → Yeniye</option>
+                <div class="field-label">Sıralama Seçenekleri</div>
+                <select id="generalSortOrder">
+                    <option value="">Otomatik (Durum Öncelikli)</option>
+                    <option value="name_asc">İsim (A → Z)</option>
+                    <option value="name_desc">İsim (Z → A)</option>
+                    <option value="num_asc">Numara (Küçük → Büyük)</option>
+                    <option value="num_desc">Numara (Büyük → Küçük)</option>
+                    <option value="date_desc">Tarih (Yeniden → Eskiye)</option>
+                    <option value="date_asc">Tarih (Eskiden → Yeniye)</option>
                 </select>
             </div>
 
@@ -660,7 +750,7 @@
         </div>
         
         <div style="padding: 12px 24px; background: #f8fafc; border-top: 1px solid var(--border); font-size:12px; color:var(--text-muted); text-align:center;">
-          <span id="lastSavedInfo">Son kayıt: Yok</span> • Hücrelere çift tıklayarak kopyalayabilirsiniz.
+          <span id="lastSavedInfo">Son kayıt: Yok</span> • Detay için satıra tıklayın.
         </div>
 
       </div>
@@ -671,6 +761,17 @@
   <div class="toast" id="toast">
     <span style="font-size: 18px;">✅</span>
     <span id="toastMessage">İşlem başarılı.</span>
+  </div>
+
+  <div class="modal-overlay" id="studentDetailModal">
+    <div class="modal-card">
+        <div class="modal-header">
+            <div class="modal-title">Öğrenci Detayı</div>
+            <button class="modal-close" onclick="closeModal()">×</button>
+        </div>
+        <div class="modal-body" id="modalContent">
+            </div>
+    </div>
   </div>
 
   <script type="module">
@@ -1152,7 +1253,7 @@
       const dateFromVal = document.getElementById("dateFrom").value;
       const dateToVal = document.getElementById("dateTo").value;
       const selectedClasses = getSelectedClasses();
-      const dateSortOrder = document.getElementById("dateSortOrder").value;
+      const sortOrder = document.getElementById("generalSortOrder") ? document.getElementById("generalSortOrder").value : "";
 
       let fromDate = null;
       let toDate = null;
@@ -1182,31 +1283,31 @@
         return true;
       });
 
-      // SIRALAMA
+      // --- SIRALAMA MANTIĞI ---
       const statusOrder = { new: 0, updated: 1, normal: 2 };
-      if (dateSortOrder === "desc" || dateSortOrder === "asc") {
-        filtered.sort((a, b) => {
-          const da = a.dateObj, db = b.dateObj;
-          if (da && db && da.getTime() !== db.getTime()) {
-            return dateSortOrder === "desc" ? db - da : da - db;
-          } else if (da && !db) return -1;
-          else if (!da && db) return 1;
-          
-          const sa = statusOrder[a.status] ?? 2;
-          const sb = statusOrder[b.status] ?? 2;
-          if (sa !== sb) return sa - sb;
-          return parseInt(b.okulNo || "0") - parseInt(a.okulNo || "0");
-        });
-      } else {
-        filtered.sort((a, b) => {
-          const sa = statusOrder[a.status] ?? 2;
-          const sb = statusOrder[b.status] ?? 2;
-          if (sa !== sb) return sa - sb;
-          const da = a.dateObj, db = b.dateObj;
-          if (da && db && da.getTime() !== db.getTime()) return db - da;
-          return parseInt(b.okulNo || "0") - parseInt(a.okulNo || "0");
-        });
-      }
+      
+      filtered.sort((a, b) => {
+        // 1. İsim Sıralama
+        if (sortOrder === "name_asc") return a.isim.localeCompare(b.isim, 'tr');
+        if (sortOrder === "name_desc") return b.isim.localeCompare(a.isim, 'tr');
+
+        // 2. Numara Sıralama (Okul No)
+        if (sortOrder === "num_asc") return parseInt(a.okulNo || "0") - parseInt(b.okulNo || "0");
+        if (sortOrder === "num_desc") return parseInt(b.okulNo || "0") - parseInt(a.okulNo || "0");
+
+        // 3. Tarih Sıralama
+        if (sortOrder === "date_asc" || sortOrder === "date_desc") {
+            const da = a.dateObj ? a.dateObj.getTime() : 0;
+            const db = b.dateObj ? b.dateObj.getTime() : 0;
+            return sortOrder === "date_desc" ? db - da : da - db;
+        }
+
+        // 4. Varsayılan (Otomatik: Durum -> Numara)
+        const sa = statusOrder[a.status] ?? 2;
+        const sb = statusOrder[b.status] ?? 2;
+        if (sa !== sb) return sa - sb;
+        return parseInt(b.okulNo || "0") - parseInt(a.okulNo || "0");
+      });
 
       if (recentOnly && filtered.length > 30) filtered = filtered.slice(0, 30);
 
@@ -1281,15 +1382,20 @@
     // INIT & EVENTS
     // =======================
     function setupEventListeners() {
-      const ids = ["searchInput", "genderFilter", "scholarFilter", "statusFilter", "dateFrom", "dateTo", "recentOnly", "dateSortOrder"];
-      ids.forEach(id => document.getElementById(id).addEventListener("input", () => applyFilters()));
+      const ids = ["searchInput", "genderFilter", "scholarFilter", "statusFilter", "dateFrom", "dateTo", "recentOnly", "generalSortOrder"];
+      ids.forEach(id => {
+          const el = document.getElementById(id);
+          if(el) el.addEventListener("input", () => applyFilters());
+      });
       
       document.getElementById("classFilterContainer").addEventListener("change", () => applyFilters());
 
       document.getElementById("clearFiltersBtn").addEventListener("click", () => {
         ids.forEach(id => {
             const el = document.getElementById(id);
-            if(el.type==='checkbox') el.checked=false; else el.value="";
+            if(el) {
+                if(el.type==='checkbox') el.checked=false; else el.value="";
+            }
         });
         document.querySelectorAll("#classFilterContainer input").forEach(cb => cb.checked=false);
         applyFilters();
@@ -1298,6 +1404,10 @@
       document.getElementById("reloadBtn").addEventListener("click", () => loadData());
       document.getElementById("saveSnapshotBtn").addEventListener("click", () => saveSnapshot(students));
       document.getElementById("printBtn").addEventListener("click", () => {
+        // Yazdırma tarihini güncelle
+        const d = new Date();
+        document.getElementById("printDateInfo").textContent = "Rapor Tarihi: " + d.toLocaleDateString("tr-TR") + " " + d.toLocaleTimeString("tr-TR");
+        
         syncPrintColumnVisibility();
         window.print();
       });
@@ -1317,16 +1427,25 @@
         applyFilters();
       });
 
-      // Çift tıklama ile kopyalama
-      document.getElementById("tableBody").addEventListener("dblclick", async e => {
-        const cell = e.target.closest("td");
-        if (!cell) return;
-        const text = cell.innerText.trim();
-        if (!text) return;
-        try {
-          await navigator.clipboard.writeText(text);
-          showToast("Kopyalandı: " + text);
-        } catch(err) { console.error(err); }
+      // Tablo Satırına Tıklama (Modal Açma)
+      document.getElementById("tableBody").addEventListener("click", e => {
+        const tr = e.target.closest("tr");
+        if (!tr || tr.classList.contains("loading-row")) return;
+        
+        // Hangi öğrenci olduğunu bul
+        const noCell = tr.querySelector('[data-field="okulNo"]');
+        if(!noCell) return;
+        const rowOkulNo = noCell.textContent.trim();
+        const nameCell = tr.querySelector('[data-field="isim"]');
+        const rowName = nameCell ? nameCell.textContent.trim() : "";
+
+        const student = students.find(s => s.okulNo == rowOkulNo && s.isim == rowName);
+        if(student) openStudentModal(student);
+      });
+      
+      // Modal dışına tıklayınca kapat
+      document.getElementById("studentDetailModal").addEventListener("click", (e) => {
+        if(e.target === document.getElementById("studentDetailModal")) closeModal();
       });
 
       // TXT İndir
@@ -1361,6 +1480,70 @@
         };
         reader.readAsText(file);
       });
+    }
+
+    // Modal Fonksiyonları
+    window.closeModal = function() {
+      document.getElementById("studentDetailModal").classList.remove("active");
+    };
+
+    function openStudentModal(s) {
+      const modal = document.getElementById("studentDetailModal");
+      const content = document.getElementById("modalContent");
+      
+      let statusHtml = "";
+      let diffHtml = "";
+
+      // Durum Tespiti
+      if (s.status === "new") {
+        statusHtml = `<span class="status-badge new" style="font-size:14px; padding:6px 12px;">✨ Yeni Kayıt</span>`;
+        diffHtml = `<div class="change-log-box" style="background:#f0fdf4; border-color:#86efac; color:#166534;">Bu öğrenci listeye yeni eklendi.</div>`;
+      } else if (s.status === "updated") {
+        statusHtml = `<span class="status-badge updated" style="font-size:14px; padding:6px 12px;">✏️ Bilgileri Güncellendi</span>`;
+        
+        // Değişiklikleri bul
+        if (snapshot && snapshot.records && snapshot.records[s.id]) {
+            const oldData = snapshot.records[s.id].data;
+            const changes = [];
+            const fields = {
+                isim: "İsim", soyisim: "Soyisim", sinif: "Sınıf", okulNo: "Okul No",
+                veliAdi: "Veli Adı", veliTelefon: "Veli Tel", burslu: "Burs Durumu"
+            };
+            
+            for(let key in fields) {
+                if(s[key] !== oldData[key]) {
+                    changes.push(`<b>${fields[key]}:</b> "${oldData[key]}" ➞ "${s[key]}"`);
+                }
+            }
+            if(changes.length > 0) {
+                diffHtml = `<div class="change-log-box">
+                    <div style="font-weight:700; margin-bottom:4px;">Değişiklikler:</div>
+                    <ul style="margin:0; padding-left:20px;">${changes.map(c => `<li>${c}</li>`).join('')}</ul>
+                </div>`;
+            }
+        }
+      } else {
+        statusHtml = `<span class="status-badge normal" style="font-size:14px; padding:6px 12px;">Kayıtlı Öğrenci</span>`;
+      }
+
+      content.innerHTML = `
+        <div style="text-align:center; margin-bottom:20px;">
+            <div style="font-size:24px; font-weight:700;">${s.isim} ${s.soyisim}</div>
+            <div style="font-size:14px; color:var(--text-muted);">${s.okulNo}</div>
+            <div style="margin-top:10px;">${statusHtml}</div>
+        </div>
+
+        <div class="detail-row"><span class="detail-label">Sınıf:</span> <span class="detail-val">${s.sinif}</span></div>
+        <div class="detail-row"><span class="detail-label">Cinsiyet:</span> <span class="detail-val">${s.cinsiyet}</span></div>
+        <div class="detail-row"><span class="detail-label">Veli Adı:</span> <span class="detail-val">${s.veliAdi} ${s.veliSoyadi}</span></div>
+        <div class="detail-row"><span class="detail-label">Veli Telefon:</span> <span class="detail-val">${s.veliTelefon || "-"}</span></div>
+        <div class="detail-row"><span class="detail-label">Kayıt Tarihi:</span> <span class="detail-val">${s.tarih || "-"}</span></div>
+        <div class="detail-row"><span class="detail-label">Burs Durumu:</span> <span class="detail-val">${s.burslu ? "Burslu" : "Normal"}</span></div>
+        
+        ${diffHtml}
+      `;
+      
+      modal.classList.add("active");
     }
 
     document.addEventListener("DOMContentLoaded", async () => {
