@@ -1052,8 +1052,40 @@ let snapshotSource = "none"; // none | firebase | file
       return `${name}__${surname}`;
     }
 
+    /**
+     * Derin eşitlik kontrolü, JSON.stringify kullanmak yerine anahtar
+     * sıralamasını ve değerleri tek tek karşılaştırır.  Firebase'den gelen
+     * nesnelerde anahtarların sırası farklı olabildiği için eski yöntem
+     * tüm kayıtları "güncellendi" şeklinde işaretliyordu.  Bu fonksiyon
+     * anahtarları alfabetik olarak sıralayıp her birinin değerini karşılaştırır.
+     *
+     * @param {Object} a İlk nesne
+     * @param {Object} b İkinci nesne
+     * @returns {boolean} Nesneler eşitse true, değilse false
+     */
     function deepEqual(a, b) {
-      return JSON.stringify(a) === JSON.stringify(b);
+      // Her iki nesne de tanımlı olmalı
+      if (a === null || b === null || typeof a !== 'object' || typeof b !== 'object') {
+        return a === b;
+      }
+      const keysA = Object.keys(a).sort();
+      const keysB = Object.keys(b).sort();
+      if (keysA.length !== keysB.length) return false;
+      for (let i = 0; i < keysA.length; i++) {
+        const keyA = keysA[i];
+        const keyB = keysB[i];
+        if (keyA !== keyB) return false;
+        const valA = a[keyA];
+        const valB = b[keyB];
+        // Basit tipler veya null/undefined için doğrudan eşitlik
+        if (valA === null || valB === null || typeof valA !== 'object' || typeof valB !== 'object') {
+          if (valA !== valB) return false;
+        } else {
+          // Özyinelemeli karşılaştırma
+          if (!deepEqual(valA, valB)) return false;
+        }
+      }
+      return true;
     }
 
     // =======================
