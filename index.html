@@ -657,14 +657,14 @@
     <header class="app-header">
       <div class="app-title-block">
         <h1><span class="icon">📋</span>Öğrenci Listesi Yöneticisi</h1>
-        <p>Google E-Tablo verisi + TXT + localStorage ile değişiklik takibi.</p>
+        <p>Google E‑Tablo verisi + TXT + Firebase ile değişiklik takibi.</p>
       </div>
       <div class="header-meta">
         <div class="chip">
           <span class="icon">⬛</span><strong>Siyah / beyaz / gri tema</strong>
         </div>
         <div class="chip">
-          <span class="icon">🧠</span><span>localStorage + TXT karşılaştırma</span>
+          <span class="icon">🧠</span><span>Firebase + TXT karşılaştırma</span>
         </div>
       </div>
     </header>
@@ -825,7 +825,7 @@
             </div>
             <div class="table-toolbar-right">
               <button class="btn btn-subtle btn-sm no-print" id="saveSnapshotBtn" type="button">
-                <span class="icon">💾</span>Bu listeyi hafızaya kaydet
+                <span class="icon">💾</span>Bu listeyi Firebase'e kaydet
               </button>
               <button class="btn btn-subtle btn-sm no-print" id="downloadTxtBtn" type="button">
                 <span class="icon">📥</span>TXT indir
@@ -880,7 +880,12 @@
     <span id="toastMessage">Metin kopyalandı.</span>
   </div>
 
-  <script>
+  <!--
+    This script has been converted into an ES module so that we can
+    import Firebase libraries and remove all usages of browser localStorage.
+    Snapshot persistence is now handled via Firebase Realtime Database.
+  -->
+  <script type="module">
     // =======================
     // KONFİGÜRASYON
     // =======================
@@ -911,8 +916,39 @@
 
     let students = [];
     let snapshot = null;
-    let snapshotSource = "none"; // none | local | file
+let snapshotSource = "none"; // none | firebase | file
     let activeViewMode = "all";  // all | new-updated
+
+    // =======================
+    // FIREBASE KURULUMU
+    // =======================
+    // Firebase modüllerini dışarıdan import ediyoruz.  Versiyonlar
+    // Firebase JS SDK 9.0+ ile uyumludur.  Proje yapılandırması
+    // kullanıcı tarafından sağlanmıştır.
+    import { initializeApp } from 'https://www.gstatic.com/firebasejs/9.23.0/firebase-app.js';
+    import { getAnalytics } from 'https://www.gstatic.com/firebasejs/9.23.0/firebase-analytics.js';
+    import { getDatabase, ref, get, set } from 'https://www.gstatic.com/firebasejs/9.23.0/firebase-database.js';
+
+    const firebaseConfig = {
+      apiKey: "AIzaSyAIzu6aNQstwQCdMWODyIwiaVVBm63OeGw",
+      authDomain: "odevfeno.firebaseapp.com",
+      databaseURL: "https://odevfeno-default-rtdb.europe-west1.firebasedatabase.app",
+      projectId: "odevfeno",
+      storageBucket: "odevfeno.firebasestorage.app",
+      messagingSenderId: "662757516934",
+      appId: "1:662757516934:web:0042188832f63deb6fd307",
+      measurementId: "G-4Q99NQRB38"
+    };
+
+    // Uygulamayı başlat ve servisleri al.  Bu satırlar, uygulamanın
+    // ilk yüklenme sırasında yalnızca bir kez çalıştırılacaktır.
+    const firebaseApp = initializeApp(firebaseConfig);
+    const firebaseAnalytics = getAnalytics(firebaseApp);
+    const firebaseDb = getDatabase(firebaseApp);
+
+    // Firebase içerisinde snapshot'ların tutulduğu temel yol.  Her sekme
+    // ismi bu yolun altına encode edilerek kaydedilecektir.
+    const FIREBASE_BASE_PATH = 'snapshots';
 
     // =======================
     // ARAÇ FONKSİYONLAR
@@ -926,6 +962,21 @@
 
     function getStorageKey() {
       return STORAGE_KEY_BASE + (currentSheetName || "default");
+    }
+
+    /**
+     * Aktif sekme için Firebase Realtime Database referansını döndürür.
+     * Sekme isimlerini güvenli bir URL parçası haline getirmek için
+     * encodeURIComponent kullanılır.  Eğer sekme adı boş veya tanımlı
+     * değilse "default" kullanılır.
+     */
+    function getSnapshotRef() {
+      const name = currentSheetName || 'default';
+      // Firebase yol ayracı olarak "/" kullandığından, encode edilmiş
+      // bir isim kullanmak önemlidir.  encodeURIComponent ayrıca boşluk
+      // ve özel karakterleri de kaçırır.
+      const safeName = encodeURIComponent(name);
+      return ref(firebaseDb, `${FIREBASE_BASE_PATH}/${safeName}`);
     }
 
     function showToast(message) {
@@ -1051,7 +1102,11 @@
         formatDateTimeForBadge(snapshot.savedAt) +
         ` (${count} öğrenci, sekme: ${snapshot.sheetName || "-"})`;
 
-      if (snapshotSource === "local") {
+      if (snapshotSource === "firebase") {
+        compareLabel.textContent = "Karşılaştırma kaynağı: Firebase veritabanı";
+      } else if (snapshotSource === "local") {
+        // localStorage sürümü artık kullanılmıyor ancak eski
+        // kayıtları açıklamak için bu koşul bırakılmıştır.
         compareLabel.textContent = "Karşılaştırma kaynağı: Tarayıcı hafızası (localStorage)";
       } else if (snapshotSource === "file") {
         compareLabel.textContent = "Karşılaştırma kaynağı: Yüklenen TXT dosyası";
@@ -1060,17 +1115,25 @@
       }
     }
 
-    function loadSnapshot() {
+    /**
+     * Firebase üzerinden mevcut sekmenin snapshot bilgisini okur.  Eğer
+     * veritabanında kayıt yoksa snapshot ve snapshotSource "none" olarak
+     * ayarlanır.  Başarılı okuma sonrasında snapshotSource "firebase"
+     * olur.  Hata durumunda önceki veriler silinir ve kullanıcıya
+     * bildirilecek şekilde etiketler güncellenir.
+     */
+    async function loadSnapshot() {
       try {
-        const raw = localStorage.getItem(getStorageKey());
-        if (!raw) {
+        const snapRef = getSnapshotRef();
+        const snapData = await get(snapRef);
+        if (!snapData.exists()) {
           snapshot = null;
           snapshotSource = "none";
           updateSnapshotLabels();
           return;
         }
-        snapshot = JSON.parse(raw);
-        snapshotSource = "local";
+        snapshot = snapData.val();
+        snapshotSource = "firebase";
         updateSnapshotLabels();
       } catch (e) {
         console.error("Snapshot yüklenemedi", e);
@@ -1080,14 +1143,20 @@
       }
     }
 
-    function saveSnapshot(currentStudents) {
+    /**
+     * Verilen öğrenci listesine göre snapshot oluşturur ve Firebase'e
+     * kaydeder.  Kayıt tamamlandıktan sonra snapshot ve snapshotSource
+     * güncellenir.  Hata durumunda kullanıcıya bilgi verilir.
+     */
+    async function saveSnapshot(currentStudents) {
       const snap = buildSnapshotObject(currentStudents);
       try {
-        localStorage.setItem(getStorageKey(), JSON.stringify(snap));
+        const snapRef = getSnapshotRef();
+        await set(snapRef, snap);
         snapshot = snap;
-        snapshotSource = "local";
+        snapshotSource = "firebase";
         updateSnapshotLabels();
-        showToast("Bu sekmenin listesi tarayıcı hafızasına kaydedildi.");
+        showToast("Bu sekmenin listesi Firebase'e kaydedildi.");
       } catch (e) {
         console.error("Snapshot kaydedilemedi", e);
         showToast("Liste kaydedilirken bir hata oluştu.");
@@ -1242,12 +1311,15 @@
         btn.className = "sheet-tab";
         if (tab.name === currentSheetName) btn.classList.add("active");
         btn.innerHTML = `<span class="icon">📑</span><span>${tab.label}</span>`;
-        btn.addEventListener("click", () => {
+        // Sekme butonuna tıklandığında önce Firebase'den snapshot
+        // yüklenir, ardından arayüz ve veri listesi yenilenir.  Bu
+        // işlemler sırayla yapılabilmesi için handler async tanımlanır.
+        btn.addEventListener("click", async () => {
           if (currentSheetName === tab.name) return;
           currentSheetName = tab.name;
-          loadSnapshot();
+          await loadSnapshot();
           renderSheetTabs();
-          loadData();
+          await loadData();
         });
         container.appendChild(btn);
       });
@@ -1600,7 +1672,10 @@
 
       document.getElementById("reloadBtn").addEventListener("click", () => loadData());
 
-      document.getElementById("saveSnapshotBtn").addEventListener("click", () => saveSnapshot(students));
+      document.getElementById("saveSnapshotBtn").addEventListener("click", async () => {
+        // Kaydetme işlemini bekleyerek kullanıcıya doğru geri bildirim ver.
+        await saveSnapshot(students);
+      });
 
       document.getElementById("printBtn").addEventListener("click", () => {
         syncPrintColumnVisibility();
@@ -1697,11 +1772,13 @@
     // =======================
     // BAŞLAT
     // =======================
-    document.addEventListener("DOMContentLoaded", () => {
+    document.addEventListener("DOMContentLoaded", async () => {
+      // Sayfa yüklendiğinde sekmeleri ve olay dinleyicilerini hazırla.
       renderSheetTabs();
       setupEventListeners();
-      loadSnapshot();
-      loadData();
+      // Snapshot'ı Firebase'den yüklemeden önce bekleyerek ardından veriyi yükle.
+      await loadSnapshot();
+      await loadData();
     });
   </script>
 </body>
