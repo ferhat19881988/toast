@@ -1456,32 +1456,7 @@
       });
 
       // Tablo Satırına Tıklama (Modal Açma)
-      // --- GÜNCELLEME: Tek Tık Kopyala, Çift Tık Modal ---
-
-      // 1. Tek Tıklama: Hücre Metnini Kopyala
       document.getElementById("tableBody").addEventListener("click", e => {
-        // Tıklanan öğe bir hücre (td) mi kontrol et
-        const td = e.target.closest("td");
-        if (!td) return;
-        
-        // Yükleniyor satırıysa işlem yapma
-        const tr = td.closest("tr");
-        if (!tr || tr.classList.contains("loading-row")) return;
-
-        // Hücre içindeki metni al (innerText görünür metni alır)
-        const textToCopy = td.innerText.trim();
-        
-        if (textToCopy && textToCopy !== "–") {
-            navigator.clipboard.writeText(textToCopy).then(() => {
-                showToast(`Kopyalandı: ${textToCopy}`);
-            }).catch(err => {
-                console.error("Kopyalama hatası:", err);
-            });
-        }
-      });
-
-      // 2. Çift Tıklama: Detay Modalını Aç
-      document.getElementById("tableBody").addEventListener("dblclick", e => {
         const tr = e.target.closest("tr");
         if (!tr || tr.classList.contains("loading-row")) return;
         
@@ -1625,4 +1600,3 @@
   </script>
 </body>
 </html>
-
