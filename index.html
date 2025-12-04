@@ -1456,9 +1456,20 @@
       });
 
       // Tablo Satırına Tıklama (Modal Açma)
+      // ============================================================
+      // GÜNCELLENEN ALAN: Tablo Etkileşimleri (Tıklama ve Çift Tıklama)
+      // ============================================================
+
+      // 1. Tek Tıklama (Sadece DURUM sütununda Modal açar)
       document.getElementById("tableBody").addEventListener("click", e => {
         const tr = e.target.closest("tr");
-        if (!tr || tr.classList.contains("loading-row")) return;
+        const td = e.target.closest("td");
+        
+        // Satır yoksa veya yükleniyor satırıysa işlem yapma
+        if (!tr || tr.classList.contains("loading-row") || !td) return;
+
+        // EĞER tıklanan sütun "status" (Durum) değilse modal açma (buradan çık)
+        if (td.dataset.field !== "status") return;
         
         // Hangi öğrenci olduğunu bul
         const noCell = tr.querySelector('[data-field="okulNo"]');
@@ -1469,6 +1480,25 @@
 
         const student = students.find(s => s.okulNo == rowOkulNo && s.isim == rowName);
         if(student) openStudentModal(student);
+      });
+
+      // 2. Çift Tıklama (Durum haricindeki hücreleri kopyalar)
+      document.getElementById("tableBody").addEventListener("dblclick", async e => {
+        const td = e.target.closest("td");
+        if (!td) return;
+
+        // Durum sütununda kopyalama yapma (orası modal için)
+        if (td.dataset.field === "status") return;
+
+        const text = td.textContent.trim();
+        if (!text) return;
+
+        try {
+          await navigator.clipboard.writeText(text);
+          showToast(`Kopyalandı: ${text}`);
+        } catch (err) {
+          console.error("Kopyalama hatası:", err);
+        }
       });
       
       // Modal dışına tıklayınca kapat
@@ -1600,3 +1630,4 @@
   </script>
 </body>
 </html>
+
