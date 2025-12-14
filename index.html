@@ -936,6 +936,66 @@
       return `${name}__${surname}`;
     }
 
+
+// ID değiştiğinde (ör. isim/soyisim/okulNo düzeltmesi) aynı kişiyi "yeni" gibi göstermemek için
+// ikincil eşleştirme (hemen iyileştirme): Veli Telefon (+ mümkünse Sınıf) üzerinden eski kaydı bulup "updated" olarak işaretler.
+function normalizePhone(str) {
+  return String(str || "").replace(/\D+/g, "");
+}
+
+function findPrevMatchForStudent(student, prevMap) {
+  if (!prevMap) return null;
+
+  const phone = normalizePhone(student.veliTelefon);
+  if (!phone || phone.length < 8) return null; // çok kısa/boş telefonlar eşleştirmede güvenilmez
+
+  // Adaylar: aynı veli telefonu olan tüm eski kayıtlar
+  const candidates = [];
+  for (const prevId in prevMap) {
+    const d = (prevMap[prevId] && prevMap[prevId].data) ? prevMap[prevId].data : null;
+    if (!d) continue;
+    const p = normalizePhone(d.veliTelefon);
+    if (p && p === phone) candidates.push(prevId);
+  }
+  if (!candidates.length) return null;
+
+  // 1) Sınıf eşleşmesi (varsa) öncelik
+  const cls = String(student.sinif || "").trim();
+  let filtered = candidates;
+  if (cls) {
+    const byClass = candidates.filter(pid => String(prevMap[pid].data.sinif || "").trim() === cls);
+    if (byClass.length) filtered = byClass;
+  }
+
+  // 2) İsim/Soyisim benzerliği ile deterministik seçim (basit puanlama)
+  const n = String(student.isim || "").trim().toUpperCase();
+  const s = String(student.soyisim || "").trim().toUpperCase();
+  const score = (pid) => {
+    const d = prevMap[pid].data || {};
+    const pn = String(d.isim || "").trim().toUpperCase();
+    const ps = String(d.soyisim || "").trim().toUpperCase();
+    let sc = 0;
+    if (pn === n) sc += 5;
+    else if (pn && n && (pn.includes(n) || n.includes(pn))) sc += 2;
+    if (ps === s) sc += 5;
+    else if (ps && s && (ps.includes(s) || s.includes(ps))) sc += 2;
+    // Okul no eşleşmesi (varsa) küçük bir bonus (ama okul no yanlış atanmış olabilir)
+    const on = String(student.okulNo || "").trim();
+    const pon = String(d.okulNo || "").trim();
+    if (on && pon && on === pon) sc += 1;
+    return sc;
+  };
+
+  filtered.sort((a, b) => {
+    const sa = score(a);
+    const sb = score(b);
+    if (sb !== sa) return sb - sa;
+    return String(a).localeCompare(String(b));
+  });
+
+  return filtered[0] || null;
+}
+
     function deepEqual(a, b) {
       if (a === null || b === null || typeof a !== 'object' || typeof b !== 'object') {
         return a === b;
@@ -1106,37 +1166,58 @@
           s.status = "normal";
           return s;
         });
+let removed = [];
+if (snapshot && snapshot.records) {
+  const prevMap = snapshot.records;
+  const currentIds = new Set(parsed.map(s => s.id));
+  const matchedPrevIds = new Set();
 
-        let removed = [];
-        if (snapshot && snapshot.records) {
-          const prevMap = snapshot.records;
-          const currentIds = new Set(parsed.map(s => s.id));
+  parsed.forEach(s => {
+    const prev = prevMap[s.id];
 
-          parsed.forEach(s => {
-            const prev = prevMap[s.id];
-            if (!prev) {
-              s.status = "new";
-            } else {
-              const prevData = prev.data;
-              const currentSlim = {
-                isim: s.isim, soyisim: s.soyisim, cinsiyet: s.cinsiyet,
-                sinif: s.sinif, okulNo: s.okulNo, veliAdi: s.veliAdi,
-                veliSoyadi: s.veliSoyadi, veliTelefon: s.veliTelefon,
-                yil: s.yil, tarih: s.tarih, burslu: s.burslu
-              };
-              if (!deepEqual(prevData, currentSlim)) {
-                s.status = "updated";
-              }
-            }
-          });
+    // İnce eşleştirme: ID değişmişse (isim/soyisim/okulNo düzeltmesi vb.)
+    // aynı kişiyi "new" yerine "updated" olarak ele al.
+    let comparePrevId = null;
 
-          for (const prevId in prevMap) {
-            if (!currentIds.has(prevId)) {
-              removed.push(prevMap[prevId]);
-            }
-          }
-        }
+    if (!prev) {
+      comparePrevId = findPrevMatchForStudent(s, prevMap);
+      if (comparePrevId) {
+        matchedPrevIds.add(comparePrevId);
+        s.status = "updated";
+        s._comparePrevId = comparePrevId; // modal ve değişiklik listesi için
+      } else {
+        s.status = "new";
+        return;
+      }
+    } else {
+      comparePrevId = s.id;
+    }
 
+    const prevData = prevMap[comparePrevId].data;
+    const currentSlim = {
+      isim: s.isim, soyisim: s.soyisim, cinsiyet: s.cinsiyet,
+      sinif: s.sinif, okulNo: s.okulNo, veliAdi: s.veliAdi,
+      veliSoyadi: s.veliSoyadi, veliTelefon: s.veliTelefon,
+      yil: s.yil, tarih: s.tarih, burslu: s.burslu
+    };
+
+    if (!deepEqual(prevData, currentSlim)) {
+      s.status = "updated";
+      s._comparePrevId = comparePrevId;
+    } else {
+      // ID birebir eşleştiyse ve veri aynıysa normal; (ince eşleşmede "updated" zaten set edilmiş olur)
+      if (!s._comparePrevId) s.status = "normal";
+    }
+  });
+
+  // Removed: snapshot'ta olup güncel listede olmayanlar,
+  // fakat ince eşleştirme ile "updated"e bağlananlar removed sayılmasın.
+  for (const prevId in prevMap) {
+    if (!currentIds.has(prevId) && !matchedPrevIds.has(prevId)) {
+      removed.push(prevMap[prevId]);
+    }
+  }
+}
         students = parsed;
         renderHeader();
         populateFilters();
@@ -1560,8 +1641,8 @@
         statusHtml = `<span class="status-badge updated" style="font-size:14px; padding:6px 12px;">✏️ Bilgileri Güncellendi</span>`;
         
         // --- GÜNCELLEME 3: AKILLI DEĞİŞİKLİK TARAMA ---
-        if (snapshot && snapshot.records && snapshot.records[s.id]) {
-            const oldData = snapshot.records[s.id].data;
+        if (snapshot && snapshot.records && snapshot.records[(s._comparePrevId || s.id)]) {
+            const oldData = snapshot.records[(s._comparePrevId || s.id)].data;
             const changes = [];
             // Tüm alanları kapsayan genişletilmiş harita
             const fields = {
