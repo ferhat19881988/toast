@@ -436,7 +436,6 @@
     .status-badge.normal { background: #f1f5f9; color: var(--text-muted); border: 1px solid #e2e8f0; }
     .status-badge.new { background: var(--success-bg); color: var(--success-text); }
     .status-badge.updated { background: var(--warning-bg); color: var(--warning-text); }
-    .status-badge.danger { background: var(--danger-bg); color: var(--danger-text); }
 
     /* New/Updated Row Highlights */
     tr.new-row td { background-color: #f0fdf4; }
@@ -629,10 +628,6 @@
             <details>
               <summary>🗑️ Silinenler <span class="status-badge normal" id="removedTagCount" style="margin-left:auto">0</span></summary>
               <ul id="removedList"></ul>
-            </details>
-            <details>
-              <summary>⚠️ Okul No Çakışmaları <span class="status-badge danger" id="dupTagCount" style="margin-left:auto">0</span></summary>
-              <ul id="dupList"></ul>
             </details>
           </div>
         </section>
@@ -837,9 +832,7 @@
     let snapshotSource = "none"; 
     let activeViewMode = "all";  
 
-        let duplicateOkulNoMap = {}; // { okulNo: [student, ...] }
-
-// =======================
+    // =======================
     // FIREBASE
     // =======================
     import { initializeApp } from 'https://www.gstatic.com/firebasejs/9.23.0/firebase-app.js';
@@ -943,26 +936,6 @@
       return `${name}__${surname}`;
     }
 
-
-
-    function normalizeOkulNo(no) {
-      return String(no || "").trim();
-    }
-
-    function detectDuplicateOkulNos(list) {
-      const buckets = {};
-      (list || []).forEach(st => {
-        const no = normalizeOkulNo(st.okulNo);
-        if (!no) return;
-        if (!buckets[no]) buckets[no] = [];
-        buckets[no].push(st);
-      });
-      const dup = {};
-      Object.keys(buckets).forEach(no => {
-        if (buckets[no].length >= 2) dup[no] = buckets[no];
-      });
-      return dup;
-    }
 
 // ID değiştiğinde (ör. isim/soyisim/okulNo düzeltmesi) aynı kişiyi "yeni" gibi göstermemek için
 // ikincil eşleştirme (hemen iyileştirme): Veli Telefon (+ mümkünse Sınıf) üzerinden eski kaydı bulup "updated" olarak işaretler.
@@ -1246,14 +1219,11 @@ if (snapshot && snapshot.records) {
   }
 }
         students = parsed;
-        duplicateOkulNoMap = detectDuplicateOkulNos(parsed);
         renderHeader();
         populateFilters();
         updateSummary(removed);
         applyFilters(removed);
         document.getElementById("lastLoadedInfo").textContent = `${currentSheetName} | ${formatDateTimeForBadge(new Date().toISOString())}`;
-        const _dupKeys = duplicateOkulNoMap ? Object.keys(duplicateOkulNoMap) : [];
-        if (_dupKeys.length) showToast(`Uyarı: ${_dupKeys.length} okul numarası çakışması bulundu. (⚠️ Okul No Çakışmaları bölümüne bakın)`);
         
       } catch (err) {
         console.error(err);
@@ -1340,9 +1310,6 @@ if (snapshot && snapshot.records) {
       const updatedCount = students.filter(s => s.status === "updated").length;
       const removedCount = removedRecords.length;
 
-      const dupGroups = duplicateOkulNoMap ? Object.keys(duplicateOkulNoMap) : [];
-      const dupCount = dupGroups.length;
-
       document.getElementById("totalCount").textContent = total;
       document.getElementById("newCount").textContent = newCount;
       document.getElementById("updatedCount").textContent = updatedCount;
@@ -1351,10 +1318,6 @@ if (snapshot && snapshot.records) {
       document.getElementById("newTagCount").textContent = newCount;
       document.getElementById("updatedTagCount").textContent = updatedCount;
       document.getElementById("removedTagCount").textContent = removedCount;
-
-
-      const dupTag = document.getElementById(\"dupTagCount\");
-      if (dupTag) dupTag.textContent = dupCount;
 
       const fillList = (listId, items, isRemoved = false) => {
         const el = document.getElementById(listId);
@@ -1370,21 +1333,6 @@ if (snapshot && snapshot.records) {
       fillList("newList", students.filter(s => s.status === "new"));
       fillList("updatedList", students.filter(s => s.status === "updated"));
       fillList("removedList", removedRecords, true);
-
-
-      // Okul No Çakışmaları
-      const dupEl = document.getElementById("dupList");
-      if (dupEl) {
-        dupEl.innerHTML = "";
-        dupGroups.sort((a,b) => parseInt(a||"0") - parseInt(b||"0"));
-        dupGroups.forEach(no => {
-          const arr = duplicateOkulNoMap[no] || [];
-          const li = document.createElement("li");
-          const details = arr.map(x => `${x.isim} ${x.soyisim} <small>(${x.sinif || '-'})</small>`).join(" • ");
-          li.innerHTML = `<b>${no}</b> <span style="opacity:0.9">${details}</span>`;
-          dupEl.appendChild(li);
-        });
-      }
     }
 
     function updateListStatus(filteredRows) {
@@ -1397,13 +1345,6 @@ if (snapshot && snapshot.records) {
       let msg = `Toplam <strong>${total}</strong> kayıt içinden <strong>${visible}</strong> tanesi görüntüleniyor.`;
       if (recentOnly && visible >= 30) msg += " (Son 30 kayıt filtresi aktif)";
       bar.innerHTML = msg;
-
-
-      // Okul No çakışması uyarısı
-      const dupGroupsAll = duplicateOkulNoMap ? Object.keys(duplicateOkulNoMap) : [];
-      if (dupGroupsAll.length) {
-        bar.innerHTML += ` <span style="margin-left:10px; padding:3px 10px; border-radius:999px; background: var(--danger-bg); color: var(--danger-text); font-weight:700;">⚠️ ${dupGroupsAll.length} okul no çakışması</span>`;
-      }
 
       // --- GÜNCELLEME 2: ALT BİLGİYİ GÜNCELLE ---
       const bottomFooter = document.getElementById("lastSavedInfo");
@@ -1691,7 +1632,6 @@ if (snapshot && snapshot.records) {
       
       let statusHtml = "";
       let diffHtml = "";
-      let dupHtml = "";
 
       // Durum Tespiti
       if (s.status === "new") {
@@ -1742,18 +1682,6 @@ if (snapshot && snapshot.records) {
         statusHtml = `<span class="status-badge normal" style="font-size:14px; padding:6px 12px;">Kayıtlı Öğrenci</span>`;
       }
 
-      // Okul No çakışması bilgisi (varsa)
-      const myNo = String(s.okulNo || "").trim();
-      if (myNo && duplicateOkulNoMap && duplicateOkulNoMap[myNo] && duplicateOkulNoMap[myNo].length >= 2) {
-        const others = (duplicateOkulNoMap[myNo] || []).filter(x => !(x.id === s.id));
-        const listHtml = others.map(x => `<li>${x.isim} ${x.soyisim} <small>(${x.sinif || '-'})</small></li>`).join("");
-        dupHtml = `<div class="change-log-box" style="background: var(--danger-bg); border-color: #fca5a5; color: var(--danger-text);">
-          <div style="font-weight:800; margin-bottom:6px;">⚠️ Okul No Çakışması</div>
-          <div style="font-size:12px; opacity:0.9; margin-bottom:8px;">Bu okul numarası listede birden fazla öğrenciye atanmış.</div>
-          <ul style="margin:0; padding-left:20px; display:flex; flex-direction:column; gap:4px;">${listHtml}</ul>
-        </div>`;
-      }
-
       content.innerHTML = `
         <div style="text-align:center; margin-bottom:20px;">
             <div style="font-size:24px; font-weight:700;">${s.isim} ${s.soyisim}</div>
@@ -1768,7 +1696,6 @@ if (snapshot && snapshot.records) {
         <div class="detail-row"><span class="detail-label">Kayıt Tarihi:</span> <span class="detail-val">${s.tarih || "-"}</span></div>
         <div class="detail-row"><span class="detail-label">Burs Durumu:</span> <span class="detail-val">${s.burslu ? "Burslu" : "Normal"}</span></div>
         
-        ${dupHtml}
         ${diffHtml}
       `;
       
