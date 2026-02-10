@@ -66,6 +66,15 @@
 
       --pattern-line: rgba(58,47,28,.12);
       --pattern-line-strong: rgba(58,47,28,.18);
+
+      /* Hover durumları (tema uyumlu) */
+      --hover-primary-bg: linear-gradient(180deg, rgba(27,154,170,.96), rgba(20,122,134,.94));
+      --hover-primary-shadow: 0 22px 36px rgba(20,122,134,.22);
+      --hover-secondary-bg: linear-gradient(180deg, rgba(255,239,176,.52), rgba(255,255,255,.82));
+      --hover-secondary-border: rgba(27,154,170,.32);
+      --hover-tab-bg: linear-gradient(180deg, rgba(255,255,255,.86), rgba(247,213,107,.22));
+      --hover-toggle-bg: rgba(247,213,107,.32);
+
     }
 
     *{ box-sizing:border-box; }
@@ -372,6 +381,8 @@
       transition: transform .16s ease, box-shadow .16s ease, background .16s ease, border-color .16s ease;
       position:relative;
       overflow:hidden;
+    
+      box-shadow: 0 10px 18px rgba(12,11,8,.05);
     }
     .class-chips span::before{
       content:"";
@@ -392,6 +403,13 @@
       transform: translateY(-1px);
     }
 
+    .class-chips span:hover{
+      background: var(--hover-secondary-bg);
+      border-color: var(--hover-secondary-border);
+      transform: translateY(-1px);
+      box-shadow: 0 14px 22px rgba(12,11,8,.07);
+    }
+
     /* ====== ÜÇGEN BUTON SİSTEMİ ====== */
     .btn{
       display:inline-flex;
@@ -402,8 +420,8 @@
       font-size: 14px;
       font-weight: 800;
       cursor:pointer;
-      border:none;
-      transition: transform .18s ease, box-shadow .18s ease, filter .18s ease;
+      border: 1px solid transparent;
+      transition: transform .18s ease, box-shadow .18s ease, filter .18s ease, background .18s ease, color .18s ease, border-color .18s ease;
       letter-spacing:.2px;
       position:relative;
       isolation:isolate;
@@ -437,12 +455,24 @@
     }
     .btn:active{ transform: translateY(0); box-shadow: 0 10px 18px rgba(12,11,8,.10); }
 
+    .btn:focus-visible{
+      outline:none;
+      box-shadow: var(--ring), 0 16px 28px rgba(12,11,8,.10);
+      transform: translateY(-1px);
+    }
+
     .btn-primary{
       background: linear-gradient(180deg, rgba(217,164,65,.98), rgba(177,120,37,.96));
       color:#fff;
       box-shadow: 0 18px 28px rgba(177,120,37,.18);
+    
+      border-color: rgba(177,120,37,.55);
     }
-    .btn-primary:hover{ box-shadow: 0 22px 36px rgba(177,120,37,.22); }
+    .btn-primary:hover{
+      background: var(--hover-primary-bg);
+      border-color: rgba(20,122,134,.55);
+      box-shadow: var(--hover-primary-shadow);
+    }
 
     .btn-secondary{
       background: rgba(255,255,255,.75);
@@ -451,8 +481,10 @@
       box-shadow: 0 12px 20px rgba(12,11,8,.06);
     }
     .btn-secondary:hover{
-      background: rgba(255,255,255,.88);
-      border-color: rgba(27,154,170,.28);
+      background: var(--hover-secondary-bg);
+      border-color: var(--hover-secondary-border);
+      box-shadow: 0 16px 26px rgba(12,11,8,.08);
+      transform: translateY(-2px);
     }
 
     .btn-sm{ padding: 8px 12px; font-size: 13px; }
@@ -558,8 +590,8 @@
     }
     .sheet-tab:hover{
       transform: translateY(-2px);
-      background: rgba(255,255,255,.78);
-      border-color: rgba(27,154,170,.24);
+      background: var(--hover-tab-bg);
+      border-color: var(--hover-secondary-border);
       box-shadow: 0 16px 26px rgba(12,11,8,.08);
     }
     .sheet-tab.active{
@@ -569,6 +601,12 @@
       box-shadow: 0 18px 28px rgba(20,122,134,.16);
       transform:none;
     }
+
+    .sheet-tab.active:hover{
+      filter: brightness(1.03) saturate(1.06);
+      box-shadow: 0 20px 34px rgba(20,122,134,.20);
+    }
+
 
     .view-toggles{
       display:flex;
@@ -590,8 +628,9 @@
       transition: background .18s ease, color .18s ease, transform .18s ease;
     }
     .view-toggles button:hover:not(.active){
-      background: rgba(255,255,255,.6);
+      background: var(--hover-toggle-bg);
       color: var(--ink-1);
+      box-shadow: 0 12px 18px rgba(12,11,8,.06);
       transform: translateY(-1px);
     }
     .view-toggles button.active{
@@ -599,6 +638,14 @@
       color: var(--ink-1);
       box-shadow: 0 12px 18px rgba(12,11,8,.06);
     }
+
+
+    .sheet-tab:focus-visible,
+    .view-toggles button:focus-visible{
+      outline:none;
+      box-shadow: var(--ring);
+    }
+
 
     /* Table */
     .table-scroll-area{ max-height: 700px; overflow:auto; }
@@ -2041,4 +2088,5 @@ if (snapshot && snapshot.records) {
   </script>
 </body>
 </html>
+
 
