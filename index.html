@@ -12,59 +12,69 @@
   <style>
 
     :root{
-      --primary: #7c8cff;
-      --primary-dark: #6274f6;
-      --primary-soft: #eef0ff;
-      --primary-light: rgba(124,140,255,.18);
+      /* ====== MISIR PİRAMİTLERİ TEMASI ====== */
+      --sand-0:#fff8e7;
+      --sand-1:#f7e7c2;
+      --sand-2:#e8cf98;
+      --sand-3:#d8b775;
 
-      --secondary: #79c7b8;
-      --secondary-soft: #ecfbf7;
-      --accent: #ffb9c8;
-      --accent-soft: #fff1f5;
-      --warning: #ffcc8f;
-      --warning-soft: #fff6eb;
-      --danger: #ff8f9d;
-      --danger-soft: #fff2f4;
+      --gold-0:#ffefb0;
+      --gold-1:#f7d56b;
+      --gold-2:#d9a441;
+      --gold-3:#b17825;
 
-      --bg-body: #f7f9ff;
-      --bg-body-2: #eef4ff;
-      --bg-card: rgba(255,255,255,.84);
-      --bg-card-strong: rgba(255,255,255,.94);
-      --bg-elevated: rgba(255,255,255,.72);
+      --ink-0:#0c0b08;
+      --ink-1:#17140e;
+      --ink-2:#3a2f1c;
 
-      --text-main: #27324a;
-      --text-strong: #182033;
-      --text-muted: #6e7891;
-      --text-soft: #8f97ab;
+      --oasis:#1b9aaa;
+      --oasis-dark:#147a86;
 
-      --border: rgba(146, 162, 196, .28);
-      --border-strong: rgba(124, 140, 255, .24);
+      /* Uygulama ana renkleri (mevcut değişken isimleri korunur) */
+      --primary: var(--gold-2);
+      --primary-dark: var(--gold-3);
+      --primary-light: rgba(247,213,107,.22);
 
-      --success-bg: rgba(121,199,184,.18);
-      --success-text: #21685b;
-      --warning-bg: rgba(255,204,143,.24);
-      --warning-text: #8c5a16;
-      --danger-bg: rgba(255,143,157,.18);
-      --danger-text: #a33e53;
+      --bg-body: var(--sand-0);
+      --bg-card: rgba(255,255,255,.80);
 
-      --shadow-sm: 0 8px 18px rgba(118, 133, 170, .08);
-      --shadow-md: 0 18px 40px rgba(118, 133, 170, .14);
-      --shadow-lg: 0 28px 80px rgba(95, 109, 148, .18);
-      --shadow-focus: 0 0 0 4px rgba(124,140,255,.18);
+      --text-main: #1a160f;
+      --text-muted: rgba(26,22,15,.65);
 
-      --radius-xl: 28px;
-      --radius-lg: 22px;
-      --radius-md: 18px;
-      --radius-sm: 14px;
-      --radius-xs: 12px;
+      --border: rgba(58,47,28,.16);
 
-      --ring: 0 0 0 4px rgba(124,140,255,.16), 0 10px 30px rgba(124,140,255,.14);
-      --hover-primary-bg: linear-gradient(135deg, #92a1ff 0%, #6f83ff 100%);
-      --hover-primary-shadow: 0 22px 44px rgba(111,131,255,.26);
-      --hover-secondary-bg: linear-gradient(135deg, rgba(255,255,255,.98) 0%, rgba(238,244,255,.96) 100%);
-      --hover-secondary-border: rgba(124,140,255,.30);
-      --hover-tab-bg: linear-gradient(135deg, rgba(255,255,255,.98) 0%, rgba(240,243,255,.98) 100%);
-      --hover-toggle-bg: rgba(124,140,255,.12);
+      /* Durum Renkleri (tema ile uyumlu) */
+      --success-bg: rgba(27,154,170,.15);
+      --success-text: #0f4b52;
+
+      --warning-bg: rgba(247,213,107,.22);
+      --warning-text: #6a4a12;
+
+      --danger-bg: rgba(200,72,72,.15);
+      --danger-text: #7a1d1d;
+
+      /* Gölgeler (kum & güneş hissi) */
+      --shadow-sm: 0 1px 2px rgb(12 11 8 / .06), 0 0 0 1px rgba(58,47,28,.06) inset;
+      --shadow-md: 0 14px 30px rgb(12 11 8 / .08), 0 6px 14px rgb(12 11 8 / .06);
+      --shadow-lg: 0 26px 60px rgb(12 11 8 / .12), 0 12px 22px rgb(12 11 8 / .08);
+
+      --radius-lg: 18px;
+      --radius-md: 14px;
+      --radius-sm: 10px;
+
+      --ring: 0 0 0 3px rgba(27,154,170,.18), 0 0 0 1px rgba(27,154,170,.12) inset;
+
+      --pattern-line: rgba(58,47,28,.12);
+      --pattern-line-strong: rgba(58,47,28,.18);
+
+      /* Hover durumları (tema uyumlu) */
+      --hover-primary-bg: linear-gradient(180deg, rgba(27,154,170,.96), rgba(20,122,134,.94));
+      --hover-primary-shadow: 0 22px 36px rgba(20,122,134,.22);
+      --hover-secondary-bg: linear-gradient(180deg, rgba(255,239,176,.52), rgba(255,255,255,.82));
+      --hover-secondary-border: rgba(27,154,170,.32);
+      --hover-tab-bg: linear-gradient(180deg, rgba(255,255,255,.86), rgba(247,213,107,.22));
+      --hover-toggle-bg: rgba(247,213,107,.32);
+
     }
 
     *{ box-sizing:border-box; }
@@ -78,18 +88,34 @@
       color:var(--text-main);
       -webkit-font-smoothing:antialiased;
       line-height:1.5;
+
+      /* Çok katmanlı "kum + piramit" arka plan */
       background:
-        radial-gradient(900px 500px at 0% 0%, rgba(124,140,255,.18), transparent 62%),
-        radial-gradient(700px 420px at 100% 0%, rgba(121,199,184,.16), transparent 55%),
-        radial-gradient(800px 520px at 50% 100%, rgba(255,185,200,.15), transparent 60%),
-        linear-gradient(180deg, var(--bg-body), var(--bg-body-2));
+        radial-gradient(1200px 600px at 10% -10%, rgba(255,239,176,.55), transparent 65%),
+        radial-gradient(900px 500px at 95% 5%, rgba(27,154,170,.22), transparent 55%),
+        radial-gradient(800px 400px at 40% 110%, rgba(217,164,65,.28), transparent 60%),
+
+        /* Piramit siluetleri (tekrar eden üçgenler) */
+        linear-gradient(135deg, transparent 75%, rgba(58,47,28,.08) 75%) 0 0/180px 180px,
+        linear-gradient(225deg, transparent 75%, rgba(58,47,28,.06) 75%) 0 0/180px 180px,
+        linear-gradient(45deg, transparent 75%, rgba(58,47,28,.05) 75%) 90px 90px/180px 180px,
+        linear-gradient(315deg, transparent 75%, rgba(58,47,28,.04) 75%) 90px 90px/180px 180px,
+
+        /* İnce doku */
+        repeating-linear-gradient(
+          90deg,
+          rgba(58,47,28,.03) 0 1px,
+          transparent 1px 10px
+        ),
+        linear-gradient(180deg, var(--sand-0), var(--sand-1));
       background-attachment: fixed;
     }
 
+    /* --- Dekoratif "tapınak" çerçevesi hissi --- */
     .app-shell{
-      max-width:1680px;
+      max-width:1600px;
       margin:0 auto;
-      padding:28px;
+      padding:24px;
       display:flex;
       flex-direction:column;
       gap:24px;
@@ -97,33 +123,27 @@
       isolation:isolate;
     }
 
-    .app-shell::before,
-    .app-shell::after{
+    .app-shell::before{
       content:"";
       position:fixed;
-      border-radius:999px;
+      inset:0;
       pointer-events:none;
-      filter: blur(12px);
       z-index:-1;
-      opacity:.65;
-    }
-    .app-shell::before{
-      inset:auto auto 8% -6%;
-      width:360px;
-      height:360px;
-      background:rgba(124,140,255,.16);
-    }
-    .app-shell::after{
-      inset:8% -8% auto auto;
-      width:420px;
-      height:420px;
-      background:rgba(121,199,184,.14);
+      opacity:.9;
+      background:
+        radial-gradient(600px 220px at 15% 20%, rgba(255,239,176,.22), transparent 70%),
+        radial-gradient(520px 220px at 85% 30%, rgba(27,154,170,.12), transparent 70%),
+        radial-gradient(520px 220px at 50% 92%, rgba(217,164,65,.12), transparent 70%);
+      filter: blur(0.2px);
     }
 
+    /* Header */
     header.app-header{
-      background: linear-gradient(135deg, rgba(255,255,255,.95) 0%, rgba(245,248,255,.86) 100%);
-      border-radius: var(--radius-xl);
-      padding: 28px 34px;
+      background:
+        linear-gradient(180deg, rgba(255,255,255,.86), rgba(255,255,255,.70)),
+        radial-gradient(900px 140px at 40% 0%, rgba(247,213,107,.14), transparent 70%);
+      border-radius: var(--radius-lg);
+      padding: 24px 32px;
       display:flex;
       flex-wrap:wrap;
       align-items:center;
@@ -133,59 +153,67 @@
       border: 1px solid var(--border);
       position:relative;
       overflow:hidden;
-      backdrop-filter: blur(16px);
     }
 
-    header.app-header::before{
+    /* Üst-Alt friz şeridi (piramit/üçgen) */
+    header.app-header::before,
+    header.app-header::after{
       content:"";
       position:absolute;
-      inset:0;
-      background: linear-gradient(90deg, rgba(124,140,255,.06), transparent 28%, transparent 72%, rgba(121,199,184,.08));
-      pointer-events:none;
+      left:0; right:0;
+      height:10px;
+      background:
+        linear-gradient(135deg, transparent 75%, var(--pattern-line-strong) 75%) 0 0/18px 18px,
+        linear-gradient(225deg, transparent 75%, var(--pattern-line-strong) 75%) 9px 9px/18px 18px;
+      opacity:.55;
     }
+    header.app-header::before{ top:0; }
+    header.app-header::after{ bottom:0; transform: rotate(180deg); }
 
     .app-title-block h1{
       margin:0;
-      font-size: 31px;
+      font-size: 28px;
       font-weight: 800;
-      color: var(--text-strong);
+      color: var(--ink-1);
       display:flex;
       align-items:center;
-      gap:14px;
-      letter-spacing:-.02em;
+      gap:12px;
+      letter-spacing:.2px;
     }
 
     .app-title-block h1 span.icon{
-      background: linear-gradient(135deg, #ffffff 0%, #eef2ff 100%);
-      color: var(--primary-dark);
-      width: 60px;
-      height: 60px;
+      background:
+        radial-gradient(circle at 30% 25%, rgba(255,239,176,.9), rgba(217,164,65,.35)),
+        linear-gradient(180deg, rgba(255,255,255,.45), rgba(255,255,255,0));
+      color: var(--ink-1);
+      width: 50px;
+      height: 50px;
       display:flex;
       align-items:center;
       justify-content:center;
-      border-radius: 20px;
-      font-size: 28px;
-      border: 1px solid rgba(124,140,255,.18);
-      box-shadow: 0 18px 36px rgba(124,140,255,.16);
+      border-radius: 14px;
+      font-size: 24px;
+      border: 1px solid rgba(58,47,28,.14);
+      box-shadow: 0 10px 22px rgba(12,11,8,.10);
       position:relative;
       overflow:hidden;
     }
     .app-title-block h1 span.icon::after{
       content:"";
       position:absolute;
-      inset:-40%;
-      background: linear-gradient(135deg, transparent 35%, rgba(255,255,255,.72) 50%, transparent 65%);
-      animation: shimmer 7s linear infinite;
-      opacity:.85;
+      inset:-60%;
+      background: conic-gradient(from 180deg, transparent, rgba(255,239,176,.35), transparent);
+      animation: shimmer 6.5s linear infinite;
+      opacity:.55;
     }
 
     @keyframes shimmer{
-      to{ transform: translateX(140%) translateY(10%) rotate(18deg); }
+      to{ transform: rotate(360deg); }
     }
 
     .app-title-block p{
-      margin: 6px 0 0 0;
-      font-size: 14px;
+      margin: 4px 0 0 0;
+      font-size: 13.5px;
       color: var(--text-muted);
     }
 
@@ -196,25 +224,27 @@
     }
 
     .chip{
-      background: rgba(255,255,255,.76);
+      background: rgba(255,255,255,.55);
       border: 1px solid var(--border);
-      padding: 12px 18px;
+      padding: 8px 16px;
       border-radius: 999px;
       font-size: 13px;
-      font-weight: 700;
-      color: var(--text-main);
+      font-weight: 600;
+      color: rgba(26,22,15,.72);
       display:flex;
       align-items:center;
       gap:8px;
-      box-shadow: var(--shadow-sm);
-      backdrop-filter: blur(14px);
+      box-shadow: 0 10px 16px rgba(12,11,8,.06);
+      backdrop-filter: blur(6px);
     }
 
+    /* Print Header (Varsayılan Gizli) */
     .print-title-block{ display:none; }
 
+    /* Main Grid */
     .dashboard-grid{
       display:grid;
-      grid-template-columns: minmax(340px, 390px) minmax(0, 1fr);
+      grid-template-columns: 350px 1fr;
       gap:24px;
       align-items:start;
     }
@@ -222,559 +252,254 @@
       .dashboard-grid{ grid-template-columns:1fr; }
     }
 
+    /* Panels */
     .panel{
-      background: linear-gradient(135deg, rgba(255,255,255,.93) 0%, rgba(247,250,255,.82) 100%);
-      border-radius: var(--radius-xl);
-      padding: 26px;
+      background:
+        linear-gradient(180deg, rgba(255,255,255,.88), rgba(255,255,255,.68)),
+        radial-gradient(900px 220px at 10% 0%, rgba(247,213,107,.12), transparent 60%);
+      border-radius: var(--radius-lg);
+      padding: 24px;
       box-shadow: var(--shadow-md);
       border: 1px solid var(--border);
       height:100%;
       position:relative;
       overflow:hidden;
-      backdrop-filter: blur(14px);
     }
 
+    /* Panel köşe "taş" üçgenleri */
     .panel::before{
       content:"";
       position:absolute;
       inset:0;
       pointer-events:none;
+      opacity:.35;
       background:
-        radial-gradient(400px 120px at 0% 0%, rgba(124,140,255,.08), transparent 62%),
-        linear-gradient(180deg, rgba(255,255,255,.18), transparent 40%);
-      opacity:.9;
+        linear-gradient(135deg, var(--pattern-line) 0 1px, transparent 1px) 0 0/26px 26px;
+      mask:
+        radial-gradient(12px 12px at 0 0, #0000 98%, #000) top left,
+        radial-gradient(12px 12px at 100% 0, #0000 98%, #000) top right,
+        radial-gradient(12px 12px at 0 100%, #0000 98%, #000) bottom left,
+        radial-gradient(12px 12px at 100% 100%, #0000 98%, #000) bottom right,
+        linear-gradient(#000, #000);
+      mask-composite: intersect;
     }
 
     .panel-title{
-      font-size:19px;
+      font-size:18px;
       font-weight:800;
-      margin-bottom:22px;
+      margin-bottom:20px;
       display:flex;
       align-items:center;
       justify-content:space-between;
-      color: var(--text-strong);
-      letter-spacing:-.01em;
-      position:relative;
-      z-index:1;
+      color: var(--ink-1);
+      letter-spacing:.2px;
     }
 
-
-
-    .dashboard-side-stack{
-      display:flex;
-      flex-direction:column;
-      gap:24px;
-    }
-
-    .section-stack{ display:flex; flex-direction:column; gap:18px; }
-
-    .overview-strip{
-      display:grid;
-      grid-template-columns: repeat(3, minmax(0,1fr));
-      gap:12px;
-      margin-bottom:18px;
-    }
-
-    .overview-mini-card{
-      min-height:94px;
-      padding:16px 16px 14px;
-      border-radius:20px;
-      background: linear-gradient(135deg, rgba(255,255,255,.95) 0%, rgba(246,249,255,.88) 100%);
-      border:1px solid rgba(146,162,196,.22);
-      box-shadow: 0 14px 28px rgba(118,133,170,.10);
-      display:flex;
-      flex-direction:column;
-      justify-content:space-between;
-      position:relative;
-      overflow:hidden;
-    }
-    .overview-mini-card::before{
-      content:"";
-      position:absolute;
-      inset:auto -20% -40% auto;
-      width:110px;
-      height:110px;
-      border-radius:50%;
-      background: rgba(124,140,255,.08);
-      pointer-events:none;
-    }
-    .overview-mini-card.green::before{ background: rgba(121,199,184,.12); }
-    .overview-mini-card.pink::before{ background: rgba(255,185,200,.14); }
-    .overview-mini-label{
-      font-size:11px;
-      text-transform:uppercase;
-      letter-spacing:.08em;
-      font-weight:900;
-      color:var(--text-muted);
-    }
-    .overview-mini-value{
-      font-size:24px;
-      font-weight:900;
-      color:var(--text-strong);
-      letter-spacing:-.03em;
-      line-height:1;
-    }
-    .overview-mini-desc{
-      font-size:12px;
-      color:var(--text-muted);
-      font-weight:700;
-    }
-
-    .filter-panel{
-      padding:0;
-      overflow:hidden;
-    }
-    .filter-panel .panel-title{ display:none; }
-
-    .filter-shell{
-      position:relative;
-      z-index:1;
-      display:flex;
-      flex-direction:column;
-      gap:0;
-    }
-
-    .filter-hero{
-      position:relative;
-      padding:24px 24px 20px;
-      background:
-        radial-gradient(220px 120px at 0% 0%, rgba(124,140,255,.16), transparent 70%),
-        radial-gradient(240px 120px at 100% 0%, rgba(121,199,184,.16), transparent 72%),
-        linear-gradient(135deg, rgba(255,255,255,.98) 0%, rgba(244,247,255,.95) 60%, rgba(239,248,246,.94) 100%);
-      border-bottom:1px solid rgba(146,162,196,.18);
-    }
-
-    .filter-hero-top{
-      display:flex;
-      align-items:flex-start;
-      justify-content:space-between;
-      gap:14px;
-      margin-bottom:16px;
-    }
-
-    .filter-eyebrow{
-      display:inline-flex;
-      align-items:center;
-      gap:8px;
-      padding:8px 12px;
-      border-radius:999px;
-      background: rgba(255,255,255,.84);
-      border:1px solid rgba(124,140,255,.16);
-      color:var(--primary-dark);
-      font-size:11px;
-      font-weight:900;
-      letter-spacing:.08em;
-      text-transform:uppercase;
-      box-shadow: 0 10px 20px rgba(118,133,170,.08);
-      margin-bottom:10px;
-    }
-
-    .filter-hero h3{
-      margin:0;
-      font-size:24px;
-      line-height:1.1;
-      letter-spacing:-.03em;
-      color:var(--text-strong);
-    }
-    .filter-hero p{
-      margin:8px 0 0;
-      font-size:13px;
-      color:var(--text-muted);
-      max-width:520px;
-    }
-
-    .filter-actions{
-      display:flex;
-      gap:10px;
-      flex-wrap:wrap;
-      justify-content:flex-end;
-    }
-
-    .filter-highlight-row{
-      display:grid;
-      grid-template-columns: repeat(3, minmax(0,1fr));
-      gap:10px;
-    }
-
-    .filter-highlight{
-      min-height:72px;
-      border-radius:18px;
-      padding:14px 14px 12px;
-      background: rgba(255,255,255,.78);
-      border:1px solid rgba(146,162,196,.18);
-      box-shadow: 0 12px 22px rgba(118,133,170,.08);
-      display:flex;
-      flex-direction:column;
-      gap:6px;
-    }
-    .filter-highlight strong{
-      font-size:12px;
-      font-weight:900;
-      color:var(--text-muted);
-      text-transform:uppercase;
-      letter-spacing:.08em;
-    }
-    .filter-highlight span{
-      font-size:14px;
-      font-weight:800;
-      color:var(--text-strong);
-    }
-    .filter-highlight small{
-      font-size:12px;
-      color:var(--text-muted);
-      font-weight:700;
-    }
-
-    .filter-form{
-      padding:24px;
-      display:flex;
-      flex-direction:column;
-      gap:18px;
-    }
-
-    .filter-section{
-      display:flex;
-      flex-direction:column;
-      gap:14px;
-      padding:18px;
-      border-radius:22px;
-      background: linear-gradient(135deg, rgba(255,255,255,.92) 0%, rgba(248,250,255,.86) 100%);
-      border:1px solid rgba(146,162,196,.18);
-      box-shadow: 0 14px 28px rgba(118,133,170,.08);
-      position:relative;
-      overflow:hidden;
-    }
-    .filter-section::before{
-      content:"";
-      position:absolute;
-      inset:0;
-      pointer-events:none;
-      background: linear-gradient(135deg, rgba(124,140,255,.04), transparent 42%);
-    }
-
-    .filter-section-head{
-      display:flex;
-      align-items:center;
-      justify-content:space-between;
-      gap:10px;
-      position:relative;
-      z-index:1;
-    }
-    .filter-section-title{
-      display:flex;
-      flex-direction:column;
-      gap:4px;
-    }
-    .filter-section-title strong{
-      font-size:14px;
-      font-weight:900;
-      color:var(--text-strong);
-      letter-spacing:-.01em;
-    }
-    .filter-section-title span{
-      font-size:12px;
-      color:var(--text-muted);
-      font-weight:700;
-    }
-
-    .section-badge{
-      display:inline-flex;
-      align-items:center;
-      min-height:34px;
-      padding:8px 12px;
-      border-radius:999px;
-      background: rgba(124,140,255,.10);
-      color:var(--primary-dark);
-      border:1px solid rgba(124,140,255,.14);
-      font-size:11px;
-      font-weight:900;
-      letter-spacing:.08em;
-      text-transform:uppercase;
-      white-space:nowrap;
-    }
-
-    .filter-grid-2,
-    .filter-grid-3{
-      display:grid;
-      gap:12px;
-      position:relative;
-      z-index:1;
-    }
-    .filter-grid-2{ grid-template-columns: repeat(2, minmax(0,1fr)); }
-    .filter-grid-3{ grid-template-columns: repeat(3, minmax(0,1fr)); }
-
-    .filter-footer-actions{
-      display:grid;
-      grid-template-columns: 1.25fr .95fr;
-      gap:12px;
-      position:relative;
-      z-index:1;
-    }
-
-    .quick-toggle-card{
-      display:flex;
-      align-items:center;
-      justify-content:space-between;
-      gap:14px;
-      min-height:58px;
-      padding:14px 16px;
-      border-radius:18px;
-      background: rgba(255,255,255,.84);
-      border:1px solid rgba(146,162,196,.18);
-      box-shadow: 0 10px 18px rgba(118,133,170,.08);
-      position:relative;
-      z-index:1;
-    }
-    .quick-toggle-copy{
-      display:flex;
-      flex-direction:column;
-      gap:3px;
-    }
-    .quick-toggle-copy strong{ font-size:14px; color:var(--text-strong); }
-    .quick-toggle-copy span{ font-size:12px; color:var(--text-muted); font-weight:700; }
-
-    .filter-note{
-      padding:14px 16px;
-      border-radius:18px;
-      background: linear-gradient(135deg, rgba(238,243,255,.78) 0%, rgba(255,255,255,.88) 100%);
-      border:1px dashed rgba(124,140,255,.24);
-      color:var(--text-muted);
-      font-size:12px;
-      font-weight:700;
-      line-height:1.55;
-      position:relative;
-      z-index:1;
-    }
-
-
+    /* Stats Cards */
     .stats-container{
       display:grid;
-      grid-template-columns: repeat(2, minmax(0, 1fr));
-      gap:14px;
+      grid-template-columns: repeat(2, 1fr);
+      gap:12px;
       margin-bottom:20px;
     }
 
     .stat-card{
-      background: linear-gradient(135deg, rgba(255,255,255,.94) 0%, rgba(246,249,255,.88) 100%);
-      border-radius: var(--radius-lg);
-      padding: 20px;
+      background: rgba(255,255,255,.55);
+      border-radius: var(--radius-md);
+      padding: 16px;
       display:flex;
       flex-direction:column;
-      border: 1px solid var(--border);
-      transition: transform .2s ease, box-shadow .2s ease, border-color .2s ease;
-      box-shadow: var(--shadow-sm);
+      border: 1px solid rgba(58,47,28,.10);
+      transition: transform .18s ease, box-shadow .18s ease;
+      box-shadow: 0 10px 18px rgba(12,11,8,.05);
       position:relative;
       overflow:hidden;
     }
-    .stat-card::after{
-      content:"";
-      position:absolute;
-      inset:auto -18% -45% auto;
-      width:140px;
-      height:140px;
-      border-radius:50%;
-      background: rgba(124,140,255,.08);
-    }
-    .stat-card:hover{ transform: translateY(-4px); box-shadow: 0 22px 40px rgba(118,133,170,.16); border-color: var(--border-strong); }
+    .stat-card:hover{ transform: translateY(-2px); box-shadow: 0 18px 30px rgba(12,11,8,.08); }
     .stat-card.total{
-      background: linear-gradient(135deg, rgba(255,255,255,.96) 0%, rgba(238,243,255,.92) 100%);
+      background:
+        linear-gradient(180deg, rgba(255,255,255,.78), rgba(255,255,255,.55)),
+        radial-gradient(500px 180px at 30% 0%, rgba(247,213,107,.18), transparent 65%);
+      border-color: rgba(58,47,28,.14);
       grid-column: 1 / -1;
     }
-    .stat-card.new{ background: linear-gradient(135deg, rgba(236,251,247,.96) 0%, rgba(243,255,252,.92) 100%); color: var(--success-text); }
-    .stat-card.updated{ background: linear-gradient(135deg, rgba(255,246,235,.96) 0%, rgba(255,252,247,.92) 100%); color: var(--warning-text); }
-    .stat-card.removed{ background: linear-gradient(135deg, rgba(255,242,244,.96) 0%, rgba(255,248,249,.92) 100%); color: var(--danger-text); }
+    .stat-card.new{ background: var(--success-bg); color: var(--success-text); border-color: rgba(27,154,170,.18); }
+    .stat-card.updated{ background: var(--warning-bg); color: var(--warning-text); border-color: rgba(217,164,65,.20); }
+    .stat-card.removed{ background: var(--danger-bg); color: var(--danger-text); border-color: rgba(200,72,72,.18); }
 
-    .stat-label{ font-size: 12px; font-weight: 800; text-transform: uppercase; letter-spacing: .08em; opacity:.92; }
-    .stat-value{ font-size: 38px; font-weight: 900; margin: 6px 0; line-height: 1; letter-spacing:-.04em; }
-    .stat-desc{ font-size: 12px; opacity: .78; }
+    .stat-label{ font-size: 12px; font-weight: 800; text-transform: uppercase; letter-spacing: .08em; opacity:.85; }
+    .stat-value{ font-size: 34px; font-weight: 900; margin: 4px 0; line-height: 1; }
+    .stat-desc{ font-size: 12px; opacity: .75; }
 
-    .filters-stack{ display:flex; flex-direction:column; gap:18px; position:relative; z-index:1; }
-    .field-group{ display:flex; flex-direction:column; gap:8px; }
+    /* Filter Inputs */
+    .filters-stack{ display:flex; flex-direction:column; gap:16px; }
+    .field-group{ display:flex; flex-direction:column; gap:6px; }
     .field-label{
       font-size: 13px;
-      font-weight: 800;
-      color: var(--text-strong);
+      font-weight: 700;
+      color: var(--ink-1);
       display:flex;
       justify-content:space-between;
     }
 
     input[type="text"], input[type="date"], select{
       width:100%;
-      min-height:52px;
-      padding: 13px 16px;
-      border-radius: 16px;
-      border: 1px solid var(--border);
+      padding: 10px 14px;
+      border-radius: 10px;
+      border: 1px solid rgba(58,47,28,.18);
       font-size: 14px;
       font-family: inherit;
-      color: var(--text-main);
-      background: rgba(255,255,255,.86);
-      transition: box-shadow .18s ease, border-color .18s ease, transform .18s ease, background .18s ease;
-      box-shadow: 0 8px 18px rgba(118,133,170,.07);
-      backdrop-filter: blur(8px);
-    }
-    input::placeholder{ color: var(--text-soft); }
-    input:hover, select:hover{
-      border-color: rgba(124,140,255,.26);
-      background: rgba(255,255,255,.96);
+      background: rgba(255,255,255,.78);
+      transition: box-shadow .18s ease, border-color .18s ease, transform .18s ease;
+      box-shadow: 0 10px 16px rgba(12,11,8,.04);
+      backdrop-filter: blur(6px);
     }
     input:focus, select:focus{
       outline:none;
-      border-color: rgba(124,140,255,.55);
+      border-color: rgba(27,154,170,.45);
       box-shadow: var(--ring);
       transform: translateY(-1px);
-      background: #fff;
     }
 
-    input[type="checkbox"]{
-      accent-color: var(--primary-dark);
-    }
-
+    /* Class Chips */
     .class-chips{
       display:flex;
       flex-wrap:wrap;
-      gap:10px;
+      gap:8px;
       padding:4px 0;
     }
     .class-chips label{ cursor:pointer; user-select:none; }
     .class-chips input[type="checkbox"]{ display:none; }
     .class-chips span{
-      display:inline-flex;
-      align-items:center;
-      min-height:44px;
-      padding: 10px 16px;
-      background: rgba(255,255,255,.86);
-      border: 1px solid var(--border);
-      border-radius: 14px;
+      display:inline-block;
+      padding: 7px 12px;
+      background: rgba(255,255,255,.55);
+      border: 1px solid rgba(58,47,28,.16);
+      border-radius: 12px;
       font-size: 13px;
-      font-weight: 700;
-      color: var(--text-main);
-      transition: transform .16s ease, box-shadow .16s ease, background .16s ease, border-color .16s ease, color .16s ease;
+      color: rgba(26,22,15,.72);
+      transition: transform .16s ease, box-shadow .16s ease, background .16s ease, border-color .16s ease;
       position:relative;
       overflow:hidden;
-      box-shadow: 0 8px 18px rgba(118,133,170,.06);
+    
+      box-shadow: 0 10px 18px rgba(12,11,8,.05);
     }
     .class-chips span::before{
       content:"";
       position:absolute;
-      inset:0;
-      background: linear-gradient(135deg, rgba(124,140,255,.06), transparent 55%);
-      opacity:1;
+      inset:-1px;
+      background:
+        linear-gradient(135deg, transparent 72%, rgba(217,164,65,.25) 72%) 0 0/20px 20px;
+      opacity:.22;
       pointer-events:none;
     }
     .class-chips input:checked + span{
-      background: linear-gradient(135deg, #8f9cff 0%, #7387ff 100%);
+      background:
+        linear-gradient(180deg, rgba(217,164,65,.95), rgba(177,120,37,.92));
       color: #fff;
-      border-color: rgba(115,135,255,.4);
+      border-color: rgba(177,120,37,.55);
       font-weight: 800;
-      box-shadow: 0 16px 30px rgba(115,135,255,.24);
-      transform: translateY(-2px);
+      box-shadow: 0 14px 26px rgba(177,120,37,.18);
+      transform: translateY(-1px);
     }
 
     .class-chips span:hover{
       background: var(--hover-secondary-bg);
       border-color: var(--hover-secondary-border);
-      transform: translateY(-2px);
-      box-shadow: 0 16px 28px rgba(118,133,170,.12);
+      transform: translateY(-1px);
+      box-shadow: 0 14px 22px rgba(12,11,8,.07);
     }
 
+    /* ====== ÜÇGEN BUTON SİSTEMİ ====== */
     .btn{
       display:inline-flex;
       align-items:center;
       justify-content:center;
-      gap:10px;
-      min-height:54px;
-      padding: 14px 22px;
-      font-size: 15px;
+      gap:8px;
+      padding: 11px 20px;
+      font-size: 14px;
       font-weight: 800;
       cursor:pointer;
       border: 1px solid transparent;
-      border-radius: 18px;
       transition: transform .18s ease, box-shadow .18s ease, filter .18s ease, background .18s ease, color .18s ease, border-color .18s ease;
-      letter-spacing:.01em;
+      letter-spacing:.2px;
       position:relative;
       isolation:isolate;
-      overflow:hidden;
-      -webkit-tap-highlight-color: transparent;
-      touch-action: manipulation;
-      user-select:none;
-      backface-visibility:hidden;
+
+      /* Üçgen köşeler: "piramidal" görünüm */
+      border-radius: 12px;
+      clip-path: polygon(
+        10px 0%,
+        calc(100% - 10px) 0%,
+        100% 10px,
+        100% calc(100% - 10px),
+        calc(100% - 10px) 100%,
+        10px 100%,
+        0% calc(100% - 10px),
+        0% 10px
+      );
     }
     .btn::before{
       content:"";
       position:absolute;
       inset:0;
       z-index:-1;
-      opacity:.95;
-      background: linear-gradient(180deg, rgba(255,255,255,.28), rgba(255,255,255,0));
-      pointer-events:none;
-    }
-    .btn::after{
-      content:"";
-      position:absolute;
-      inset:auto -20% -120% auto;
-      width:140px;
-      height:140px;
-      border-radius:50%;
-      background: rgba(255,255,255,.18);
-      transform: translate3d(0,0,0);
-      transition: transform .28s ease, opacity .28s ease;
-      opacity:.8;
+      opacity:.9;
+      background: linear-gradient(180deg, rgba(255,255,255,.22), rgba(0,0,0,0));
       pointer-events:none;
     }
     .btn:hover{
-      transform: translateY(-3px) scale(1.01);
-      box-shadow: 0 18px 34px rgba(118,133,170,.18);
-      filter: saturate(1.04);
+      transform: translateY(-2px);
+      box-shadow: 0 16px 28px rgba(12,11,8,.12);
+      filter: saturate(1.05);
     }
-    .btn:hover::after{ transform: translate(-12px, -18px); }
-    .btn:active{
-      transform: translateY(0) scale(.985);
-      box-shadow: 0 10px 20px rgba(118,133,170,.14);
-    }
+    .btn:active{ transform: translateY(0); box-shadow: 0 10px 18px rgba(12,11,8,.10); }
 
-    .btn:focus-visible,
-    .btn:focus{
+    .btn:focus-visible{
       outline:none;
-      box-shadow: var(--ring);
+      box-shadow: var(--ring), 0 16px 28px rgba(12,11,8,.10);
+      transform: translateY(-1px);
     }
 
     .btn-primary{
-      background: linear-gradient(135deg, #8e9bff 0%, #7487ff 100%);
+      background: linear-gradient(180deg, rgba(217,164,65,.98), rgba(177,120,37,.96));
       color:#fff;
-      box-shadow: 0 18px 34px rgba(116,135,255,.24);
-      border-color: rgba(116,135,255,.34);
+      box-shadow: 0 18px 28px rgba(177,120,37,.18);
+    
+      border-color: rgba(177,120,37,.55);
     }
     .btn-primary:hover{
       background: var(--hover-primary-bg);
-      border-color: rgba(111,131,255,.42);
+      border-color: rgba(20,122,134,.55);
       box-shadow: var(--hover-primary-shadow);
     }
 
     .btn-secondary{
-      background: linear-gradient(135deg, rgba(255,255,255,.98) 0%, rgba(244,247,255,.96) 100%);
-      border: 1px solid var(--border);
-      color: var(--text-strong);
-      box-shadow: 0 12px 22px rgba(118,133,170,.10);
+      background: rgba(255,255,255,.75);
+      border: 1px solid rgba(58,47,28,.18);
+      color: var(--ink-1);
+      box-shadow: 0 12px 20px rgba(12,11,8,.06);
     }
     .btn-secondary:hover{
       background: var(--hover-secondary-bg);
       border-color: var(--hover-secondary-border);
-      box-shadow: 0 18px 32px rgba(118,133,170,.14);
-      transform: translateY(-3px) scale(1.01);
+      box-shadow: 0 16px 26px rgba(12,11,8,.08);
+      transform: translateY(-2px);
     }
 
-    .btn-sm{ min-height:44px; padding: 10px 16px; font-size: 13px; border-radius: 15px; }
+    .btn-sm{ padding: 8px 12px; font-size: 13px; }
 
+    /* Changes Accordion */
     .change-lists details{
-      background: linear-gradient(135deg, rgba(255,255,255,.92) 0%, rgba(248,250,255,.86) 100%);
-      border-radius: 18px;
-      margin-bottom: 12px;
+      background: rgba(255,255,255,.55);
+      border-radius: 12px;
+      margin-bottom: 10px;
       overflow:hidden;
-      border: 1px solid var(--border);
-      box-shadow: var(--shadow-sm);
+      border: 1px solid rgba(58,47,28,.12);
+      box-shadow: 0 10px 18px rgba(12,11,8,.05);
     }
     .change-lists summary{
-      padding: 15px 16px;
+      padding: 12px 14px;
       cursor:pointer;
       font-size: 13px;
       font-weight: 900;
@@ -782,205 +507,138 @@
       display:flex;
       justify-content:space-between;
       align-items:center;
-      letter-spacing:.01em;
-      color: var(--text-strong);
+      letter-spacing:.2px;
+      color: var(--ink-1);
     }
     .change-lists ul{
       margin:0;
-      padding: 12px 16px;
-      background: rgba(255,255,255,.94);
-      border-top: 1px solid var(--border);
+      padding: 12px 14px;
+      background: rgba(255,255,255,.85);
+      border-top: 1px solid rgba(58,47,28,.12);
       list-style-type:none;
       max-height: 220px;
       overflow-y:auto;
     }
     .change-lists li{
       font-size: 13px;
-      padding: 8px 0;
-      border-bottom: 1px solid rgba(146,162,196,.16);
-      color: var(--text-main);
+      padding: 6px 0;
+      border-bottom: 1px solid rgba(58,47,28,.08);
+      color: rgba(26,22,15,.76);
     }
 
+    /* Table Toolbar */
     .table-tools-container{
-      background: linear-gradient(145deg, rgba(255,255,255,.97) 0%, rgba(245,248,255,.92) 54%, rgba(250,252,255,.96) 100%);
-      border-radius: var(--radius-xl);
-      border: 1px solid var(--border);
-      box-shadow: var(--shadow-lg);
+      background:
+        linear-gradient(180deg, rgba(255,255,255,.86), rgba(255,255,255,.70));
+      border-radius: var(--radius-lg);
+      border: 1px solid rgba(58,47,28,.14);
+      box-shadow: var(--shadow-md);
       overflow:hidden;
       display:flex;
       flex-direction:column;
       position:relative;
-      backdrop-filter: blur(18px);
-      isolation:isolate;
     }
     .table-tools-container::before{
       content:"";
       position:absolute;
       inset:0;
       pointer-events:none;
-      background: radial-gradient(500px 180px at 100% 0%, rgba(121,199,184,.08), transparent 70%);
+      opacity:.20;
+      background:
+        linear-gradient(135deg, transparent 75%, rgba(58,47,28,.20) 75%) 0 0/22px 22px,
+        linear-gradient(225deg, transparent 75%, rgba(58,47,28,.14) 75%) 11px 11px/22px 22px;
+      mask: linear-gradient(#000, #000);
     }
 
     .toolbar-header{
-      padding: 22px 24px 18px;
-      border-bottom: 1px solid var(--border);
-      background: linear-gradient(135deg, rgba(255,255,255,.99) 0%, rgba(243,247,255,.97) 52%, rgba(239,248,246,.92) 100%);
+      padding: 16px 24px;
+      border-bottom: 1px solid rgba(58,47,28,.14);
+      background:
+        radial-gradient(900px 180px at 40% 0%, rgba(247,213,107,.18), transparent 70%),
+        linear-gradient(180deg, rgba(255,255,255,.85), rgba(255,255,255,.70));
       display:flex;
       flex-wrap:wrap;
       justify-content:space-between;
-      align-items:flex-start;
-      gap:18px;
-      position:relative;
-    }
-
-    .sheet-tabs{ display:flex; gap:10px; flex-wrap:wrap; }
-
-    .table-toolbar-left,
-    .table-toolbar-right{
-      position:relative;
-      z-index:1;
-    }
-
-    .table-panel-eyebrow{
-      display:flex;
       align-items:center;
-      gap:10px;
-      flex-wrap:wrap;
-      margin-bottom:4px;
+      gap:16px;
     }
 
-    .table-panel-kicker{
-      display:inline-flex;
-      align-items:center;
-      gap:8px;
-      padding:8px 12px;
-      border-radius:999px;
-      background: rgba(255,255,255,.84);
-      border:1px solid rgba(124,140,255,.16);
-      color: var(--primary-dark);
-      font-size:12px;
-      font-weight:900;
-      letter-spacing:.06em;
-      text-transform:uppercase;
-      box-shadow: 0 10px 22px rgba(118,133,170,.10);
-    }
-
-    .table-panel-title{
-      margin:0;
-      font-size:22px;
-      font-weight:900;
-      color: var(--text-strong);
-      letter-spacing:-.03em;
-    }
-
-    .table-panel-subtitle{
-      margin:6px 0 0 0;
-      font-size:13px;
-      color: var(--text-muted);
-    }
-
-    .toolbar-summary{
-      display:flex;
-      gap:10px;
-      flex-wrap:wrap;
-      margin-top:10px;
-    }
-
-    .toolbar-pill{
-      display:inline-flex;
-      align-items:center;
-      gap:8px;
-      min-height:40px;
-      padding:10px 14px;
-      border-radius:16px;
-      background: rgba(255,255,255,.82);
-      border:1px solid rgba(146,162,196,.22);
-      font-size:12px;
-      font-weight:800;
-      color: var(--text-main);
-      box-shadow: 0 10px 20px rgba(118,133,170,.08);
-    }
-
-    .toolbar-pill .dot{
-      width:10px;
-      height:10px;
-      border-radius:50%;
-      display:inline-block;
-      background: linear-gradient(135deg, #8e9bff 0%, #7487ff 100%);
-      box-shadow: 0 0 0 4px rgba(124,140,255,.12);
-      flex:0 0 auto;
-    }
-
-    .toolbar-pill.soft-green .dot{ background: linear-gradient(135deg, #90d8cb 0%, #7ecabc 100%); box-shadow: 0 0 0 4px rgba(126,202,188,.16); }
-    .toolbar-pill.soft-pink .dot{ background: linear-gradient(135deg, #ffc0cd 0%, #ff9eb0 100%); box-shadow: 0 0 0 4px rgba(255,143,157,.14); }
-
+    .sheet-tabs{ display:flex; gap:8px; flex-wrap:wrap; }
 
     .sheet-tab{
-      background: rgba(255,255,255,.88);
-      border: 1px solid var(--border);
-      min-height:46px;
-      padding: 10px 18px;
-      border-radius: 16px;
+      background: transparent;
+      border: 1px solid rgba(58,47,28,.18);
+      padding: 8px 16px;
+      border-radius: 12px;
       font-size: 14px;
-      font-weight: 800;
-      color: var(--text-main);
+      font-weight: 900;
+      color: rgba(26,22,15,.72);
       cursor:pointer;
-      transition: transform .18s ease, box-shadow .18s ease, background .18s ease, border-color .18s ease, color .18s ease;
-      backdrop-filter: blur(8px);
-      box-shadow: 0 10px 18px rgba(118,133,170,.08);
+      transition: transform .18s ease, box-shadow .18s ease, background .18s ease, border-color .18s ease;
+      clip-path: polygon(
+        10px 0%,
+        calc(100% - 10px) 0%,
+        100% 10px,
+        100% calc(100% - 10px),
+        calc(100% - 10px) 100%,
+        10px 100%,
+        0% calc(100% - 10px),
+        0% 10px
+      );
+      background: rgba(255,255,255,.55);
+      backdrop-filter: blur(6px);
     }
     .sheet-tab:hover{
       transform: translateY(-2px);
       background: var(--hover-tab-bg);
       border-color: var(--hover-secondary-border);
-      box-shadow: 0 16px 28px rgba(118,133,170,.14);
+      box-shadow: 0 16px 26px rgba(12,11,8,.08);
     }
     .sheet-tab.active{
-      background: linear-gradient(135deg, #90d8cb 0%, #7ecabc 100%);
-      color:#123c35;
-      border-color: rgba(126,202,188,.4);
-      box-shadow: 0 18px 30px rgba(126,202,188,.22);
+      background: linear-gradient(180deg, rgba(27,154,170,.92), rgba(20,122,134,.92));
+      color:#fff;
+      border-color: rgba(20,122,134,.55);
+      box-shadow: 0 18px 28px rgba(20,122,134,.16);
       transform:none;
     }
 
     .sheet-tab.active:hover{
-      filter: brightness(1.03) saturate(1.04);
-      box-shadow: 0 20px 34px rgba(126,202,188,.24);
+      filter: brightness(1.03) saturate(1.06);
+      box-shadow: 0 20px 34px rgba(20,122,134,.20);
     }
+
 
     .view-toggles{
       display:flex;
-      gap:6px;
-      background: rgba(124,140,255,.08);
-      padding: 5px;
-      border-radius: 18px;
-      border: 1px solid rgba(124,140,255,.10);
-      backdrop-filter: blur(10px);
-      width: fit-content;
+      background: rgba(58,47,28,.10);
+      padding: 3px;
+      border-radius: 14px;
+      border: 1px solid rgba(58,47,28,.12);
+      backdrop-filter: blur(6px);
     }
     .view-toggles button{
       background: transparent;
       border:none;
-      min-height:42px;
-      padding: 8px 16px;
+      padding: 6px 14px;
       font-size: 13px;
-      border-radius: 14px;
+      border-radius: 12px;
       cursor:pointer;
-      color: var(--text-main);
-      font-weight: 800;
-      transition: background .18s ease, color .18s ease, transform .18s ease, box-shadow .18s ease;
+      color: rgba(26,22,15,.70);
+      font-weight: 900;
+      transition: background .18s ease, color .18s ease, transform .18s ease;
     }
     .view-toggles button:hover:not(.active){
       background: var(--hover-toggle-bg);
-      color: var(--text-strong);
-      box-shadow: 0 10px 18px rgba(118,133,170,.10);
+      color: var(--ink-1);
+      box-shadow: 0 12px 18px rgba(12,11,8,.06);
       transform: translateY(-1px);
     }
     .view-toggles button.active{
-      background: rgba(255,255,255,.96);
-      color: var(--primary-dark);
-      box-shadow: 0 12px 20px rgba(118,133,170,.12);
+      background: rgba(255,255,255,.85);
+      color: var(--ink-1);
+      box-shadow: 0 12px 18px rgba(12,11,8,.06);
     }
+
 
     .sheet-tab:focus-visible,
     .view-toggles button:focus-visible{
@@ -988,100 +646,78 @@
       box-shadow: var(--ring);
     }
 
-    .table-scroll-area{
-      max-height: 700px;
-      overflow:auto;
-      padding: 12px 14px 18px;
-      background: linear-gradient(180deg, rgba(251,252,255,.84) 0%, rgba(247,249,255,.72) 100%);
-      scrollbar-width: thin;
-      scrollbar-color: rgba(124,140,255,.34) rgba(124,140,255,.08);
-    }
-    .table-scroll-area::-webkit-scrollbar{ width:12px; height:12px; }
-    .table-scroll-area::-webkit-scrollbar-track{ background: rgba(124,140,255,.08); border-radius:999px; }
-    .table-scroll-area::-webkit-scrollbar-thumb{ background: linear-gradient(180deg, rgba(142,155,255,.72), rgba(126,202,188,.62)); border-radius:999px; border:2px solid rgba(255,255,255,.8); }
 
-    table{
-      width:100%;
-      border-collapse:separate;
-      border-spacing:0;
-      font-size: 14px;
-      background: rgba(255,255,255,.84);
-      border: 1px solid rgba(146,162,196,.16);
-      border-radius: 22px;
-      overflow:hidden;
-      box-shadow: 0 16px 34px rgba(118,133,170,.10);
-    }
+    /* Table */
+    .table-scroll-area{ max-height: 700px; overflow:auto; }
+
+    table{ width:100%; border-collapse:collapse; font-size: 14px; }
 
     thead th{
-      background: linear-gradient(180deg, rgba(250,251,255,.99), rgba(238,243,255,.97));
+      background:
+        linear-gradient(180deg, rgba(255,255,255,.75), rgba(255,255,255,.50)),
+        radial-gradient(600px 120px at 10% 0%, rgba(247,213,107,.22), transparent 60%);
       position:sticky;
       top:0;
       text-align:left;
-      padding: 14px 14px;
+      padding: 8px 10px;
       font-weight: 900;
-      color: var(--text-muted);
+      color: rgba(26,22,15,.68);
       font-size: 11px;
       text-transform: uppercase;
       letter-spacing: .08em;
-      border-bottom: 1px solid var(--border);
+      border-bottom: 1px solid rgba(58,47,28,.14);
       white-space: nowrap;
       z-index: 10;
-      box-shadow: inset 0 -1px 0 rgba(146,162,196,.16), 0 8px 16px rgba(118,133,170,.05);
     }
 
-    tbody tr{ transition: background .16s ease, transform .16s ease, box-shadow .16s ease; cursor:pointer; }
-    tbody tr:hover{ background-color: rgba(124,140,255,.05); transform: translateY(-1px); box-shadow: inset 0 0 0 999px rgba(124,140,255,.04); }
+    tbody tr{ transition: background .12s ease; cursor:pointer; }
+    tbody tr:hover{ background-color: rgba(247,213,107,.10); }
 
     tbody td{
-      padding: 13px 14px;
-      border-bottom: 1px solid rgba(146,162,196,.14);
+      padding: 8px 10px;
+      border-bottom: 1px solid rgba(58,47,28,.12);
       color: var(--text-main);
       white-space: nowrap;
       font-size: 13px;
-      background: rgba(255,255,255,.78);
-      transition: background .16s ease;
     }
 
-    tbody tr:nth-child(even) td{
-      background: rgba(248,250,255,.88);
-    }
-
+    /* Status Pills in Table */
     .status-badge{
       display:inline-flex;
       align-items:center;
       gap:6px;
-      min-height:30px;
-      padding: 5px 12px;
+      padding: 4px 10px;
       border-radius: 999px;
       font-size: 11px;
       font-weight: 900;
       text-transform: uppercase;
       letter-spacing:.05em;
-      box-shadow: 0 8px 16px rgba(118,133,170,.08);
-      border: 1px solid transparent;
+      box-shadow: 0 10px 16px rgba(12,11,8,.05);
     }
     .status-badge.normal{
-      background: rgba(255,255,255,.88);
-      color: var(--text-muted);
-      border-color: rgba(146,162,196,.20);
+      background: rgba(255,255,255,.60);
+      color: rgba(26,22,15,.65);
+      border: 1px solid rgba(58,47,28,.12);
     }
-    .status-badge.new{ background: rgba(121,199,184,.18); color: var(--success-text); border-color: rgba(121,199,184,.26); }
-    .status-badge.updated{ background: rgba(255,204,143,.24); color: var(--warning-text); border-color: rgba(255,204,143,.34); }
-    .status-badge.danger{ background: rgba(255,143,157,.18); color: var(--danger-text); border-color: rgba(255,143,157,.28); }
+    .status-badge.new{ background: rgba(27,154,170,.18); color: #0f4b52; border: 1px solid rgba(27,154,170,.18); }
+    .status-badge.updated{ background: rgba(247,213,107,.26); color: #6a4a12; border: 1px solid rgba(217,164,65,.22); }
+    .status-badge.danger{ background: rgba(200,72,72,.18); color: #7a1d1d; border: 1px solid rgba(200,72,72,.20); }
 
-    tr.new-row td{ background-color: rgba(121,199,184,.08); }
-    tr.updated-row td{ background-color: rgba(255,204,143,.10); }
-    tr.new-row:hover td{ background-color: rgba(121,199,184,.14); }
-    tr.updated-row:hover td{ background-color: rgba(255,204,143,.18); }
+    /* New/Updated Row Highlights */
+    tr.new-row td{ background-color: rgba(27,154,170,.07); }
+    tr.updated-row td{ background-color: rgba(247,213,107,.10); }
+    tr.new-row:hover td{ background-color: rgba(27,154,170,.14); }
+    tr.updated-row:hover td{ background-color: rgba(247,213,107,.18); }
 
+    /* Toast */
     .toast{
       position:fixed;
       bottom: 30px;
       right: 30px;
-      background: rgba(24,32,51,.96);
+      background: rgba(23,20,14,.96);
       color:#fff;
-      padding: 14px 22px;
-      border-radius: 18px;
+      padding: 12px 24px;
+      border-radius: 16px;
       box-shadow: var(--shadow-lg);
       font-size: 14px;
       display:flex;
@@ -1092,59 +728,62 @@
       transition: all .30s cubic-bezier(.16, 1, .3, 1);
       pointer-events:none;
       z-index: 100;
-      border: 1px solid rgba(255,255,255,.10);
+      border: 1px solid rgba(247,213,107,.25);
     }
     .toast.visible{ opacity:1; transform: translateY(0); }
 
+    /* Modal */
     .modal-overlay{
       position:fixed; inset:0;
-      background: rgba(24,32,51,.34);
+      background: rgba(12,11,8,.55);
       z-index:2000;
       display:none;
       align-items:center;
       justify-content:center;
-      backdrop-filter: blur(8px);
-      padding:18px;
+      backdrop-filter: blur(4px);
     }
     .modal-overlay.active{ display:flex; }
     .modal-card{
-      background: linear-gradient(135deg, rgba(255,255,255,.98) 0%, rgba(246,249,255,.96) 100%);
+      background:
+        linear-gradient(180deg, rgba(255,255,255,.92), rgba(255,255,255,.78));
       width:100%;
-      max-width: 560px;
-      border-radius: var(--radius-xl);
+      max-width: 520px;
+      border-radius: var(--radius-lg);
       box-shadow: var(--shadow-lg);
       overflow:hidden;
       animation: modalSlide .30s ease;
-      border: 1px solid var(--border);
+      border: 1px solid rgba(58,47,28,.16);
     }
     @keyframes modalSlide{
       from{ transform: translateY(18px); opacity:0; }
       to{ transform: translateY(0); opacity:1; }
     }
     .modal-header{
-      padding: 18px 24px;
-      border-bottom: 1px solid var(--border);
+      padding: 16px 24px;
+      border-bottom: 1px solid rgba(58,47,28,.14);
       display:flex;
       justify-content:space-between;
       align-items:center;
-      background: linear-gradient(135deg, rgba(255,255,255,.98) 0%, rgba(240,244,255,.94) 100%);
+      background:
+        radial-gradient(800px 160px at 30% 0%, rgba(247,213,107,.22), transparent 70%),
+        linear-gradient(180deg, rgba(255,255,255,.90), rgba(255,255,255,.75));
     }
-    .modal-title{ font-size: 18px; font-weight: 900; color: var(--text-strong); }
+    .modal-title{ font-size: 18px; font-weight: 900; color: var(--ink-1); }
 
     .modal-close{
       background: rgba(255,255,255,.0);
       border:none;
       font-size: 24px;
       cursor:pointer;
-      color: var(--text-muted);
+      color: rgba(26,22,15,.55);
       line-height:1;
-      padding: 6px 10px;
-      border-radius: 14px;
+      padding: 4px 10px;
+      border-radius: 12px;
       transition: transform .18s ease, background .18s ease, color .18s ease;
     }
     .modal-close:hover{
-      background: rgba(255,143,157,.14);
-      color: var(--danger-text);
+      background: rgba(200,72,72,.16);
+      color: #7a1d1d;
       transform: rotate(90deg);
     }
 
@@ -1155,257 +794,24 @@
       justify-content:space-between;
       margin-bottom: 12px;
       font-size: 14px;
-      border-bottom: 1px dashed rgba(146,162,196,.26);
-      padding-bottom: 8px;
+      border-bottom: 1px dashed rgba(58,47,28,.18);
+      padding-bottom: 6px;
       gap: 12px;
     }
-    .detail-label{ color: var(--text-muted); font-weight: 800; }
-    .detail-val{ font-weight: 800; color: var(--text-strong); text-align:right; }
+    .detail-label{ color: rgba(26,22,15,.62); font-weight: 800; }
+    .detail-val{ font-weight: 800; color: var(--ink-1); text-align:right; }
 
     .change-log-box{
       margin-top: 16px;
-      padding: 14px;
-      background: rgba(255,246,235,.78);
-      border: 1px solid rgba(255,204,143,.34);
-      border-radius: 16px;
+      padding: 12px;
+      background: rgba(247,213,107,.18);
+      border: 1px solid rgba(217,164,65,.30);
+      border-radius: 12px;
       font-size: 13px;
-      color: var(--warning-text);
-      box-shadow: 0 12px 20px rgba(118,133,170,.08);
+      color: #6a4a12;
+      box-shadow: 0 12px 18px rgba(12,11,8,.06);
     }
 
-    .muted-text{ color: var(--text-muted); font-size: 12px; }
-
-    thead th{
-      cursor:default;
-    }
-    thead th.sort-highlight{
-      color: var(--primary-dark);
-      background: linear-gradient(180deg, rgba(243,246,255,.99), rgba(232,239,255,.98));
-    }
-    thead th.sort-highlight::after{
-      content: attr(data-sort-indicator);
-      display:inline-flex;
-      align-items:center;
-      justify-content:center;
-      margin-left:8px;
-      min-width:22px;
-      height:22px;
-      padding:0 6px;
-      border-radius:999px;
-      background: rgba(124,140,255,.12);
-      color: var(--primary-dark);
-      font-size:10px;
-      font-weight:900;
-      vertical-align:middle;
-    }
-
-    tbody td:first-child,
-    thead th:first-child{
-      position: sticky;
-      left: 0;
-      z-index: 11;
-    }
-    tbody td:first-child{
-      box-shadow: 10px 0 18px rgba(118,133,170,.06);
-    }
-
-    .table-footer-bar{
-      padding: 16px 24px;
-      background: linear-gradient(180deg, rgba(247,249,255,.92), rgba(242,246,255,.96));
-      border-top: 1px solid var(--border);
-      display:flex;
-      gap:12px;
-      align-items:center;
-      justify-content:space-between;
-      flex-wrap:wrap;
-      font-size:12px;
-      color:var(--text-muted);
-      font-weight:700;
-    }
-    .footer-pills{
-      display:flex;
-      flex-wrap:wrap;
-      gap:8px;
-      align-items:center;
-    }
-    .footer-pill{
-      display:inline-flex;
-      align-items:center;
-      gap:8px;
-      padding:8px 12px;
-      border-radius:999px;
-      background: rgba(255,255,255,.82);
-      border:1px solid rgba(146,162,196,.18);
-      color: var(--text-main);
-      box-shadow: 0 10px 18px rgba(118,133,170,.07);
-    }
-
-    .modal-card{
-      position:relative;
-    }
-    .modal-card::before{
-      content:"";
-      position:absolute;
-      inset:0 0 auto 0;
-      height:120px;
-      background: linear-gradient(135deg, rgba(124,140,255,.12), rgba(121,199,184,.10), rgba(255,185,200,.10));
-      pointer-events:none;
-    }
-    .modal-header,
-    .modal-body{
-      position:relative;
-      z-index:1;
-    }
-    .student-hero{
-      display:grid;
-      grid-template-columns:auto 1fr;
-      gap:16px;
-      align-items:center;
-      padding:18px;
-      border-radius:22px;
-      background: linear-gradient(135deg, rgba(255,255,255,.9), rgba(246,249,255,.95));
-      border:1px solid rgba(146,162,196,.18);
-      box-shadow: 0 16px 30px rgba(118,133,170,.10);
-      margin-bottom:18px;
-    }
-    .student-avatar{
-      width:68px;
-      height:68px;
-      border-radius:22px;
-      display:flex;
-      align-items:center;
-      justify-content:center;
-      font-size:30px;
-      font-weight:900;
-      color: var(--primary-dark);
-      background: linear-gradient(135deg, #ffffff, #edf1ff);
-      border:1px solid rgba(124,140,255,.18);
-      box-shadow: 0 14px 28px rgba(124,140,255,.14);
-    }
-    .student-hero h3{
-      margin:0;
-      font-size:24px;
-      line-height:1.1;
-      color: var(--text-strong);
-      letter-spacing:-.03em;
-    }
-    .student-hero p{
-      margin:6px 0 0 0;
-      font-size:13px;
-      color: var(--text-muted);
-    }
-    .student-meta-inline{
-      display:flex;
-      flex-wrap:wrap;
-      gap:8px;
-      margin-top:12px;
-    }
-    .mini-pill{
-      display:inline-flex;
-      align-items:center;
-      gap:8px;
-      min-height:34px;
-      padding:7px 11px;
-      border-radius:999px;
-      background: rgba(255,255,255,.82);
-      border:1px solid rgba(146,162,196,.18);
-      color: var(--text-main);
-      font-size:12px;
-      font-weight:800;
-    }
-    .detail-grid{
-      display:grid;
-      grid-template-columns: 1fr 1fr;
-      gap:12px;
-      margin-top:8px;
-    }
-    .detail-row{
-      display:flex;
-      flex-direction:column;
-      justify-content:flex-start;
-      margin-bottom:0;
-      padding:14px 15px;
-      border: 1px solid rgba(146,162,196,.18);
-      border-radius:18px;
-      background: rgba(255,255,255,.78);
-      min-height:86px;
-      box-shadow: 0 12px 24px rgba(118,133,170,.06);
-      gap:0;
-    }
-    .detail-val{
-      text-align:left;
-      word-break:break-word;
-      margin-top:8px;
-      font-size:15px;
-    }
-    .detail-actions{
-      display:flex;
-      gap:10px;
-      flex-wrap:wrap;
-      margin-top:18px;
-    }
-    .detail-action-btn{
-      display:inline-flex;
-      align-items:center;
-      justify-content:center;
-      gap:8px;
-      min-height:42px;
-      padding:10px 14px;
-      border-radius:16px;
-      border:1px solid rgba(146,162,196,.18);
-      background: linear-gradient(135deg, rgba(255,255,255,.98), rgba(243,247,255,.95));
-      color: var(--text-strong);
-      font-size:13px;
-      font-weight:800;
-      cursor:pointer;
-      box-shadow: 0 10px 18px rgba(118,133,170,.08);
-      transition: transform .18s ease, box-shadow .18s ease, border-color .18s ease;
-    }
-    .detail-action-btn:hover{
-      transform: translateY(-2px);
-      box-shadow: 0 16px 24px rgba(118,133,170,.12);
-      border-color: rgba(124,140,255,.24);
-    }
-
-    @media (max-width: 860px){
-      .app-shell{ padding:16px; }
-      header.app-header{ padding:22px 20px; }
-      .app-title-block h1{ font-size:26px; }
-      .toolbar-header{ padding:16px; }
-      .table-toolbar-right,
-      .table-toolbar-left{ width:100%; }
-      .table-toolbar-right{ justify-content:flex-start; }
-      .btn{ width:100%; }
-      .table-toolbar-right .btn{ width:100%; }
-      .stats-container{ grid-template-columns:1fr; }
-
-      .overview-strip,
-      .filter-highlight-row,
-      .filter-grid-3,
-      .filter-footer-actions{ grid-template-columns:1fr; }
-      .filter-grid-2{ grid-template-columns:1fr; }
-      .filter-hero-top{ flex-direction:column; }
-      .filter-actions{ width:100%; justify-content:stretch; }
-      .filter-actions .btn{ flex:1 1 100%; }
-
-      .view-toggles{ width:100%; }
-      .view-toggles button{ flex:1 1 0; }
-      .student-hero{ grid-template-columns:1fr; text-align:center; }
-      .student-avatar{ margin:0 auto; }
-      .student-meta-inline{ justify-content:center; }
-      .detail-grid{ grid-template-columns:1fr; }
-      .detail-actions{ flex-direction:column; }
-      .detail-action-btn{ width:100%; }
-      .table-footer-bar{ padding:14px 16px; }
-      .footer-pills{ width:100%; }
-      .footer-pill{ width:100%; justify-content:center; }
-      .stat-card.total{ grid-column:auto; }
-      .toolbar-summary{ width:100%; }
-      .toolbar-pill{ flex:1 1 100%; }
-      .table-scroll-area{ padding: 10px 8px 14px; }
-      table{ border-radius: 18px; }
-      thead th, tbody td{ padding-left:10px; padding-right:10px; }
-    }
     /* Yazdırma stilleri (mevcut kurallar korunur) */
     @media print{
       body{ background:white; padding:0; }
@@ -1489,27 +895,9 @@
 
     <div class="dashboard-grid">
       
-      <div class="dashboard-side-stack">
+      <div style="display: flex; flex-direction: column; gap: 24px;">
         
-        <section class="section-stack">
-          <div class="overview-strip no-print">
-            <div class="overview-mini-card">
-              <div class="overview-mini-label">Genel Görünüm</div>
-              <div class="overview-mini-value">Canlı</div>
-              <div class="overview-mini-desc">Anlık veri takibi ve hızlı filtreleme</div>
-            </div>
-            <div class="overview-mini-card green">
-              <div class="overview-mini-label">Yazdırma Akışı</div>
-              <div class="overview-mini-value">Hazır</div>
-              <div class="overview-mini-desc">Sade siyah-beyaz çıktı düzeni korunur</div>
-            </div>
-            <div class="overview-mini-card pink">
-              <div class="overview-mini-label">Kontrol Alanı</div>
-              <div class="overview-mini-value">Premium</div>
-              <div class="overview-mini-desc">Dashboard hissi veren düzenli panel yapısı</div>
-            </div>
-          </div>
-
+        <section>
           <div class="stats-container">
             <div class="stat-card total">
               <div class="stat-label">Toplam Öğrenci</div>
@@ -1553,112 +941,61 @@
           </div>
         </section>
 
-        <section class="panel filter-panel">
-          <div class="filter-shell">
-            <div class="filter-hero">
-              <div class="filter-hero-top">
-                <div>
-                  <div class="filter-eyebrow">🎛️ Akıllı filtre merkezi</div>
-                  <h3>Filtreleme ve görünüm yönetimi</h3>
-                  <p>Kayıtları daha hızlı daraltın, görünümü netleştirin ve karşılaştırma akışını tek panelden yönetin.</p>
-                </div>
-                <div class="filter-actions">
-                  <button class="btn btn-secondary btn-sm" id="clearFiltersBtn" type="button">Temizle</button>
-                  <button class="btn btn-primary btn-sm" id="reloadBtn" type="button">🔄 Verileri Yenile</button>
-                </div>
+        <section class="panel">
+          <div class="panel-title">
+            <span>🔍 Filtreleme</span>
+            <button class="btn btn-secondary btn-sm" id="clearFiltersBtn" type="button">Temizle</button>
+          </div>
+          
+          <div class="filters-stack">
+            <div class="field-group">
+              <div class="field-label">Genel Arama</div>
+              <input type="text" id="searchInput" placeholder="İsim, No, Veli..." />
+            </div>
+
+            <div style="display:grid; grid-template-columns: 1fr 1fr; gap:10px;">
+              <div class="field-group">
+                <div class="field-label">Cinsiyet</div>
+                <select id="genderFilter">
+                  <option value="">Tümü</option>
+                  <option value="KIZ">Kız</option>
+                  <option value="ERKEK">Erkek</option>
+                </select>
               </div>
-              <div class="filter-highlight-row no-print">
-                <div class="filter-highlight">
-                  <strong>Arama</strong>
-                  <span>İsim • numara • veli</span>
-                  <small>Tek kutudan hızlı metin taraması</small>
-                </div>
-                <div class="filter-highlight">
-                  <strong>Durum</strong>
-                  <span>Yeni • güncel • normal</span>
-                  <small>Değişiklik bazlı liste ayıklama</small>
-                </div>
-                <div class="filter-highlight">
-                  <strong>Çıktı</strong>
-                  <span>Yazdırma dostu akış</span>
-                  <small>Seçim sonrası sade çıktı düzeni</small>
-                </div>
+              <div class="field-group">
+                <div class="field-label">Burs</div>
+                <select id="scholarFilter">
+                  <option value="">Tümü</option>
+                  <option value="nonempty">Burslu</option>
+                  <option value="empty">Burssuz</option>
+                </select>
               </div>
             </div>
 
-            <div class="filter-form filters-stack">
-              <div class="filter-section">
-                <div class="filter-section-head">
-                  <div class="filter-section-title">
-                    <strong>Metin tabanlı arama</strong>
-                    <span>Öğrenci, okul no, veli veya benzer alanlarda hızlı arama yapın.</span>
-                  </div>
-                  <span class="section-badge">Hızlı erişim</span>
-                </div>
-                <div class="field-group">
-                  <div class="field-label">Genel Arama</div>
-                  <input type="text" id="searchInput" placeholder="İsim, No, Veli..." />
-                </div>
-              </div>
+            <div class="field-group">
+              <div class="field-label">Kayıt Durumu</div>
+              <select id="statusFilter">
+                <option value="">Tüm Durumlar</option>
+                <option value="new">Sadece Yeni</option>
+                <option value="updated">Güncellenenler</option>
+                <option value="normal">Değişiklik Yok</option>
+              </select>
+            </div>
 
-              <div class="filter-section">
-                <div class="filter-section-head">
-                  <div class="filter-section-title">
-                    <strong>Temel filtreler</strong>
-                    <span>Cinsiyet, burs ve kayıt durumu alanlarını birlikte yönetin.</span>
-                  </div>
-                  <span class="section-badge">Alan seçimi</span>
-                </div>
-                <div class="filter-grid-3">
-                  <div class="field-group">
-                    <div class="field-label">Cinsiyet</div>
-                    <select id="genderFilter">
-                      <option value="">Tümü</option>
-                      <option value="KIZ">Kız</option>
-                      <option value="ERKEK">Erkek</option>
-                    </select>
-                  </div>
-                  <div class="field-group">
-                    <div class="field-label">Burs</div>
-                    <select id="scholarFilter">
-                      <option value="">Tümü</option>
-                      <option value="nonempty">Burslu</option>
-                      <option value="empty">Burssuz</option>
-                    </select>
-                  </div>
-                  <div class="field-group">
-                    <div class="field-label">Kayıt Durumu</div>
-                    <select id="statusFilter">
-                      <option value="">Tüm Durumlar</option>
-                      <option value="new">Sadece Yeni</option>
-                      <option value="updated">Güncellenenler</option>
-                      <option value="normal">Değişiklik Yok</option>
-                    </select>
-                  </div>
-                </div>
+            <div style="display:grid; grid-template-columns: 1fr 1fr; gap:10px;">
+              <div class="field-group">
+                <div class="field-label">Başlangıç Tarihi</div>
+                <input type="date" id="dateFrom" />
               </div>
+              <div class="field-group">
+                <div class="field-label">Bitiş Tarihi</div>
+                <input type="date" id="dateTo" />
+              </div>
+            </div>
 
-              <div class="filter-section">
-                <div class="filter-section-head">
-                  <div class="filter-section-title">
-                    <strong>Zaman ve sıralama</strong>
-                    <span>Tarih aralığını belirleyin ve listeleme önceliğini değiştirin.</span>
-                  </div>
-                  <span class="section-badge">Gelişmiş</span>
-                </div>
-                <div class="filter-grid-2">
-                  <div class="field-group">
-                    <div class="field-label">Başlangıç Tarihi</div>
-                    <input type="date" id="dateFrom" />
-                  </div>
-                  <div class="field-group">
-                    <div class="field-label">Bitiş Tarihi</div>
-                    <input type="date" id="dateTo" />
-                  </div>
-                </div>
-                <div class="field-group">
-                  <div class="field-label">Sıralama Seçenekleri</div>
-                  <select id="generalSortOrder">
+            <div class="field-group">
+                <div class="field-label">Sıralama Seçenekleri</div>
+                <select id="generalSortOrder">
                     <option value="">Otomatik (Durum Öncelikli)</option>
                     <option value="name_asc">İsim (A → Z)</option>
                     <option value="name_desc">İsim (Z → A)</option>
@@ -1666,39 +1003,27 @@
                     <option value="num_desc">Numara (Büyük → Küçük)</option>
                     <option value="date_desc">Tarih (Yeniden → Eskiye)</option>
                     <option value="date_asc">Tarih (Eskiden → Yeniye)</option>
-                  </select>
-                </div>
-              </div>
+                </select>
+            </div>
 
-              <div class="filter-section">
-                <div class="filter-section-head">
-                  <div class="filter-section-title">
-                    <strong>Sınıf seçimi ve hızlı görünüm</strong>
-                    <span>Belirli sınıfları öne çıkarın ve yakın dönem kayıtlarını tek tıkla filtreleyin.</span>
-                  </div>
-                  <span class="section-badge">Segmentasyon</span>
-                </div>
-                <div class="field-group">
-                  <div class="field-label">Sınıflar</div>
-                  <div id="classFilterContainer" class="class-chips"></div>
-                </div>
-                <div class="quick-toggle-card">
-                  <div class="quick-toggle-copy">
-                    <strong>Yakın tarih odağı</strong>
-                    <span>Son 30 kaydı öne çıkararak hızlı kontrol yapın.</span>
-                  </div>
-                  <label style="display:flex; gap:8px; align-items:center; font-size:13px; cursor:pointer; font-weight:800;">
-                    <input type="checkbox" id="recentOnly" style="width:16px; height:16px;" />
-                    <span>Sadece son 30 kayıt</span>
-                  </label>
-                </div>
-                <div class="filter-note no-print">Bu panel, mevcut veri akışını değiştirmeden sadece görünüm ve kullanım hissini güçlendirecek şekilde düzenlendi. Yazdırma tarafında sade siyah-beyaz yapı korunur.</div>
-              </div>
+            <div class="field-group">
+              <div class="field-label">Sınıflar</div>
+              <div id="classFilterContainer" class="class-chips"></div>
+            </div>
 
-              <div class="filter-footer-actions no-print">
-                <button class="btn btn-secondary" id="openChangesBtn" type="button" onclick="document.getElementById('viewNewUpdatedBtn')?.click()">✨ Değişiklikleri Göster</button>
-                <button class="btn btn-secondary" id="focusTableBtn" type="button" onclick="document.querySelector('.table-tools-container')?.scrollIntoView({behavior:'smooth', block:'start'})">📍 Tabloya Git</button>
-              </div>
+            <div class="field-group">
+              <label style="display:flex; gap:8px; align-items:center; font-size:13px; cursor:pointer;">
+                <input type="checkbox" id="recentOnly" style="width:16px; height:16px;" />
+                <span>Sadece son 30 kayıt</span>
+              </label>
+            </div>
+            
+            <hr style="border:0; border-top:1px solid var(--border); width:100%;">
+            
+            <div style="display:flex; flex-direction:column; gap:8px;">
+               <button class="btn btn-secondary" id="reloadBtn" type="button">
+                 🔄 Verileri Yenile
+               </button>
             </div>
           </div>
         </section>
@@ -1709,20 +1034,10 @@
         
         <div class="toolbar-header">
           <div class="table-toolbar-left" style="display:flex; flex-direction:column; gap:8px;">
-            <div class="table-panel-eyebrow">
-              <span class="table-panel-kicker">📊 Veri Paneli</span>
-            </div>
-            <h2 class="table-panel-title">Öğrenci kayıt görünümü</h2>
-            <p class="table-panel-subtitle">Liste, değişiklik ve yazdırma akışını tek panelden yönetin.</p>
             <div class="sheet-tabs" id="sheetTabs"></div>
             <div class="view-toggles">
               <button type="button" data-view="all" class="active" id="viewAllBtn">Tüm Liste</button>
               <button type="button" data-view="new-updated" id="viewNewUpdatedBtn">✨ Değişiklikler</button>
-            </div>
-            <div class="toolbar-summary no-print">
-              <div class="toolbar-pill"><span class="dot"></span><span>Canlı tablo görünümü</span></div>
-              <div class="toolbar-pill soft-green"><span class="dot"></span><span>Yazdırma uyumlu düzen</span></div>
-              <div class="toolbar-pill soft-pink"><span class="dot"></span><span>Premium kontrol şeridi</span></div>
             </div>
           </div>
           
@@ -1742,16 +1057,16 @@
           </div>
         </div>
 
-        <div style="padding: 12px 24px; background: linear-gradient(135deg, rgba(255,255,255,.96) 0%, rgba(246,249,255,.92) 100%); border-bottom: 1px solid var(--border); font-size:12px; color:var(--text-muted); font-weight:700;" id="listStatusBar">
+        <div style="padding: 8px 24px; background: #fff; border-bottom: 1px solid var(--border); font-size:12px; color:var(--text-muted);" id="listStatusBar">
           Yükleniyor...
         </div>
 
         <input type="file" id="uploadTxtInput" accept=".txt,.json" style="display:none;" />
         
-        <div class="no-print" style="padding: 14px 24px; background: linear-gradient(180deg, rgba(248,250,255,.88), rgba(243,247,255,.82)); border-bottom: 1px solid var(--border);">
-            <details style="background: rgba(255,255,255,.74); border: 1px solid rgba(146,162,196,.18); border-radius: 18px; padding: 12px 14px; box-shadow: 0 10px 20px rgba(118,133,170,.07);">
-                <summary style="font-size:12px; color:var(--text-muted); cursor:pointer; font-weight:800;">🖨️ Yazdırma Sütunlarını Seç</summary>
-                <div class="cols" id="printColsContainer" style="display:flex; flex-wrap:wrap; gap:12px; padding-top:12px; font-size:13px;"></div>
+        <div class="no-print" style="padding: 10px 24px; background: #f8fafc; border-bottom: 1px solid var(--border);">
+            <details>
+                <summary style="font-size:12px; color:var(--text-muted); cursor:pointer;">🖨️ Yazdırma Sütunlarını Seç</summary>
+                <div class="cols" id="printColsContainer" style="display:flex; flex-wrap:wrap; gap:12px; padding-top:8px; font-size:13px;"></div>
             </details>
         </div>
 
@@ -1768,13 +1083,8 @@
           </table>
         </div>
         
-        <div class="table-footer-bar">
-          <div class="footer-pills">
-            <span class="footer-pill"><span id="lastSavedInfo">Son kayıt: Yok</span></span>
-            <span class="footer-pill">Durum hücresine tıklayın</span>
-            <span class="footer-pill">Çift tıklama ile kopyala</span>
-          </div>
-          <div>Detaylı görünüm aktif</div>
+        <div style="padding: 12px 24px; background: #f8fafc; border-top: 1px solid var(--border); font-size:12px; color:var(--text-muted); text-align:center;">
+          <span id="lastSavedInfo">Son kayıt: Yok</span> • Detay için satıra tıklayın.
         </div>
 
       </div>
@@ -1791,7 +1101,7 @@
     <div class="modal-card">
         <div class="modal-header">
             <div class="modal-title">Öğrenci Detayı</div>
-            <button class="modal-close" onclick="closeModal()" aria-label="Detay penceresini kapat">×</button>
+            <button class="modal-close" onclick="closeModal()">×</button>
         </div>
         <div class="modal-body" id="modalContent">
             </div>
@@ -1877,47 +1187,6 @@
       document.getElementById("toastMessage").textContent = message;
       toast.classList.add("visible");
       setTimeout(() => toast.classList.remove("visible"), 3000);
-    }
-
-    function escapeHtml(value) {
-      return String(value ?? "")
-        .replace(/&/g, "&amp;")
-        .replace(/</g, "&lt;")
-        .replace(/>/g, "&gt;")
-        .replace(/"/g, "&quot;")
-        .replace(/'/g, "&#39;");
-    }
-
-    function syncHeaderSortState() {
-      const sortOrder = document.getElementById("generalSortOrder") ? document.getElementById("generalSortOrder").value : "";
-      const map = {
-        name_asc: { field: "isim", indicator: "A→Z" },
-        name_desc: { field: "isim", indicator: "Z→A" },
-        num_asc: { field: "okulNo", indicator: "1→9" },
-        num_desc: { field: "okulNo", indicator: "9→1" },
-        date_asc: { field: "tarih", indicator: "Eski" },
-        date_desc: { field: "tarih", indicator: "Yeni" }
-      };
-      document.querySelectorAll("#tableHeaderRow th").forEach(th => {
-        th.classList.remove("sort-highlight");
-        th.removeAttribute("data-sort-indicator");
-      });
-      if (!sortOrder || !map[sortOrder]) return;
-      const target = document.querySelector(`#tableHeaderRow th[data-field="${map[sortOrder].field}"]`);
-      if (target) {
-        target.classList.add("sort-highlight");
-        target.setAttribute("data-sort-indicator", map[sortOrder].indicator);
-      }
-    }
-
-    async function copyTextToClipboard(text, successMessage = "Kopyalandı") {
-      if (!text) return;
-      try {
-        await navigator.clipboard.writeText(text);
-        showToast(successMessage);
-      } catch (err) {
-        console.error("Kopyalama hatası:", err);
-      }
     }
 
     function parseCSV(text) {
@@ -2345,7 +1614,6 @@ if (snapshot && snapshot.records) {
         `;
         printContainer.appendChild(label);
       });
-      syncHeaderSortState();
     }
 
     function populateFilters() {
@@ -2516,7 +1784,6 @@ if (snapshot && snapshot.records) {
       if (recentOnly && filtered.length > 30) filtered = filtered.slice(0, 30);
 
       renderTable(filtered);
-      syncHeaderSortState();
       updateSummary(removedRecords);
       updateListStatus(filtered);
     }
@@ -2683,18 +1950,6 @@ if (snapshot && snapshot.records) {
         if(e.target === document.getElementById("studentDetailModal")) closeModal();
       });
 
-      document.getElementById("modalContent").addEventListener("click", async (e) => {
-        const btn = e.target.closest("[data-copy-value]");
-        if (!btn) return;
-        await copyTextToClipboard(btn.dataset.copyValue, btn.dataset.copyLabel || "Kopyalandı");
-      });
-
-      document.addEventListener("keydown", (e) => {
-        if (e.key === "Escape" && document.getElementById("studentDetailModal").classList.contains("active")) {
-          closeModal();
-        }
-      });
-
       // TXT İndir
       document.getElementById("downloadTxtBtn").addEventListener("click", () => {
         if (!students.length) return showToast("Liste boş.");
@@ -2732,7 +1987,6 @@ if (snapshot && snapshot.records) {
     // Modal Fonksiyonları
     window.closeModal = function() {
       document.getElementById("studentDetailModal").classList.remove("active");
-      document.body.style.overflow = "";
     };
 
     function openStudentModal(s) {
@@ -2743,15 +1997,18 @@ if (snapshot && snapshot.records) {
       let diffHtml = "";
       let dupHtml = "";
 
+      // Durum Tespiti
       if (s.status === "new") {
         statusHtml = `<span class="status-badge new" style="font-size:14px; padding:6px 12px;">✨ Yeni Kayıt</span>`;
         diffHtml = `<div class="change-log-box" style="background:#f0fdf4; border-color:#86efac; color:#166534;">Bu öğrenci listeye yeni eklendi.</div>`;
       } else if (s.status === "updated") {
         statusHtml = `<span class="status-badge updated" style="font-size:14px; padding:6px 12px;">✏️ Bilgileri Güncellendi</span>`;
         
+        // --- GÜNCELLEME 3: AKILLI DEĞİŞİKLİK TARAMA ---
         if (snapshot && snapshot.records && snapshot.records[(s._comparePrevId || s.id)]) {
             const oldData = snapshot.records[(s._comparePrevId || s.id)].data;
             const changes = [];
+            // Tüm alanları kapsayan genişletilmiş harita
             const fields = {
                 isim: "İsim",
                 soyisim: "Soyisim",
@@ -2767,10 +2024,12 @@ if (snapshot && snapshot.records) {
             };
             
             for(let key in fields) {
+                // Stringe çevirip trim yaparak karşılaştır (Hassas karşılaştırma)
                 const oldVal = String(oldData[key] || "").trim();
                 const newVal = String(s[key] || "").trim();
+                
                 if(oldVal !== newVal) {
-                    changes.push(`<b>${fields[key]}:</b> <br/> <span style="color:#b91c1c; text-decoration:line-through; font-size:12px;">${escapeHtml(oldVal || '(Boş)')}</span> <span style="margin:0 4px">➞</span> <span style="color:#15803d; font-weight:600;">${escapeHtml(newVal || '(Boş)')}</span>`);
+                    changes.push(`<b>${fields[key]}:</b> <br/> <span style="color:#b91c1c; text-decoration:line-through; font-size:12px;">${oldVal || '(Boş)'}</span> <span style="margin:0 4px">➞</span> <span style="color:#15803d; font-weight:600;">${newVal}</span>`);
                 }
             }
             if(changes.length > 0) {
@@ -2779,6 +2038,7 @@ if (snapshot && snapshot.records) {
                     <ul style="margin:0; padding-left:20px; display:flex; flex-direction:column; gap:6px;">${changes.map(c => `<li>${c}</li>`).join('')}</ul>
                 </div>`;
             } else {
+                // Veri farklı görünse de trim yapınca aynı olabilir
                 diffHtml = `<div class="change-log-box">Görünürde değişiklik algılandı ancak biçimsel olabilir.</div>`;
             }
         }
@@ -2786,10 +2046,11 @@ if (snapshot && snapshot.records) {
         statusHtml = `<span class="status-badge normal" style="font-size:14px; padding:6px 12px;">Kayıtlı Öğrenci</span>`;
       }
 
+      // Okul No çakışması bilgisi (varsa)
       const myNo = String(s.okulNo || "").trim();
       if (myNo && duplicateOkulNoMap && duplicateOkulNoMap[myNo] && duplicateOkulNoMap[myNo].length >= 2) {
         const others = (duplicateOkulNoMap[myNo] || []).filter(x => !(x.id === s.id));
-        const listHtml = others.map(x => `<li>${escapeHtml(x.isim)} ${escapeHtml(x.soyisim)} <small>(${escapeHtml(x.sinif || '-')})</small></li>`).join("");
+        const listHtml = others.map(x => `<li>${x.isim} ${x.soyisim} <small>(${x.sinif || '-'})</small></li>`).join("");
         dupHtml = `<div class="change-log-box" style="background: var(--danger-bg); border-color: #fca5a5; color: var(--danger-text);">
           <div style="font-weight:800; margin-bottom:6px;">⚠️ Okul No Çakışması</div>
           <div style="font-size:12px; opacity:0.9; margin-bottom:8px;">Bu okul numarası listede birden fazla öğrenciye atanmış.</div>
@@ -2797,49 +2058,27 @@ if (snapshot && snapshot.records) {
         </div>`;
       }
 
-      const initials = `${String(s.isim || "").trim().charAt(0) || "?"}${String(s.soyisim || "").trim().charAt(0) || ""}`.toUpperCase();
-      const fullName = `${s.isim || ""} ${s.soyisim || ""}`.trim();
-      const safePhone = escapeHtml(s.veliTelefon || "");
-      const phoneAction = s.veliTelefon ? `<button class="detail-action-btn" type="button" data-copy-value="${escapeHtml(s.veliTelefon || "")}" data-copy-label="Veli telefonu kopyalandı">📋 Telefonu Kopyala</button>` : ``;
-      const nameAction = `<button class="detail-action-btn" type="button" data-copy-value="${escapeHtml(fullName)}" data-copy-label="Öğrenci adı kopyalandı">👤 Adı Kopyala</button>`;
-      const numberAction = `<button class="detail-action-btn" type="button" data-copy-value="${escapeHtml(s.okulNo || "")}" data-copy-label="Okul numarası kopyalandı">🔢 Okul No Kopyala</button>`;
-
       content.innerHTML = `
-        <div class="student-hero">
-          <div class="student-avatar">${escapeHtml(initials)}</div>
-          <div>
-            <h3>${escapeHtml(s.isim)} ${escapeHtml(s.soyisim)}</h3>
-            <p>Öğrenci kartı • No: ${escapeHtml(s.okulNo || "-")}</p>
-            <div class="student-meta-inline">
-              ${statusHtml}
-              <span class="mini-pill">🏫 ${escapeHtml(s.sinif || "-")}</span>
-              <span class="mini-pill">📅 ${escapeHtml(s.tarih || "-")}</span>
-            </div>
-          </div>
+        <div style="text-align:center; margin-bottom:20px;">
+            <div style="font-size:24px; font-weight:700;">${s.isim} ${s.soyisim}</div>
+            <div style="font-size:14px; color:var(--text-muted);">${s.okulNo}</div>
+            <div style="margin-top:10px;">${statusHtml}</div>
         </div>
 
-        <div class="detail-grid">
-          <div class="detail-row"><span class="detail-label">Sınıf</span><span class="detail-val">${escapeHtml(s.sinif || "-")}</span></div>
-          <div class="detail-row"><span class="detail-label">Cinsiyet</span><span class="detail-val">${escapeHtml(s.cinsiyet || "-")}</span></div>
-          <div class="detail-row"><span class="detail-label">Veli Adı</span><span class="detail-val">${escapeHtml(`${s.veliAdi || ""} ${s.veliSoyadi || ""}`.trim() || "-")}</span></div>
-          <div class="detail-row"><span class="detail-label">Veli Telefon</span><span class="detail-val">${safePhone || "-"}</span></div>
-          <div class="detail-row"><span class="detail-label">Kayıt Tarihi</span><span class="detail-val">${escapeHtml(s.tarih || "-")}</span></div>
-          <div class="detail-row"><span class="detail-label">Burs Durumu</span><span class="detail-val">${s.burslu ? "Burslu" : "Normal"}</span></div>
-        </div>
-
-        <div class="detail-actions">
-          ${nameAction}
-          ${numberAction}
-          ${phoneAction}
-        </div>
-
+        <div class="detail-row"><span class="detail-label">Sınıf:</span> <span class="detail-val">${s.sinif}</span></div>
+        <div class="detail-row"><span class="detail-label">Cinsiyet:</span> <span class="detail-val">${s.cinsiyet}</span></div>
+        <div class="detail-row"><span class="detail-label">Veli Adı:</span> <span class="detail-val">${s.veliAdi} ${s.veliSoyadi}</span></div>
+        <div class="detail-row"><span class="detail-label">Veli Telefon:</span> <span class="detail-val">${s.veliTelefon || "-"}</span></div>
+        <div class="detail-row"><span class="detail-label">Kayıt Tarihi:</span> <span class="detail-val">${s.tarih || "-"}</span></div>
+        <div class="detail-row"><span class="detail-label">Burs Durumu:</span> <span class="detail-val">${s.burslu ? "Burslu" : "Normal"}</span></div>
+        
         ${dupHtml}
         ${diffHtml}
       `;
       
       modal.classList.add("active");
-      document.body.style.overflow = "hidden";
     }
+
     document.addEventListener("DOMContentLoaded", async () => {
       renderSheetTabs();
       setupEventListeners();
