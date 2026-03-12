@@ -1656,7 +1656,6 @@
     // FIREBASE
     // =======================
     import { initializeApp } from 'https://www.gstatic.com/firebasejs/9.23.0/firebase-app.js';
-    import { getAnalytics } from 'https://www.gstatic.com/firebasejs/9.23.0/firebase-analytics.js';
     import { getDatabase, ref, get, set } from 'https://www.gstatic.com/firebasejs/9.23.0/firebase-database.js';
 
     const firebaseConfig = {
@@ -1667,11 +1666,9 @@
       storageBucket: "odevfeno.firebasestorage.app",
       messagingSenderId: "662757516934",
       appId: "1:662757516934:web:0042188832f63deb6fd307",
-      measurementId: "G-4Q99NQRB38"
     };
 
     const firebaseApp = initializeApp(firebaseConfig);
-    const firebaseAnalytics = getAnalytics(firebaseApp);
     const firebaseDb = getDatabase(firebaseApp);
     const FIREBASE_BASE_PATH = 'snapshots';
 
