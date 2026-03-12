@@ -1885,23 +1885,15 @@ function findPrevMatchForStudent(student, prevMap) {
 
     function updateSnapshotLabels() {
       // Not: Artık "Son kayıt:..." metnini updateListStatus fonksiyonu yönetiyor.
-      // Üst rozetlerde Firebase son kaydetme tarihi gösterilir.
+      // Sadece "Karşılaştırma" etiketini burada güncelliyoruz.
       const compareLabel = document.getElementById("compareSourceLabel");
-      const lastLoadedInfo = document.getElementById("lastLoadedInfo");
 
       if (!snapshot || !snapshot.savedAt) {
         compareLabel.textContent = "Son Kaydetme Tarihi: Yok";
-        if (lastLoadedInfo) {
-          lastLoadedInfo.textContent = `${currentSheetName} | Firebase Son Kaydedilme Tarihi: Yok`;
-        }
         return;
       }
 
-      const savedAtText = formatDateTimeForBadge(snapshot.savedAt);
-      compareLabel.textContent = "Son Kaydetme Tarihi: " + savedAtText;
-      if (lastLoadedInfo) {
-        lastLoadedInfo.textContent = `${currentSheetName} | Firebase Son Kaydedilme Tarihi: ${savedAtText}`;
-      }
+      compareLabel.textContent = "Son Kaydetme Tarihi: " + formatDateTimeForBadge(snapshot.savedAt);
     }
 
     async function loadSnapshot() {
@@ -2068,7 +2060,7 @@ if (snapshot && snapshot.records) {
         populateFilters();
         updateSummary(removed);
         applyFilters(removed);
-        updateSnapshotLabels();
+        document.getElementById("lastLoadedInfo").textContent = `${currentSheetName} | ${formatDateTimeForBadge(new Date().toISOString())}`;
         const _dupKeys = duplicateOkulNoMap ? Object.keys(duplicateOkulNoMap) : [];
         if (_dupKeys.length) showToast(`Uyarı: ${_dupKeys.length} okul numarası çakışması bulundu. (⚠️ Okul No Çakışmaları bölümüne bakın)`);
         
