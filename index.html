@@ -938,9 +938,9 @@
     }
 
     .status-badge.updated{
-      background: rgba(225,234,255,.96);
-      color: #3357b7;
-      border-color: rgba(161,184,255,.95);
+      background: rgba(255,244,238,.98);
+      color: #b5634c;
+      border-color: rgba(255,188,165,.98);
     }
 
     .status-badge.removed{
@@ -974,9 +974,9 @@
     }
 
     tbody tr:hover td[data-field="status"] .status-badge.updated{
-      background: rgba(209,223,255,.98);
-      color: #2649a6;
-      border-color: rgba(120,152,245,.98);
+      background: rgba(255,233,224,.98);
+      color: #9f4f3d;
+      border-color: rgba(244,164,137,.98);
       transform: translateY(-1px);
     }
 
@@ -1133,6 +1133,36 @@
       margin: 2px 0;
     }
 
+
+    body.print-preparing,
+    body.print-preparing *{
+      transition:none !important;
+      animation:none !important;
+    }
+
+    body.print-preparing header.app-header,
+    body.print-preparing .dashboard-grid > div:first-child,
+    body.print-preparing .table-tools-container .toolbar-header,
+    body.print-preparing .table-tools-container #listStatusBar,
+    body.print-preparing .table-tools-container input,
+    body.print-preparing .no-print,
+    body.print-preparing .toast,
+    body.print-preparing .modal-overlay{
+      display:none !important;
+    }
+
+    body.print-preparing .table-tools-container,
+    body.print-preparing .table-scroll-area,
+    body.print-preparing .panel,
+    body.print-preparing .dashboard-grid,
+    body.print-preparing .dashboard-grid > div{
+      background:#fff !important;
+      box-shadow:none !important;
+    }
+
+    #printFooterNote{
+      font-weight: 700;
+    }
     /* Responsive touch-ups */
     @media (max-width: 900px){
       .app-shell{ padding:18px; }
@@ -1301,6 +1331,26 @@
 
       .print-title-block p{
         display:none !important;
+      }
+
+      #printFooterNote{
+        display:block !important;
+        background:#fff !important;
+        border:none !important;
+        border-top:1px solid #000 !important;
+        margin-top:8px !important;
+        padding:8px 0 0 0 !important;
+        font-size:10px !important;
+        line-height:1.4 !important;
+        color:#000 !important;
+        text-align:left !important;
+        font-weight:700 !important;
+      }
+
+      #printFooterNote span{
+        color:#000 !important;
+        background:none !important;
+        font-weight:700 !important;
       }
     }
 
@@ -1536,7 +1586,7 @@
           </table>
         </div>
         
-        <div style="padding: 12px 24px; background: #f8fafc; border-top: 1px solid var(--border); font-size:12px; color:var(--text-muted); text-align:center;">
+        <div id="printFooterNote" style="padding: 12px 24px; background: #f8fafc; border-top: 1px solid var(--border); font-size:12px; color:var(--text-muted); text-align:center;">
           <span id="lastSavedInfo">Son kayıt: Yok</span>
         </div>
 
@@ -2162,7 +2212,7 @@ if (snapshot && snapshot.records) {
       // --- GÜNCELLEME 2: ALT BİLGİYİ GÜNCELLE ---
       const bottomFooter = document.getElementById("lastSavedInfo");
       if(bottomFooter) {
-         bottomFooter.textContent = `Şu an listede ${visible} sayıda öğrenci vardır.`;
+         bottomFooter.textContent = `Bu yazdırma çıktısında listede ${visible} öğrenci yer almaktadır.`;
       }
     }
 
@@ -2327,7 +2377,21 @@ if (snapshot && snapshot.records) {
       document.getElementById("saveSnapshotBtn").addEventListener("click", () => saveSnapshot(students));
       document.getElementById("printBtn").addEventListener("click", () => {
         syncPrintColumnVisibility();
-        window.print();
+        document.body.classList.add("print-preparing");
+        requestAnimationFrame(() => {
+          setTimeout(() => {
+            window.print();
+          }, 80);
+        });
+      });
+
+      window.addEventListener("afterprint", () => {
+        document.body.classList.remove("print-preparing");
+      });
+
+      window.addEventListener("beforeprint", () => {
+        document.body.classList.add("print-preparing");
+        syncPrintColumnVisibility();
       });
       document.getElementById("printColsContainer").addEventListener("change", syncPrintColumnVisibility);
 
