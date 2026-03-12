@@ -1187,7 +1187,10 @@
         background:#fff !important;
         padding:0;
         color:#000 !important;
-        font-family:'Manrope','Inter',sans-serif !important;
+        font-family:Arial,'Segoe UI','Helvetica Neue',Tahoma,sans-serif !important;
+        text-rendering: geometricPrecision !important;
+        -webkit-font-smoothing: antialiased !important;
+        -moz-osx-font-smoothing: grayscale !important;
         -webkit-print-color-adjust: exact !important;
         print-color-adjust: exact !important;
       }
@@ -1245,7 +1248,7 @@
         width:100% !important;
         border-collapse:collapse !important;
         table-layout:auto !important;
-        font-family:'Manrope','Inter',sans-serif !important;
+        font-family:Arial,'Segoe UI','Helvetica Neue',Tahoma,sans-serif !important;
       }
 
       thead{
@@ -1281,6 +1284,11 @@
         font-weight: 700 !important;
         padding: 4px 5px !important;
         line-height: 1.28 !important;
+      }
+
+      th[data-field="veliTelefon"],
+      td[data-field="veliTelefon"]{
+        text-align:center !important;
       }
 
       td[data-field="veliTelefon"]{
@@ -1343,8 +1351,8 @@
         font-size:10px !important;
         line-height:1.4 !important;
         color:#000 !important;
-        text-align:left !important;
-        font-weight:700 !important;
+        text-align:center !important;
+        font-weight:500 !important;
       }
 
       #printFooterNote span{
@@ -2379,9 +2387,11 @@ if (snapshot && snapshot.records) {
         syncPrintColumnVisibility();
         document.body.classList.add("print-preparing");
         requestAnimationFrame(() => {
-          setTimeout(() => {
-            window.print();
-          }, 80);
+          requestAnimationFrame(() => {
+            setTimeout(() => {
+              window.print();
+            }, 60);
+          });
         });
       });
 
@@ -2598,5 +2608,3 @@ if (snapshot && snapshot.records) {
   </script>
 </body>
 </html>
-
-
