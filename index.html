@@ -55,10 +55,6 @@
 
       --danger-bg: rgba(247,139,139,.18);
       --danger-text: #a23535;
-      --info-bg: rgba(126, 164, 255, .16);
-      --info-text: #3553a2;
-      --dup-bg: rgba(255, 214, 102, .22);
-      --dup-text: #9a6500;
 
       /* Gölgeler */
       --shadow-sm: 0 1px 2px rgba(15,23,42,.04), 0 0 0 1px rgba(255,255,255,.7) inset;
@@ -107,20 +103,6 @@
         ),
         linear-gradient(180deg, var(--paper-0), var(--paper-1));
       background-attachment: fixed;
-    }
-
-
-    body::after{
-      content:"";
-      position:fixed;
-      inset:0;
-      pointer-events:none;
-      z-index:-1;
-      opacity:.26;
-      background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='240' height='240' viewBox='0 0 240 240'%3E%3Ctext x='28' y='66' font-size='34'%3E%F0%9F%93%93%3C/text%3E%3Ctext x='154' y='92' font-size='32'%3E%F0%9F%93%9A%3C/text%3E%3Ctext x='84' y='168' font-size='30'%3E%F0%9F%93%98%3C/text%3E%3Ctext x='170' y='184' font-size='28'%3E%F0%9F%93%9D%3C/text%3E%3Ctext x='36' y='206' font-size='28'%3E%F0%9F%A7%AA%3C/text%3E%3C/svg%3E");
-      background-size:240px 240px;
-      background-repeat:repeat;
-      mix-blend-mode:soft-light;
     }
 
     a, button, input, select, summary{
@@ -246,8 +228,6 @@
       letter-spacing:.01em;
     }
 
-    .app-title-block p:empty{ display:none; }
-
     .header-meta{
       display:flex;
       gap:12px;
@@ -372,18 +352,18 @@
     }
 
     .stat-card.updated{
-      background: linear-gradient(180deg, rgba(244,240,255,.98), rgba(238,233,255,.96));
-      color: var(--info-text);
+      background: linear-gradient(180deg, rgba(255,247,243,.98), rgba(255,240,235,.96));
+      color: var(--warning-text);
     }
 
     .stat-card.removed{
-      background: linear-gradient(180deg, rgba(255,244,244,.98), rgba(255,237,237,.96));
-      color: var(--danger-text);
+      background: linear-gradient(180deg, rgba(255,243,246,.98), rgba(253,235,241,.96));
+      color: #b54763;
     }
 
     .stat-card.duplicate{
-      background: linear-gradient(180deg, rgba(255,250,234,.98), rgba(255,243,200,.96));
-      color: var(--dup-text);
+      background: linear-gradient(180deg, rgba(255,250,236,.98), rgba(255,244,207,.96));
+      color: #a56a00;
     }
 
     .stat-label{
@@ -399,6 +379,7 @@
       font-weight: 900;
       margin: 5px 0;
       line-height: 1;
+      min-height: 34px;
     }
 
     .stat-desc{
@@ -632,19 +613,20 @@
       font-size: 13px;
       font-weight: 900;
       list-style:none;
-      display:grid;
-      grid-template-columns: minmax(0, 1fr) 88px 20px;
+      display:flex;
+      justify-content:space-between;
       align-items:center;
       letter-spacing:.01em;
       color: var(--ink-0);
       gap:12px;
     }
 
-    .change-summary-label{
-      display:flex;
-      align-items:center;
-      gap:8px;
-      min-width:0;
+    .change-lists summary .status-badge{
+      margin-left:auto;
+      min-width: 48px;
+      justify-content:center;
+      padding-inline: 14px;
+      flex: 0 0 48px;
     }
 
     .change-lists summary::-webkit-details-marker{
@@ -656,8 +638,7 @@
       font-size: 15px;
       color: var(--primary-dark);
       transition: transform .2s ease;
-      margin-left: 0;
-      justify-self:end;
+      margin-left: auto;
     }
 
     .change-lists details[open] summary::after{
@@ -931,27 +912,58 @@
     }
 
     .status-badge.normal{
-      background: rgba(243,246,252,.92);
-      color: rgba(51,65,85,.84);
-      border-color: rgba(203,213,225,.88);
+      background: rgba(241,245,249,.96);
+      color: #5b6778;
+      border-color: rgba(184,197,214,.95);
     }
 
     .status-badge.new{
-      background: rgba(116,196,182,.16);
-      color: #17695d;
-      border-color: rgba(116,196,182,.26);
+      background: rgba(215,246,239,.96);
+      color: #0f766e;
+      border-color: rgba(123,213,197,.95);
     }
 
     .status-badge.updated{
-      background: var(--info-bg);
-      color: var(--info-text);
-      border-color: rgba(126, 164, 255, .30);
+      background: rgba(225,234,255,.96);
+      color: #3357b7;
+      border-color: rgba(161,184,255,.95);
+    }
+
+    .status-badge.removed{
+      background: rgba(255,239,244,.96);
+      color: #b54763;
+      border-color: rgba(244,183,199,.95);
     }
 
     .status-badge.danger{
-      background: var(--dup-bg);
-      color: var(--dup-text);
-      border-color: rgba(255, 214, 102, .42);
+      background: rgba(255,247,222,.98);
+      color: #a56a00;
+      border-color: rgba(239,206,102,.95);
+    }
+
+    td[data-field="status"] .status-badge{
+      transition: transform .16s ease, box-shadow .16s ease, filter .16s ease, background .16s ease, border-color .16s ease, color .16s ease;
+    }
+
+    tbody tr:hover td[data-field="status"] .status-badge.normal{
+      background: rgba(231,236,243,.98);
+      color: #475569;
+      border-color: rgba(160,174,194,.98);
+      transform: translateY(-1px);
+    }
+
+    tbody tr:hover td[data-field="status"] .status-badge.new{
+      background: rgba(194,239,229,.98);
+      color: #0b6b63;
+      border-color: rgba(86,196,172,.98);
+      transform: translateY(-1px);
+    }
+
+    tbody tr:hover td[data-field="status"] .status-badge.updated{
+      background: rgba(209,223,255,.98);
+      color: #2649a6;
+      border-color: rgba(120,152,245,.98);
+      transform: translateY(-1px);
     }
 
     /* New/Updated Row Highlights */
@@ -1119,8 +1131,8 @@
     /* Yazdırma stilleri */
     @media print{
       @page{
-        size:A4 landscape;
-        margin:7mm;
+        size:A4 portrait;
+        margin:8mm;
       }
 
       html, body{
@@ -1151,7 +1163,6 @@
       .table-tools-container .toolbar-header,
       .table-tools-container #listStatusBar,
       .table-tools-container input,
-      .table-tools-container > div[style*='border-top'],
       .no-print,
       .toast,
       .modal-overlay{
@@ -1165,19 +1176,39 @@
 
       .table-tools-container,
       .table-scroll-area,
-      .panel{
+      .panel,
+      .dashboard-grid,
+      .dashboard-grid > div{
+        display:block !important;
         border:none !important;
         box-shadow:none !important;
         overflow:visible !important;
         background:#fff !important;
-        padding:0;
+        padding:0 !important;
+        margin:0 !important;
+        max-height:none !important;
+        height:auto !important;
+        transform:none !important;
+      }
+
+      .table-scroll-area{
+        overflow:visible !important;
       }
 
       table{
         width:100% !important;
         border-collapse:collapse !important;
-        table-layout:fixed !important;
+        table-layout:auto !important;
         font-family:'Manrope','Inter',sans-serif !important;
+      }
+
+      thead{
+        display:table-header-group !important;
+      }
+
+      tr, img{
+        page-break-inside: avoid !important;
+        break-inside: avoid !important;
       }
 
       thead th,
@@ -1191,28 +1222,20 @@
       }
 
       thead th{
+        position:static !important;
         font-weight: 800 !important;
-        font-size: 10px !important;
-        padding: 6px 6px !important;
+        font-size: 9.4px !important;
+        padding: 5px 5px !important;
       }
 
       tbody td{
-        font-size: 9.1px !important;
+        font-size: 8.8px !important;
         padding: 4px 5px !important;
       }
 
-      th[data-field='status'],
-      td[data-field='status']{
+      th[data-field="status"],
+      td[data-field="status"]{
         display:none !important;
-      }
-
-      th[data-field='cinsiyet'], td[data-field='cinsiyet'],
-      th[data-field='sinif'], td[data-field='sinif'],
-      th[data-field='okulNo'], td[data-field='okulNo'],
-      th[data-field='yil'], td[data-field='yil'],
-      th[data-field='tarih'], td[data-field='tarih'],
-      th[data-field='burslu'], td[data-field='burslu']{
-        font-size:8.8px !important;
       }
 
       tbody tr:nth-child(even),
@@ -1247,10 +1270,7 @@
       }
 
       .print-title-block p{
-        font-size: 12px;
-        margin:5px 0 0 0;
-        color:#000 !important;
-        font-weight: 700;
+        display:none !important;
       }
     }
 
@@ -1273,20 +1293,20 @@
     
     <div class="print-title-block">
         <h1>ÖĞRENCİ LİSTESİ</h1>
-        <p id="printDateInfo">Son Kaydetme Tarihi: -</p>
+        
     </div>
 
     <header class="app-header">
       <div class="app-title-block">
         <h1><span class="icon">🎓</span> Öğrenci Listesi Yöneticisi</h1>
-        <p></p>
+        
       </div>
       <div class="header-meta">
         <div class="chip">
           <span id="lastLoadedInfo">Veri bekleniyor...</span>
         </div>
         <div class="chip">
-           <span id="compareSourceLabel">Karşılaştırma: Yok</span>
+           <span id="compareSourceLabel">Son Kaydetme Tarihi: Yok</span>
         </div>
       </div>
     </header>
@@ -1319,26 +1339,26 @@
             </div>
             <div class="stat-card duplicate">
               <div class="stat-label">Çakışma</div>
-              <div class="stat-value" id="duplicateCount">–</div>
+              <div class="stat-value" id="dupCount">–</div>
               <div class="stat-desc">Okul no çakışmaları</div>
             </div>
           </div>
           
           <div class="change-lists">
             <details>
-              <summary><span class="change-summary-label">🆕 Yeni Kayıtlar</span><span class="status-badge new" id="newTagCount">0</span></summary>
+              <summary>🆕 Yeni Kayıtlar <span class="status-badge new" id="newTagCount">0</span></summary>
               <ul id="newList"></ul>
             </details>
             <details>
-              <summary><span class="change-summary-label">✏️ Güncellenenler</span><span class="status-badge updated" id="updatedTagCount">0</span></summary>
+              <summary>✏️ Güncellenenler <span class="status-badge updated" id="updatedTagCount">0</span></summary>
               <ul id="updatedList"></ul>
             </details>
             <details>
-              <summary><span class="change-summary-label">🗑️ Silinenler</span><span class="status-badge normal" id="removedTagCount">0</span></summary>
+              <summary>🗑️ Silinenler <span class="status-badge removed" id="removedTagCount">0</span></summary>
               <ul id="removedList"></ul>
             </details>
             <details>
-              <summary><span class="change-summary-label">⚠️ Okul No Çakışmaları</span><span class="status-badge danger" id="dupTagCount">0</span></summary>
+              <summary>⚠️ Okul No Çakışmaları <span class="status-badge danger" id="dupTagCount">0</span></summary>
               <ul id="dupList"></ul>
             </details>
           </div>
@@ -1468,7 +1488,7 @@
         
         <div class="no-print" style="padding: 10px 24px; background: #f8fafc; border-bottom: 1px solid var(--border);">
             <details>
-                <summary style="font-size:12px; color:var(--text-muted); cursor:pointer;">🖨️ Yazdırma Sütunlarını Seç (Durum hariç)</summary>
+                <summary style="font-size:12px; color:var(--text-muted); cursor:pointer;">🖨️ Yazdırma Sütunlarını Seç</summary>
                 <div class="cols" id="printColsContainer" style="display:flex; flex-wrap:wrap; gap:12px; padding-top:8px; font-size:13px;"></div>
             </details>
         </div>
@@ -1487,7 +1507,7 @@
         </div>
         
         <div style="padding: 12px 24px; background: #f8fafc; border-top: 1px solid var(--border); font-size:12px; color:var(--text-muted); text-align:center;">
-          <span id="lastSavedInfo">Liste hazır.</span> • Detay için durum alanına tıklayın.
+          <span id="lastSavedInfo">Son kayıt: Yok</span>
         </div>
 
       </div>
@@ -1590,14 +1610,6 @@
       document.getElementById("toastMessage").textContent = message;
       toast.classList.add("visible");
       setTimeout(() => toast.classList.remove("visible"), 3000);
-    }
-
-    function debounce(fn, delay = 120) {
-      let timeoutId;
-      return (...args) => {
-        clearTimeout(timeoutId);
-        timeoutId = setTimeout(() => fn(...args), delay);
-      };
     }
 
     function parseCSV(text) {
@@ -1784,26 +1796,16 @@ function findPrevMatchForStudent(student, prevMap) {
     }
 
     function updateSnapshotLabels() {
+      // Not: Artık "Son kayıt:..." metnini updateListStatus fonksiyonu yönetiyor.
+      // Sadece "Karşılaştırma" etiketini burada güncelliyoruz.
       const compareLabel = document.getElementById("compareSourceLabel");
-      const lastLoadedInfo = document.getElementById("lastLoadedInfo");
 
-      if (!snapshot) {
-        compareLabel.textContent = "Karşılaştırma: Yok";
-        if (lastLoadedInfo) lastLoadedInfo.textContent = `${currentSheetName} | Son Kaydetme: Yok`;
+      if (!snapshot || !snapshot.savedAt) {
+        compareLabel.textContent = "Son Kaydetme Tarihi: Yok";
         return;
       }
 
-      if (snapshotSource === "firebase") {
-        compareLabel.textContent = "Karşılaştırma: Firebase DB";
-      } else if (snapshotSource === "file") {
-        compareLabel.textContent = "Karşılaştırma: TXT Dosyası";
-      } else {
-        compareLabel.textContent = "Karşılaştırma: Yok";
-      }
-
-      if (lastLoadedInfo) {
-        lastLoadedInfo.textContent = `${currentSheetName} | Son Kaydetme: ${formatDateTimeForBadge(snapshot.savedAt)}`;
-      }
+      compareLabel.textContent = "Son Kaydetme Tarihi: " + formatDateTimeForBadge(snapshot.savedAt);
     }
 
     async function loadSnapshot() {
@@ -1970,7 +1972,7 @@ if (snapshot && snapshot.records) {
         populateFilters();
         updateSummary(removed);
         applyFilters(removed);
-        updateSnapshotLabels();
+        document.getElementById("lastLoadedInfo").textContent = `${currentSheetName} | ${formatDateTimeForBadge(new Date().toISOString())}`;
         const _dupKeys = duplicateOkulNoMap ? Object.keys(duplicateOkulNoMap) : [];
         if (_dupKeys.length) showToast(`Uyarı: ${_dupKeys.length} okul numarası çakışması bulundu. (⚠️ Okul No Çakışmaları bölümüne bakın)`);
         
@@ -2017,7 +2019,8 @@ if (snapshot && snapshot.records) {
 
       const printContainer = document.getElementById("printColsContainer");
       printContainer.innerHTML = "";
-      COLUMNS.filter(col => col.key !== "status").forEach(col => {
+      COLUMNS.forEach(col => {
+        if (col.key === "status") return;
         const id = "print-col-" + col.key;
         const label = document.createElement("label");
         label.style.display = "flex";
@@ -2066,8 +2069,8 @@ if (snapshot && snapshot.records) {
       document.getElementById("newCount").textContent = newCount;
       document.getElementById("updatedCount").textContent = updatedCount;
       document.getElementById("removedCount").textContent = removedCount;
-      const duplicateCountEl = document.getElementById("duplicateCount");
-      if (duplicateCountEl) duplicateCountEl.textContent = dupCount;
+      const dupCountEl = document.getElementById("dupCount");
+      if (dupCountEl) dupCountEl.textContent = dupCount;
 
       document.getElementById("newTagCount").textContent = newCount;
       document.getElementById("updatedTagCount").textContent = updatedCount;
@@ -2129,7 +2132,7 @@ if (snapshot && snapshot.records) {
       // --- GÜNCELLEME 2: ALT BİLGİYİ GÜNCELLE ---
       const bottomFooter = document.getElementById("lastSavedInfo");
       if(bottomFooter) {
-         bottomFooter.textContent = `Şu an listede ${visible} öğrenci görüntüleniyor.`;
+         bottomFooter.textContent = `Şu an listede ${visible} sayıda öğrenci vardır.`;
       }
     }
 
@@ -2214,10 +2217,8 @@ if (snapshot && snapshot.records) {
         return;
       }
 
-      const fragment = document.createDocumentFragment();
       rows.forEach(s => {
         const tr = document.createElement("tr");
-        tr.dataset.studentId = s.id;
         if (s.status === "new") tr.classList.add("new-row");
         if (s.status === "updated") tr.classList.add("updated-row");
 
@@ -2247,9 +2248,8 @@ if (snapshot && snapshot.records) {
           }
           tr.appendChild(td);
         });
-        fragment.appendChild(tr);
+        body.appendChild(tr);
       });
-      body.appendChild(fragment);
       syncPrintColumnVisibility();
     }
 
@@ -2265,10 +2265,6 @@ if (snapshot && snapshot.records) {
         Array.from(tr.children).forEach(cell => {
           const field = cell.dataset.field;
           if (!field) return;
-          if (field === "status") {
-            cell.style.display = "";
-            return;
-          }
           cell.style.display = hiddenFields.has(field) ? "none" : "";
         });
       });
@@ -2279,12 +2275,9 @@ if (snapshot && snapshot.records) {
     // =======================
     function setupEventListeners() {
       const ids = ["searchInput", "genderFilter", "scholarFilter", "statusFilter", "dateFrom", "dateTo", "recentOnly", "generalSortOrder"];
-      const debouncedApplyFilters = debounce(() => applyFilters(), 90);
       ids.forEach(id => {
           const el = document.getElementById(id);
-          if (!el) return;
-          const evtName = el.tagName === "SELECT" || el.type === "checkbox" || el.type === "date" ? "change" : "input";
-          el.addEventListener(evtName, debouncedApplyFilters);
+          if(el) el.addEventListener("input", () => applyFilters());
       });
       
       document.getElementById("classFilterContainer").addEventListener("change", () => applyFilters());
@@ -2303,8 +2296,6 @@ if (snapshot && snapshot.records) {
       document.getElementById("reloadBtn").addEventListener("click", () => loadData());
       document.getElementById("saveSnapshotBtn").addEventListener("click", () => saveSnapshot(students));
       document.getElementById("printBtn").addEventListener("click", () => {
-        const sourceDate = (snapshot && snapshot.savedAt) ? new Date(snapshot.savedAt) : new Date();
-        document.getElementById("printDateInfo").textContent = "Son Kaydetme Tarihi: " + sourceDate.toLocaleDateString("tr-TR") + " " + sourceDate.toLocaleTimeString("tr-TR");
         syncPrintColumnVisibility();
         window.print();
       });
@@ -2513,3 +2504,5 @@ if (snapshot && snapshot.records) {
   </script>
 </body>
 </html>
+
+
