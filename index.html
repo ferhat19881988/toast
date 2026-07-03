@@ -986,6 +986,114 @@
     tr.new-row:hover td{ background-color: rgba(116,196,182,.11); }
     tr.updated-row:hover td{ background-color: rgba(255,188,165,.13); }
 
+
+
+    /* Source Settings Modal */
+    .settings-modal-card{
+      max-width: 860px;
+    }
+
+    .settings-help{
+      background: linear-gradient(180deg, rgba(236,242,255,.96), rgba(247,250,255,.94));
+      border: 1px solid rgba(125,142,247,.20);
+      color: rgba(30,41,59,.82);
+      border-radius: 16px;
+      padding: 12px 14px;
+      font-size: 12.5px;
+      font-weight: 700;
+      margin-bottom: 16px;
+    }
+
+    .settings-grid{
+      display:grid;
+      grid-template-columns: 1.4fr .8fr .45fr .45fr;
+      gap: 12px;
+      align-items:end;
+      margin-bottom: 18px;
+    }
+
+    .mapping-list{
+      border: 1px solid rgba(226,232,240,.96);
+      border-radius: 18px;
+      overflow:hidden;
+      background: rgba(255,255,255,.72);
+      box-shadow: 0 12px 22px rgba(125,142,247,.06);
+    }
+
+    .mapping-head,
+    .mapping-row{
+      display:grid;
+      grid-template-columns: 1.2fr .9fr 110px;
+      gap: 10px;
+      align-items:center;
+      padding: 10px 14px;
+    }
+
+    .mapping-head{
+      background: linear-gradient(180deg, rgba(245,248,255,.98), rgba(238,244,255,.96));
+      color: rgba(51,65,85,.88);
+      font-size: 11px;
+      font-weight: 900;
+      text-transform: uppercase;
+      letter-spacing: .08em;
+      border-bottom: 1px solid rgba(226,232,240,.92);
+    }
+
+    .mapping-row{
+      border-bottom: 1px solid rgba(226,232,240,.78);
+    }
+
+    .mapping-row:last-child{ border-bottom:none; }
+
+    .mapping-field-title{
+      font-size: 13px;
+      font-weight: 900;
+      color: var(--ink-0);
+    }
+
+    .mapping-field-sub{
+      font-size: 11.5px;
+      color: var(--text-muted);
+      font-weight: 700;
+      margin-top: 1px;
+    }
+
+    .mapping-row input[type="text"]{
+      min-height: 40px;
+      padding: 8px 11px;
+      border-radius: 12px;
+      font-size: 13px;
+    }
+
+    .mapping-visible{
+      justify-content:center;
+      display:flex;
+      gap:7px;
+      align-items:center;
+      font-size: 12px;
+      font-weight: 800;
+      color: rgba(30,41,59,.76);
+    }
+
+    .settings-actions{
+      display:flex;
+      justify-content:space-between;
+      align-items:center;
+      gap:10px;
+      margin-top: 18px;
+      flex-wrap:wrap;
+    }
+
+    @media (max-width: 760px){
+      .settings-grid,
+      .mapping-head,
+      .mapping-row{
+        grid-template-columns: 1fr;
+      }
+      .mapping-visible{ justify-content:flex-start; }
+    }
+
+
     /* Toast */
     .toast{
       position:fixed;
@@ -1551,6 +1659,9 @@
           </div>
           
           <div class="table-toolbar-right" style="display:flex; gap:8px; flex-wrap:wrap;">
+            <button class="btn btn-secondary btn-sm no-print" id="sourceSettingsBtn" type="button">
+              ⚙️ Ayarlar
+            </button>
             <button class="btn btn-primary btn-sm no-print" id="saveSnapshotBtn">
               💾 Kaydet
             </button>
@@ -1617,40 +1728,183 @@
     </div>
   </div>
 
+
+  <div class="modal-overlay" id="sourceSettingsModal">
+    <div class="modal-card settings-modal-card">
+      <form id="sourceSettingsForm">
+        <div class="modal-header">
+          <div>
+            <div class="modal-title">Veri Kaynağı Ayarları</div>
+            <div class="muted-text">E-tablo adresini, bölüm adını ve okunacak sütunları buradan değiştirin.</div>
+          </div>
+          <button class="modal-close" type="button" onclick="closeSourceSettingsModal()">×</button>
+        </div>
+        <div class="modal-body">
+          <div class="settings-help">
+            Varsayılan ayar: aynı Google e-tablosu, <b>2026 YAZ LGS</b> bölümü. Sütun kutularına <b>A, B, C</b> gibi harf, <b>1, 2, 3</b> gibi sıra numarası veya doğrudan başlık adı yazabilirsiniz. Aynı isimli sütunlar için harf kullanmanız önerilir.
+          </div>
+
+          <div class="settings-grid">
+            <div class="field-group">
+              <div class="field-label">E-tablo adresi veya ID</div>
+              <input type="text" id="settingsSheetUrl" placeholder="Google Sheets linki veya ID" />
+            </div>
+            <div class="field-group">
+              <div class="field-label">Bölüm / Sayfa adı</div>
+              <input type="text" id="settingsSheetName" placeholder="2026 YAZ LGS" />
+            </div>
+            <div class="field-group">
+              <div class="field-label">Başlık satırı</div>
+              <input type="text" id="settingsHeaderRow" placeholder="1" />
+            </div>
+            <div class="field-group">
+              <div class="field-label">Veri başlangıcı</div>
+              <input type="text" id="settingsDataStartRow" placeholder="2" />
+            </div>
+          </div>
+
+          <div class="mapping-list">
+            <div class="mapping-head">
+              <div>Alan</div>
+              <div>Kaynak sütun</div>
+              <div>Tabloda göster</div>
+            </div>
+            <div id="columnMappingRows"></div>
+          </div>
+
+          <div class="settings-actions">
+            <button class="btn btn-secondary btn-sm" id="resetSourceSettingsBtn" type="button">↩️ Varsayılana Dön</button>
+            <div style="display:flex; gap:8px; flex-wrap:wrap; justify-content:flex-end;">
+              <button class="btn btn-secondary btn-sm" type="button" onclick="closeSourceSettingsModal()">Vazgeç</button>
+              <button class="btn btn-primary btn-sm" type="submit">✅ Kaydet ve Yenile</button>
+            </div>
+          </div>
+        </div>
+      </form>
+    </div>
+  </div>
+
   <script type="module">
     // =======================
     // KONFİGÜRASYON
     // =======================
-    const SHEET_ID = "16BD_BrNLYBaXviCzB8yDKBGS2Vdj5DHi";
+    const DEFAULT_SPREADSHEET_INPUT = "16BD_BrNLYBaXviCzB8yDKBGS2Vdj5DHi";
+    const SETTINGS_STORAGE_KEY = "ogrenci_listesi_source_settings_v4";
 
-    const SHEET_TABS = [
-      { name: "2025-2026", label: "2025-2026 Dönemi" }
-    ];
+    const DEFAULT_APP_SETTINGS = {
+      spreadsheetInput: DEFAULT_SPREADSHEET_INPUT,
+      sheetName: "2026 YAZ LGS",
+      headerRow: 1,
+      dataStartRow: 2,
+      fields: {
+        isim:         { label: "İSİM / TAM AD", source: "A", visible: true,  hint: "Örn. İsim*" },
+        soyisim:      { label: "SOYİSİM",       source: "",  visible: false, hint: "Ayrı soyisim sütunu varsa" },
+        cinsiyet:     { label: "CİNSİYET",      source: "",  visible: false, hint: "Kız / Erkek" },
+        sinif:        { label: "SINIF",         source: "B", visible: true,  hint: "Örn. Sınıf*" },
+        okulNo:       { label: "ÖĞRENCİ NO",    source: "C", visible: true,  hint: "Örn. Öğrenci No" },
+        veliAdi:      { label: "VELİ 1 ADI",    source: "D", visible: true,  hint: "İlk veli adı" },
+        veliSoyadi:   { label: "VELİ 1 SOYADI", source: "",  visible: false, hint: "Ayrı soyadı sütunu varsa" },
+        veliTelefon:  { label: "VELİ 1 TELEFON",source: "E", visible: true,  hint: "İlk telefon" },
+        veli2Adi:     { label: "VELİ 2 ADI",    source: "F", visible: true,  hint: "İkinci veli adı" },
+        veli2Telefon: { label: "VELİ 2 TELEFON",source: "G", visible: true,  hint: "İkinci telefon" },
+        yil:          { label: "YIL",           source: "",  visible: false, hint: "Varsa" },
+        tarih:        { label: "TARİH",         source: "",  visible: false, hint: "gg.aa.yyyy" },
+        burslu:       { label: "BURSLU MU?",    source: "",  visible: false, hint: "Varsa" }
+      }
+    };
 
-    let currentSheetName = SHEET_TABS[0].name;
-    const STORAGE_KEY_BASE = "ogrenci_listesi_snapshot_v3_";
+    const FIELD_ORDER = Object.keys(DEFAULT_APP_SETTINGS.fields);
+    const STATUS_COLUMN = { key: "status", label: "DURUM" };
 
-    const COLUMNS = [
-      { key: "status",   label: "DURUM" },
-      { key: "isim",     label: "İSİM" },
-      { key: "soyisim",  label: "SOYİSİM" },
-      { key: "cinsiyet", label: "CİNSİYET" },
-      { key: "sinif",    label: "SINIF" },
-      { key: "okulNo",   label: "OKUL NO" },
-      { key: "veliAdi",  label: "VELİ ADI" },
-      { key: "veliSoyadi", label: "VELİ SOYADI" },
-      { key: "veliTelefon", label: "VELİ TELEFON" },
-      { key: "yil",      label: "YIL" },
-      { key: "tarih",    label: "TARİH" },
-      { key: "burslu",   label: "BURSLU MU?" }
-    ];
+    function cloneDefaultSettings() {
+      return JSON.parse(JSON.stringify(DEFAULT_APP_SETTINGS));
+    }
+
+    function normalizeAppSettings(raw) {
+      const base = cloneDefaultSettings();
+      const source = raw && typeof raw === "object" ? raw : {};
+      const out = {
+        spreadsheetInput: String(source.spreadsheetInput || base.spreadsheetInput).trim() || base.spreadsheetInput,
+        sheetName: String(source.sheetName || base.sheetName).trim() || base.sheetName,
+        headerRow: Math.max(1, parseInt(source.headerRow || base.headerRow, 10) || base.headerRow),
+        dataStartRow: Math.max(1, parseInt(source.dataStartRow || base.dataStartRow, 10) || base.dataStartRow),
+        fields: {}
+      };
+      FIELD_ORDER.forEach(key => {
+        const current = (source.fields && source.fields[key]) ? source.fields[key] : {};
+        out.fields[key] = {
+          ...base.fields[key],
+          ...current,
+          label: String((current.label || base.fields[key].label || key)).trim(),
+          source: String((current.source ?? base.fields[key].source ?? "")).trim(),
+          visible: Boolean(current.visible ?? base.fields[key].visible)
+        };
+      });
+      if (out.dataStartRow <= out.headerRow) out.dataStartRow = out.headerRow + 1;
+      return out;
+    }
+
+    function loadAppSettings() {
+      try {
+        const raw = localStorage.getItem(SETTINGS_STORAGE_KEY);
+        return normalizeAppSettings(raw ? JSON.parse(raw) : null);
+      } catch (e) {
+        console.warn("Ayarlar okunamadı, varsayılan kullanılacak.", e);
+        return normalizeAppSettings(null);
+      }
+    }
+
+    function saveAppSettings() {
+      localStorage.setItem(SETTINGS_STORAGE_KEY, JSON.stringify(appSettings));
+    }
+
+    function extractSpreadsheetId(value) {
+      const input = String(value || "").trim();
+      if (!input) return DEFAULT_SPREADSHEET_INPUT;
+      const urlMatch = input.match(/\/spreadsheets\/d\/([a-zA-Z0-9-_]+)/);
+      if (urlMatch && urlMatch[1]) return urlMatch[1];
+      const idMatch = input.match(/[a-zA-Z0-9-_]{20,}/);
+      return idMatch ? idMatch[0] : DEFAULT_SPREADSHEET_INPUT;
+    }
+
+    function getActiveSpreadsheetId() {
+      return extractSpreadsheetId(appSettings.spreadsheetInput);
+    }
+
+    function getDataFieldKeys() {
+      return FIELD_ORDER.slice();
+    }
+
+    function getVisibleDataFieldKeys() {
+      return FIELD_ORDER.filter(key => appSettings.fields[key] && appSettings.fields[key].visible);
+    }
+
+    function getFieldLabel(key) {
+      return (appSettings.fields[key] && appSettings.fields[key].label) || key;
+    }
+
+    function buildColumnsFromSettings() {
+      const cols = [STATUS_COLUMN];
+      getVisibleDataFieldKeys().forEach(key => {
+        cols.push({ key, label: getFieldLabel(key) });
+      });
+      return cols;
+    }
+
+    function getTableColspan() {
+      return Math.max(1, (COLUMNS && COLUMNS.length) || 1);
+    }
+
+    let appSettings = loadAppSettings();
+    let currentSheetName = appSettings.sheetName;
+    let COLUMNS = buildColumnsFromSettings();
 
     let students = [];
     let snapshot = null;
-    let snapshotSource = "none"; 
-    let activeViewMode = "all";  
+    let snapshotSource = "none";
+    let activeViewMode = "all";
+    let duplicateOkulNoMap = {}; // { okulNo: [student, ...] }
 
-        let duplicateOkulNoMap = {}; // { okulNo: [student, ...] }
 
 // =======================
     // FIREBASE
@@ -1677,15 +1931,18 @@
     // =======================
     function getSheetCsvUrl(sheetName) {
       return "https://docs.google.com/spreadsheets/d/" +
-        SHEET_ID +
+        getActiveSpreadsheetId() +
         "/gviz/tq?tqx=out:csv&sheet=" +
         encodeURIComponent(sheetName);
     }
 
+    function makeFirebaseSafeKey(value) {
+      return String(value || "default").replace(/[.#$\[\]\/]/g, "_").slice(0, 240) || "default";
+    }
+
     function getSnapshotRef() {
-      const name = currentSheetName || 'default';
-      const safeName = encodeURIComponent(name);
-      return ref(firebaseDb, `${FIREBASE_BASE_PATH}/${safeName}`);
+      const sourceKey = `${getActiveSpreadsheetId()}__${currentSheetName || 'default'}`;
+      return ref(firebaseDb, `${FIREBASE_BASE_PATH}/${makeFirebaseSafeKey(sourceKey)}`);
     }
 
     function showToast(message) {
@@ -1747,10 +2004,24 @@
 
     function createStudentId(row) {
       const num = (row.okulNo || "").trim();
-      const name = (row.isim || "").trim().toUpperCase();
-      const surname = (row.soyisim || "").trim().toUpperCase();
+      const name = (row.isim || "").trim().toLocaleUpperCase("tr-TR");
+      const surname = (row.soyisim || "").trim().toLocaleUpperCase("tr-TR");
       if (num) return `${num}__${name}__${surname}`;
-      return `${name}__${surname}`;
+      return `${name}__${surname}`.trim();
+    }
+
+    function buildStudentDataObject(student) {
+      const data = {};
+      getDataFieldKeys().forEach(key => {
+        data[key] = String(student[key] || "").trim();
+      });
+      return data;
+    }
+
+    function sameStudentData(prevData, currentData) {
+      return getDataFieldKeys().every(key => {
+        return String((prevData && prevData[key]) || "").trim() === String((currentData && currentData[key]) || "").trim();
+      });
     }
 
 
@@ -1775,28 +2046,34 @@
     }
 
 // ID değiştiğinde (ör. isim/soyisim/okulNo düzeltmesi) aynı kişiyi "yeni" gibi göstermemek için
-// ikincil eşleştirme (hemen iyileştirme): Veli Telefon (+ mümkünse Sınıf) üzerinden eski kaydı bulup "updated" olarak işaretler.
+// ikincil eşleştirme: veli telefonları (+ mümkünse sınıf) üzerinden eski kaydı bulup "updated" olarak işaretler.
 function normalizePhone(str) {
   return String(str || "").replace(/\D+/g, "");
+}
+
+function getStudentPhones(student) {
+  return [student && student.veliTelefon, student && student.veli2Telefon]
+    .map(normalizePhone)
+    .filter(phone => phone && phone.length >= 8);
+}
+
+function hasSharedPhone(a, b) {
+  const phonesA = new Set(getStudentPhones(a));
+  if (!phonesA.size) return false;
+  return getStudentPhones(b).some(phone => phonesA.has(phone));
 }
 
 function findPrevMatchForStudent(student, prevMap) {
   if (!prevMap) return null;
 
-  const phone = normalizePhone(student.veliTelefon);
-  if (!phone || phone.length < 8) return null; // çok kısa/boş telefonlar eşleştirmede güvenilmez
-
-  // Adaylar: aynı veli telefonu olan tüm eski kayıtlar
   const candidates = [];
   for (const prevId in prevMap) {
     const d = (prevMap[prevId] && prevMap[prevId].data) ? prevMap[prevId].data : null;
     if (!d) continue;
-    const p = normalizePhone(d.veliTelefon);
-    if (p && p === phone) candidates.push(prevId);
+    if (hasSharedPhone(student, d)) candidates.push(prevId);
   }
   if (!candidates.length) return null;
 
-  // 1) Sınıf eşleşmesi (varsa) öncelik
   const cls = String(student.sinif || "").trim();
   let filtered = candidates;
   if (cls) {
@@ -1804,19 +2081,17 @@ function findPrevMatchForStudent(student, prevMap) {
     if (byClass.length) filtered = byClass;
   }
 
-  // 2) İsim/Soyisim benzerliği ile deterministik seçim (basit puanlama)
-  const n = String(student.isim || "").trim().toUpperCase();
-  const s = String(student.soyisim || "").trim().toUpperCase();
+  const n = String(student.isim || "").trim().toLocaleUpperCase("tr-TR");
+  const s = String(student.soyisim || "").trim().toLocaleUpperCase("tr-TR");
   const score = (pid) => {
     const d = prevMap[pid].data || {};
-    const pn = String(d.isim || "").trim().toUpperCase();
-    const ps = String(d.soyisim || "").trim().toUpperCase();
+    const pn = String(d.isim || "").trim().toLocaleUpperCase("tr-TR");
+    const ps = String(d.soyisim || "").trim().toLocaleUpperCase("tr-TR");
     let sc = 0;
     if (pn === n) sc += 5;
     else if (pn && n && (pn.includes(n) || n.includes(pn))) sc += 2;
     if (ps === s) sc += 5;
     else if (ps && s && (ps.includes(s) || s.includes(ps))) sc += 2;
-    // Okul no eşleşmesi (varsa) küçük bir bonus (ama okul no yanlış atanmış olabilir)
     const on = String(student.okulNo || "").trim();
     const pon = String(d.okulNo || "").trim();
     if (on && pon && on === pon) sc += 1;
@@ -1863,17 +2138,14 @@ function findPrevMatchForStudent(student, prevMap) {
       currentStudents.forEach(s => {
         records[s.id] = {
           id: s.id,
-          data: {
-            isim: s.isim, soyisim: s.soyisim, cinsiyet: s.cinsiyet,
-            sinif: s.sinif, okulNo: s.okulNo, veliAdi: s.veliAdi,
-            veliSoyadi: s.veliSoyadi, veliTelefon: s.veliTelefon,
-            yil: s.yil, tarih: s.tarih, burslu: s.burslu
-          }
+          data: buildStudentDataObject(s)
         };
       });
       return {
         savedAt: new Date().toISOString(),
         sheetName: currentSheetName,
+        spreadsheetId: getActiveSpreadsheetId(),
+        sourceSettings: appSettings,
         records
       };
     }
@@ -1940,11 +2212,123 @@ function findPrevMatchForStudent(student, prevMap) {
     }
 
     // =======================
+    // AYAR MODÜLÜ VE SÜTUN OKUMA
+    // =======================
+    function columnLetterToIndex(refText) {
+      const text = String(refText || "").trim().toUpperCase();
+      if (!/^[A-Z]+$/.test(text)) return -1;
+      let index = 0;
+      for (let i = 0; i < text.length; i++) {
+        index = index * 26 + (text.charCodeAt(i) - 64);
+      }
+      return index - 1;
+    }
+
+    function normalizeHeaderText(value) {
+      return String(value || "")
+        .trim()
+        .replace(/\*/g, "")
+        .replace(/\s+/g, " ")
+        .toLocaleUpperCase("tr-TR");
+    }
+
+    function sourceSpecToIndex(spec, header) {
+      const raw = String(spec || "").trim();
+      if (!raw) return -1;
+      if (/^[A-Za-z]+$/.test(raw)) return columnLetterToIndex(raw);
+      if (/^\d+$/.test(raw)) return Math.max(0, parseInt(raw, 10) - 1);
+
+      const normalized = normalizeHeaderText(raw);
+      const exact = header.findIndex(h => normalizeHeaderText(h) === normalized);
+      if (exact !== -1) return exact;
+
+      return header.findIndex(h => {
+        const normalizedHeader = normalizeHeaderText(h);
+        return normalizedHeader && (normalizedHeader.includes(normalized) || normalized.includes(normalizedHeader));
+      });
+    }
+
+    function getMappedCell(row, header, key) {
+      const field = appSettings.fields[key] || {};
+      const idx = sourceSpecToIndex(field.source, header);
+      if (idx < 0) return "";
+      return String(row[idx] || "").trim();
+    }
+
+    function renderColumnSettingsForm() {
+      document.getElementById("settingsSheetUrl").value = appSettings.spreadsheetInput || "";
+      document.getElementById("settingsSheetName").value = appSettings.sheetName || "";
+      document.getElementById("settingsHeaderRow").value = appSettings.headerRow || 1;
+      document.getElementById("settingsDataStartRow").value = appSettings.dataStartRow || 2;
+
+      const container = document.getElementById("columnMappingRows");
+      container.innerHTML = "";
+      FIELD_ORDER.forEach(key => {
+        const field = appSettings.fields[key];
+        const row = document.createElement("div");
+        row.className = "mapping-row";
+        row.innerHTML = `
+          <div>
+            <div class="mapping-field-title">${field.label}</div>
+            <div class="mapping-field-sub">${field.hint || ""}</div>
+          </div>
+          <input type="text" data-setting-field="${key}" data-setting-part="source" value="${field.source || ""}" placeholder="Örn. A veya İsim*" />
+          <label class="mapping-visible">
+            <input type="checkbox" data-setting-field="${key}" data-setting-part="visible" ${field.visible ? "checked" : ""} />
+            Göster
+          </label>
+        `;
+        container.appendChild(row);
+      });
+    }
+
+    function readSettingsFromForm() {
+      const next = normalizeAppSettings({
+        spreadsheetInput: document.getElementById("settingsSheetUrl").value,
+        sheetName: document.getElementById("settingsSheetName").value,
+        headerRow: document.getElementById("settingsHeaderRow").value,
+        dataStartRow: document.getElementById("settingsDataStartRow").value,
+        fields: appSettings.fields
+      });
+
+      document.querySelectorAll("#columnMappingRows [data-setting-field]").forEach(input => {
+        const key = input.dataset.settingField;
+        const part = input.dataset.settingPart;
+        if (!next.fields[key]) return;
+        if (part === "visible") next.fields[key].visible = input.checked;
+        if (part === "source") next.fields[key].source = String(input.value || "").trim();
+      });
+
+      return normalizeAppSettings(next);
+    }
+
+    async function applySourceSettings(nextSettings, options = {}) {
+      appSettings = normalizeAppSettings(nextSettings);
+      currentSheetName = appSettings.sheetName;
+      COLUMNS = buildColumnsFromSettings();
+      saveAppSettings();
+      renderSheetTabs();
+      renderHeader();
+      await loadSnapshot();
+      await loadData();
+      if (!options.silent) showToast("Veri kaynağı ayarları kaydedildi.");
+    }
+
+    function openSourceSettingsModal() {
+      renderColumnSettingsForm();
+      document.getElementById("sourceSettingsModal").classList.add("active");
+    }
+
+    window.closeSourceSettingsModal = function() {
+      document.getElementById("sourceSettingsModal").classList.remove("active");
+    };
+
+    // =======================
     // VERİ YÜKLEME
     // =======================
     async function loadData() {
       const body = document.getElementById("tableBody");
-      body.innerHTML = '<tr class="loading-row"><td colspan="12" style="text-align:center; padding:40px;">Google Tablo\'dan veriler alınıyor...</td></tr>';
+      body.innerHTML = `<tr class="loading-row"><td colspan="${getTableColspan()}" style="text-align:center; padding:40px;">Google Tablo'dan veriler alınıyor...</td></tr>`;
       document.getElementById("lastLoadedInfo").textContent = "Yükleniyor...";
 
       try {
@@ -1953,102 +2337,76 @@ function findPrevMatchForStudent(student, prevMap) {
         if (!res.ok) throw new Error("Ağ hatası: " + res.status);
         const text = await res.text();
 
-        if (text.startsWith("<")) throw new Error("CSV yerine HTML geldi. Tablo yayın ayarlarını kontrol edin.");
+        if (text.startsWith("<")) throw new Error("CSV yerine HTML geldi. Tablo yayın ayarlarını ve sayfa adını kontrol edin.");
 
         const rows = parseCSV(text);
         if (!rows.length) {
-          body.innerHTML = '<tr class="loading-row"><td colspan="12">Tablo boş.</td></tr>';
+          body.innerHTML = `<tr class="loading-row"><td colspan="${getTableColspan()}">Tablo boş.</td></tr>`;
           updateListStatus([]);
           return;
         }
 
-        const header = rows[0].map(h => h.trim());
-        const dataRows = rows.slice(1).filter(r => r.some(cell => cell.trim() !== ""));
-
-        const headerIndex = name => header.indexOf(name);
-        const idxIsim = headerIndex("İsim") === -1 ? 0 : headerIndex("İsim");
-        const idxSoy = headerIndex("Soyisim*");
-        const idxCins = headerIndex("Cinsiyet*");
-        const idxSinif = headerIndex("Sınıf");
-        const idxOkulNo = headerIndex("Okul Numarası");
-        const idxVeliAd = headerIndex("Veli Adı");
-        const idxVeliSoy = headerIndex("Veli Soyadı");
-        const idxVeliTel = headerIndex("Veli Telefon");
-        const idxYil = headerIndex("YIL");
-        const idxTarih = headerIndex("Tarih");
-        const idxBurs = headerIndex("Burslu mu?");
+        const headerRowIndex = Math.min(rows.length - 1, Math.max(0, (parseInt(appSettings.headerRow, 10) || 1) - 1));
+        const dataStartIndex = Math.max(headerRowIndex + 1, (parseInt(appSettings.dataStartRow, 10) || (headerRowIndex + 2)) - 1);
+        const header = (rows[headerRowIndex] || []).map(h => String(h || "").trim());
+        const dataRows = rows.slice(dataStartIndex).filter(r => r.some(cell => String(cell || "").trim() !== ""));
 
         const parsed = dataRows.map(row => {
-          const s = {
-            isim: (row[idxIsim] || "").trim(),
-            soyisim: (row[idxSoy] || "").trim(),
-            cinsiyet: (row[idxCins] || "").trim().toUpperCase(),
-            sinif: (row[idxSinif] || "").trim(),
-            okulNo: (row[idxOkulNo] || "").trim(),
-            veliAdi: (row[idxVeliAd] || "").trim(),
-            veliSoyadi: (row[idxVeliSoy] || "").trim(),
-            veliTelefon: (row[idxVeliTel] || "").trim(),
-            yil: (row[idxYil] || "").trim(),
-            tarih: (row[idxTarih] || "").trim(),
-            burslu: (row[idxBurs] || "").trim()
-          };
+          const s = {};
+          getDataFieldKeys().forEach(key => {
+            s[key] = getMappedCell(row, header, key);
+          });
+          s.cinsiyet = (s.cinsiyet || "").trim().toLocaleUpperCase("tr-TR");
           s.id = createStudentId(s);
           s.dateObj = parseDateTR(s.tarih);
           s.status = "normal";
           return s;
+        }).filter(s => {
+          return getDataFieldKeys().some(key => String(s[key] || "").trim() !== "");
         });
-let removed = [];
-if (snapshot && snapshot.records) {
-  const prevMap = snapshot.records;
-  const currentIds = new Set(parsed.map(s => s.id));
-  const matchedPrevIds = new Set();
 
-  parsed.forEach(s => {
-    const prev = prevMap[s.id];
+        let removed = [];
+        if (snapshot && snapshot.records) {
+          const prevMap = snapshot.records;
+          const currentIds = new Set(parsed.map(s => s.id));
+          const matchedPrevIds = new Set();
 
-    // İnce eşleştirme: ID değişmişse (isim/soyisim/okulNo düzeltmesi vb.)
-    // aynı kişiyi "new" yerine "updated" olarak ele al.
-    let comparePrevId = null;
+          parsed.forEach(s => {
+            const prev = prevMap[s.id];
+            let comparePrevId = null;
 
-    if (!prev) {
-      comparePrevId = findPrevMatchForStudent(s, prevMap);
-      if (comparePrevId) {
-        matchedPrevIds.add(comparePrevId);
-        s.status = "updated";
-        s._comparePrevId = comparePrevId; // modal ve değişiklik listesi için
-      } else {
-        s.status = "new";
-        return;
-      }
-    } else {
-      comparePrevId = s.id;
-    }
+            if (!prev) {
+              comparePrevId = findPrevMatchForStudent(s, prevMap);
+              if (comparePrevId) {
+                matchedPrevIds.add(comparePrevId);
+                s.status = "updated";
+                s._comparePrevId = comparePrevId;
+              } else {
+                s.status = "new";
+                return;
+              }
+            } else {
+              comparePrevId = s.id;
+            }
 
-    const prevData = prevMap[comparePrevId].data;
-    const currentSlim = {
-      isim: s.isim, soyisim: s.soyisim, cinsiyet: s.cinsiyet,
-      sinif: s.sinif, okulNo: s.okulNo, veliAdi: s.veliAdi,
-      veliSoyadi: s.veliSoyadi, veliTelefon: s.veliTelefon,
-      yil: s.yil, tarih: s.tarih, burslu: s.burslu
-    };
+            const prevData = prevMap[comparePrevId].data;
+            const currentSlim = buildStudentDataObject(s);
 
-    if (!deepEqual(prevData, currentSlim)) {
-      s.status = "updated";
-      s._comparePrevId = comparePrevId;
-    } else {
-      // ID birebir eşleştiyse ve veri aynıysa normal; (ince eşleşmede "updated" zaten set edilmiş olur)
-      if (!s._comparePrevId) s.status = "normal";
-    }
-  });
+            if (!sameStudentData(prevData, currentSlim)) {
+              s.status = "updated";
+              s._comparePrevId = comparePrevId;
+            } else {
+              if (!s._comparePrevId) s.status = "normal";
+            }
+          });
 
-  // Removed: snapshot'ta olup güncel listede olmayanlar,
-  // fakat ince eşleştirme ile "updated"e bağlananlar removed sayılmasın.
-  for (const prevId in prevMap) {
-    if (!currentIds.has(prevId) && !matchedPrevIds.has(prevId)) {
-      removed.push(prevMap[prevId]);
-    }
-  }
-}
+          for (const prevId in prevMap) {
+            if (!currentIds.has(prevId) && !matchedPrevIds.has(prevId)) {
+              removed.push(prevMap[prevId]);
+            }
+          }
+        }
+
         students = parsed;
         duplicateOkulNoMap = detectDuplicateOkulNos(parsed);
         renderHeader();
@@ -2058,10 +2416,10 @@ if (snapshot && snapshot.records) {
         document.getElementById("lastLoadedInfo").textContent = `${currentSheetName} | ${formatDateTimeForBadge(new Date().toISOString())}`;
         const _dupKeys = duplicateOkulNoMap ? Object.keys(duplicateOkulNoMap) : [];
         if (_dupKeys.length) showToast(`Uyarı: ${_dupKeys.length} okul numarası çakışması bulundu. (⚠️ Okul No Çakışmaları bölümüne bakın)`);
-        
+
       } catch (err) {
         console.error(err);
-        body.innerHTML = `<tr class="loading-row"><td colspan="12" style="color:red">Hata: ${err.message}</td></tr>`;
+        body.innerHTML = `<tr class="loading-row"><td colspan="${getTableColspan()}" style="color:red; text-align:center; padding:40px;">Hata: ${err.message}</td></tr>`;
         document.getElementById("lastLoadedInfo").textContent = "Hata oluştu.";
         updateListStatus([]);
       }
@@ -2073,24 +2431,17 @@ if (snapshot && snapshot.records) {
     function renderSheetTabs() {
       const container = document.getElementById("sheetTabs");
       container.innerHTML = "";
-      SHEET_TABS.forEach(tab => {
-        const btn = document.createElement("button");
-        btn.type = "button";
-        btn.className = "sheet-tab";
-        if (tab.name === currentSheetName) btn.classList.add("active");
-        btn.textContent = tab.label;
-        btn.addEventListener("click", async () => {
-          if (currentSheetName === tab.name) return;
-          currentSheetName = tab.name;
-          await loadSnapshot();
-          renderSheetTabs();
-          await loadData();
-        });
-        container.appendChild(btn);
-      });
+      const btn = document.createElement("button");
+      btn.type = "button";
+      btn.className = "sheet-tab active";
+      btn.textContent = currentSheetName || "Sayfa";
+      btn.title = "Bölüm adını değiştirmek için Ayarlar modalını kullanın.";
+      btn.addEventListener("click", openSourceSettingsModal);
+      container.appendChild(btn);
     }
 
     function renderHeader() {
+      COLUMNS = buildColumnsFromSettings();
       const headerRow = document.getElementById("tableHeaderRow");
       headerRow.innerHTML = "";
       COLUMNS.forEach((col, index) => {
@@ -2169,7 +2520,8 @@ if (snapshot && snapshot.records) {
         items.forEach(s => {
           const d = isRemoved ? (s.data || {}) : s;
           const li = document.createElement("li");
-          li.innerHTML = `<b>${d.okulNo || "?"}</b> ${d.isim} ${d.soyisim} <small>(${d.sinif})</small>`;
+          const fullName = [d.isim, d.soyisim].filter(Boolean).join(" ").trim() || "İsimsiz";
+          li.innerHTML = `<b>${d.okulNo || "?"}</b> ${fullName} <small>(${d.sinif || "-"})</small>`;
           el.appendChild(li);
         });
       };
@@ -2187,7 +2539,7 @@ if (snapshot && snapshot.records) {
         dupGroups.forEach(no => {
           const arr = duplicateOkulNoMap[no] || [];
           const li = document.createElement("li");
-          const details = arr.map(x => `${x.isim} ${x.soyisim} <small>(${x.sinif || '-'})</small>`).join(" • ");
+          const details = arr.map(x => `${[x.isim, x.soyisim].filter(Boolean).join(" ").trim()} <small>(${x.sinif || '-'})</small>`).join(" • ");
           li.innerHTML = `<b>${no}</b> <span style="opacity:0.9">${details}</span>`;
           dupEl.appendChild(li);
         });
@@ -2296,12 +2648,13 @@ if (snapshot && snapshot.records) {
       body.innerHTML = "";
 
       if (!rows.length) {
-        body.innerHTML = '<tr><td colspan="12" style="text-align:center; padding:30px; color:var(--text-muted)">Eşleşen kayıt bulunamadı.</td></tr>';
+        body.innerHTML = `<tr><td colspan="${getTableColspan()}" style="text-align:center; padding:30px; color:var(--text-muted)">Eşleşen kayıt bulunamadı.</td></tr>`;
         return;
       }
 
       rows.forEach(s => {
         const tr = document.createElement("tr");
+        tr.dataset.studentId = s.id;
         if (s.status === "new") tr.classList.add("new-row");
         if (s.status === "updated") tr.classList.add("updated-row");
 
@@ -2364,6 +2717,20 @@ if (snapshot && snapshot.records) {
       });
       
       document.getElementById("classFilterContainer").addEventListener("change", () => applyFilters());
+
+      document.getElementById("sourceSettingsBtn").addEventListener("click", openSourceSettingsModal);
+      document.getElementById("sourceSettingsForm").addEventListener("submit", async (e) => {
+        e.preventDefault();
+        window.closeSourceSettingsModal();
+        await applySourceSettings(readSettingsFromForm());
+      });
+      document.getElementById("resetSourceSettingsBtn").addEventListener("click", async () => {
+        window.closeSourceSettingsModal();
+        await applySourceSettings(cloneDefaultSettings());
+      });
+      document.getElementById("sourceSettingsModal").addEventListener("click", (e) => {
+        if (e.target === document.getElementById("sourceSettingsModal")) window.closeSourceSettingsModal();
+      });
 
       document.getElementById("clearFiltersBtn").addEventListener("click", () => {
         ids.forEach(id => {
@@ -2431,13 +2798,8 @@ if (snapshot && snapshot.records) {
         if (td.dataset.field !== "status") return;
         
         // Hangi öğrenci olduğunu bul
-        const noCell = tr.querySelector('[data-field="okulNo"]');
-        if(!noCell) return;
-        const rowOkulNo = noCell.textContent.trim();
-        const nameCell = tr.querySelector('[data-field="isim"]');
-        const rowName = nameCell ? nameCell.textContent.trim() : "";
-
-        const student = students.find(s => s.okulNo == rowOkulNo && s.isim == rowName);
+        const rowId = tr.dataset.studentId;
+        const student = students.find(s => s.id === rowId);
         if(student) openStudentModal(student);
       });
 
@@ -2507,53 +2869,36 @@ if (snapshot && snapshot.records) {
     function openStudentModal(s) {
       const modal = document.getElementById("studentDetailModal");
       const content = document.getElementById("modalContent");
-      
+
       let statusHtml = "";
       let diffHtml = "";
       let dupHtml = "";
+      const displayName = [s.isim, s.soyisim].filter(Boolean).join(" ").trim() || "Öğrenci";
 
-      // Durum Tespiti
       if (s.status === "new") {
         statusHtml = `<span class="status-badge new" style="font-size:14px; padding:6px 12px;">✨ Yeni Kayıt</span>`;
         diffHtml = `<div class="change-log-box" style="background:#f0fdf4; border-color:#86efac; color:#166534;">Bu öğrenci listeye yeni eklendi.</div>`;
       } else if (s.status === "updated") {
         statusHtml = `<span class="status-badge updated" style="font-size:14px; padding:6px 12px;">✏️ Bilgileri Güncellendi</span>`;
-        
-        // --- GÜNCELLEME 3: AKILLI DEĞİŞİKLİK TARAMA ---
+
         if (snapshot && snapshot.records && snapshot.records[(s._comparePrevId || s.id)]) {
-            const oldData = snapshot.records[(s._comparePrevId || s.id)].data;
+            const oldData = snapshot.records[(s._comparePrevId || s.id)].data || {};
             const changes = [];
-            // Tüm alanları kapsayan genişletilmiş harita
-            const fields = {
-                isim: "İsim",
-                soyisim: "Soyisim",
-                sinif: "Sınıf",
-                okulNo: "Okul No",
-                cinsiyet: "Cinsiyet",
-                veliAdi: "Veli Adı",
-                veliSoyadi: "Veli Soyadı",
-                veliTelefon: "Veli Tel",
-                yil: "Yıl",
-                tarih: "Kayıt Tarihi",
-                burslu: "Burs Durumu"
-            };
-            
-            for(let key in fields) {
-                // Stringe çevirip trim yaparak karşılaştır (Hassas karşılaştırma)
+
+            getDataFieldKeys().forEach(key => {
                 const oldVal = String(oldData[key] || "").trim();
                 const newVal = String(s[key] || "").trim();
-                
                 if(oldVal !== newVal) {
-                    changes.push(`<b>${fields[key]}:</b> <br/> <span style="color:#b91c1c; text-decoration:line-through; font-size:12px;">${oldVal || '(Boş)'}</span> <span style="margin:0 4px">➞</span> <span style="color:#15803d; font-weight:600;">${newVal}</span>`);
+                    changes.push(`<b>${getFieldLabel(key)}:</b> <br/> <span style="color:#b91c1c; text-decoration:line-through; font-size:12px;">${oldVal || '(Boş)'}</span> <span style="margin:0 4px">➞</span> <span style="color:#15803d; font-weight:600;">${newVal || '(Boş)'}</span>`);
                 }
-            }
+            });
+
             if(changes.length > 0) {
                 diffHtml = `<div class="change-log-box">
                     <div style="font-weight:700; margin-bottom:8px;">Tespit Edilen Değişiklikler:</div>
                     <ul style="margin:0; padding-left:20px; display:flex; flex-direction:column; gap:6px;">${changes.map(c => `<li>${c}</li>`).join('')}</ul>
                 </div>`;
             } else {
-                // Veri farklı görünse de trim yapınca aynı olabilir
                 diffHtml = `<div class="change-log-box">Görünürde değişiklik algılandı ancak biçimsel olabilir.</div>`;
             }
         }
@@ -2561,11 +2906,10 @@ if (snapshot && snapshot.records) {
         statusHtml = `<span class="status-badge normal" style="font-size:14px; padding:6px 12px;">Kayıtlı Öğrenci</span>`;
       }
 
-      // Okul No çakışması bilgisi (varsa)
       const myNo = String(s.okulNo || "").trim();
       if (myNo && duplicateOkulNoMap && duplicateOkulNoMap[myNo] && duplicateOkulNoMap[myNo].length >= 2) {
         const others = (duplicateOkulNoMap[myNo] || []).filter(x => !(x.id === s.id));
-        const listHtml = others.map(x => `<li>${x.isim} ${x.soyisim} <small>(${x.sinif || '-'})</small></li>`).join("");
+        const listHtml = others.map(x => `<li>${[x.isim, x.soyisim].filter(Boolean).join(" ").trim()} <small>(${x.sinif || '-'})</small></li>`).join("");
         dupHtml = `<div class="change-log-box" style="background: var(--danger-bg); border-color: #fca5a5; color: var(--danger-text);">
           <div style="font-weight:800; margin-bottom:6px;">⚠️ Okul No Çakışması</div>
           <div style="font-size:12px; opacity:0.9; margin-bottom:8px;">Bu okul numarası listede birden fazla öğrenciye atanmış.</div>
@@ -2573,24 +2917,23 @@ if (snapshot && snapshot.records) {
         </div>`;
       }
 
+      const detailFields = getVisibleDataFieldKeys().filter(key => key !== "isim" && key !== "soyisim");
+      const detailHtml = detailFields.map(key => `
+        <div class="detail-row"><span class="detail-label">${getFieldLabel(key)}:</span> <span class="detail-val">${s[key] || "-"}</span></div>
+      `).join("");
+
       content.innerHTML = `
         <div style="text-align:center; margin-bottom:20px;">
-            <div style="font-size:24px; font-weight:700;">${s.isim} ${s.soyisim}</div>
-            <div style="font-size:14px; color:var(--text-muted);">${s.okulNo}</div>
+            <div style="font-size:24px; font-weight:700;">${displayName}</div>
+            <div style="font-size:14px; color:var(--text-muted);">${s.okulNo || ""}</div>
             <div style="margin-top:10px;">${statusHtml}</div>
         </div>
 
-        <div class="detail-row"><span class="detail-label">Sınıf:</span> <span class="detail-val">${s.sinif}</span></div>
-        <div class="detail-row"><span class="detail-label">Cinsiyet:</span> <span class="detail-val">${s.cinsiyet}</span></div>
-        <div class="detail-row"><span class="detail-label">Veli Adı:</span> <span class="detail-val">${s.veliAdi} ${s.veliSoyadi}</span></div>
-        <div class="detail-row"><span class="detail-label">Veli Telefon:</span> <span class="detail-val">${s.veliTelefon || "-"}</span></div>
-        <div class="detail-row"><span class="detail-label">Kayıt Tarihi:</span> <span class="detail-val">${s.tarih || "-"}</span></div>
-        <div class="detail-row"><span class="detail-label">Burs Durumu:</span> <span class="detail-val">${s.burslu ? "Burslu" : "Normal"}</span></div>
-        
+        ${detailHtml}
         ${dupHtml}
         ${diffHtml}
       `;
-      
+
       modal.classList.add("active");
     }
 
