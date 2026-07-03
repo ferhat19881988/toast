@@ -1923,9 +1923,6 @@
 // =======================
     // FIREBASE
     // =======================
-    import { initializeApp } from 'https://www.gstatic.com/firebasejs/9.23.0/firebase-app.js';
-    import { getDatabase, ref, get, set } from 'https://www.gstatic.com/firebasejs/9.23.0/firebase-database.js';
-
     const firebaseConfig = {
       apiKey: "AIzaSyAIzu6aNQstwQCdMWODyIwiaVVBm63OeGw",
       authDomain: "odevfeno.firebaseapp.com",
@@ -1936,9 +1933,65 @@
       appId: "1:662757516934:web:0042188832f63deb6fd307",
     };
 
-    const firebaseApp = initializeApp(firebaseConfig);
-    const firebaseDb = getDatabase(firebaseApp);
     const FIREBASE_BASE_PATH = 'snapshots';
+    let firebaseApp = null;
+    let firebaseDb = null;
+    let firebaseApi = null;
+    let firebaseInitPromise = null;
+
+    function timeoutAfter(ms, message) {
+      return new Promise((_, reject) => {
+        window.setTimeout(() => reject(new Error(message)), ms);
+      });
+    }
+
+    async function initFirebase() {
+      if (firebaseInitPromise) return firebaseInitPromise;
+
+      firebaseInitPromise = (async () => {
+        try {
+          const appModule = await Promise.race([
+            import('https://www.gstatic.com/firebasejs/9.23.0/firebase-app.js'),
+            timeoutAfter(7000, 'Firebase modülü zaman aşımına uğradı.')
+          ]);
+          const dbModule = await Promise.race([
+            import('https://www.gstatic.com/firebasejs/9.23.0/firebase-database.js'),
+            timeoutAfter(7000, 'Firebase veritabanı modülü zaman aşımına uğradı.')
+          ]);
+          firebaseApp = appModule.initializeApp(firebaseConfig);
+          firebaseDb = dbModule.getDatabase(firebaseApp);
+          firebaseApi = {
+            ref: dbModule.ref,
+            get: dbModule.get,
+            set: dbModule.set
+          };
+          return true;
+        } catch (e) {
+          console.error("Firebase başlatılamadı", e);
+          firebaseApp = null;
+          firebaseDb = null;
+          firebaseApi = null;
+          return false;
+        }
+      })();
+
+      return firebaseInitPromise;
+    }
+
+    function firebaseRef(path) {
+      if (!firebaseDb || !firebaseApi) throw new Error("Firebase bağlantısı hazır değil.");
+      return firebaseApi.ref(firebaseDb, path);
+    }
+
+    async function firebaseGet(path) {
+      if (!(await initFirebase())) throw new Error("Firebase bağlantısı kurulamadı.");
+      return firebaseApi.get(firebaseRef(path));
+    }
+
+    async function firebaseSet(path, value) {
+      if (!(await initFirebase())) throw new Error("Firebase bağlantısı kurulamadı.");
+      return firebaseApi.set(firebaseRef(path), value);
+    }
 
     // =======================
     // ARAÇLAR
@@ -1957,6 +2010,20 @@
       return getSheetCsvUrls(sheetName)[0];
     }
 
+    function getSheetJsonpUrl(sheetName, callbackName) {
+      const sheet = String(sheetName || "").trim() || "Sayfa1";
+      const id = getActiveSpreadsheetId();
+      const headerRow = Math.max(1, parseInt(appSettings.headerRow, 10) || 1);
+      const range = "A" + headerRow + ":ZZ";
+      const params = new URLSearchParams();
+      params.set("tqx", "out:json;responseHandler:" + callbackName);
+      params.set("headers", "1");
+      params.set("sheet", sheet);
+      params.set("range", range);
+      params.set("_", String(Date.now()));
+      return "https://docs.google.com/spreadsheets/d/" + id + "/gviz/tq?" + params.toString();
+    }
+
     function cleanCellValue(value) {
       return String(value ?? "")
         .replace(/^\uFEFF/, "")
@@ -1964,12 +2031,102 @@
         .trim();
     }
 
+    function formatDateValueForCell(value) {
+      if (!(value instanceof Date) || isNaN(value.getTime())) return cleanCellValue(value);
+      const day = String(value.getDate()).padStart(2, "0");
+      const month = String(value.getMonth() + 1).padStart(2, "0");
+      const year = value.getFullYear();
+      return `${day}.${month}.${year}`;
+    }
+
+    function getGvizCellText(cell) {
+      if (!cell) return "";
+      if (cell.f !== undefined && cell.f !== null && String(cell.f).trim() !== "") return cleanCellValue(cell.f);
+      const value = cell.v;
+      if (value instanceof Date) return formatDateValueForCell(value);
+      return cleanCellValue(value);
+    }
+
     function isLikelyHtmlResponse(text) {
       const t = String(text || "").trim().slice(0, 250).toLowerCase();
       return t.startsWith("<") || t.includes("<!doctype html") || t.includes("<html") || t.includes("servicelogin");
     }
 
-    async function fetchSheetCsv(sheetName) {
+    function parseGvizError(response) {
+      if (!response) return "Google Tablo cevabı boş geldi.";
+      if (response.status === "ok") return "";
+      const errors = Array.isArray(response.errors) ? response.errors : [];
+      const message = errors.map(e => [e.reason, e.message, e.detailed_message].filter(Boolean).join(" - ")).filter(Boolean).join(" | ");
+      return message || ("Google Tablo hata durumu: " + (response.status || "bilinmiyor"));
+    }
+
+    function gvizTableToRows(response) {
+      const err = parseGvizError(response);
+      if (err) throw new Error(err);
+      const table = response.table || {};
+      const cols = Array.isArray(table.cols) ? table.cols : [];
+      const bodyRows = Array.isArray(table.rows) ? table.rows : [];
+      const header = cols.map((col, index) => cleanCellValue(col && (col.label || col.id || `Sütun ${index + 1}`)));
+      const rows = bodyRows.map(row => {
+        const cells = Array.isArray(row && row.c) ? row.c : [];
+        const maxLen = Math.max(header.length, cells.length);
+        const out = [];
+        for (let i = 0; i < maxLen; i++) out.push(getGvizCellText(cells[i]));
+        return out;
+      });
+
+      const headerRow = Math.max(1, parseInt(appSettings.headerRow, 10) || 1);
+      const dataStartRow = Math.max(headerRow + 1, parseInt(appSettings.dataStartRow, 10) || (headerRow + 1));
+      const skipAfterHeader = Math.max(0, dataStartRow - headerRow - 1);
+      const dataRows = rows.slice(skipAfterHeader).filter(r => r.some(cell => cleanCellValue(cell) !== ""));
+
+      return {
+        header,
+        dataRows,
+        rows: [header].concat(dataRows),
+        source: "jsonp"
+      };
+    }
+
+    function fetchSheetRowsViaJsonp(sheetName) {
+      return new Promise((resolve, reject) => {
+        const callbackName = "__ogrenciSheetCallback_" + Date.now() + "_" + Math.floor(Math.random() * 100000);
+        const script = document.createElement("script");
+        let finished = false;
+        const timeout = window.setTimeout(() => {
+          cleanup();
+          reject(new Error("Google Tablo zaman aşımına uğradı. Sayfa adı veya paylaşım izni hatalı olabilir."));
+        }, 15000);
+
+        function cleanup() {
+          if (finished) return;
+          finished = true;
+          window.clearTimeout(timeout);
+          try { delete window[callbackName]; } catch (e) { window[callbackName] = undefined; }
+          if (script.parentNode) script.parentNode.removeChild(script);
+        }
+
+        window[callbackName] = (response) => {
+          try {
+            const result = gvizTableToRows(response);
+            cleanup();
+            resolve(result);
+          } catch (err) {
+            cleanup();
+            reject(err);
+          }
+        };
+
+        script.onerror = () => {
+          cleanup();
+          reject(new Error("Google Tablo betiği yüklenemedi. İnternet bağlantısı, tablo paylaşımı veya e-tablo ID'si kontrol edilmeli."));
+        };
+        script.src = getSheetJsonpUrl(sheetName, callbackName);
+        document.head.appendChild(script);
+      });
+    }
+
+    async function fetchSheetRowsViaCsv(sheetName) {
       const urls = getSheetCsvUrls(sheetName);
       let lastError = null;
 
@@ -1991,7 +2148,12 @@
             throw new Error(trimmed.slice(0, 180));
           }
 
-          return { text, url };
+          const rows = parseCSV(text);
+          const headerRowIndex = Math.min(rows.length - 1, Math.max(0, (parseInt(appSettings.headerRow, 10) || 1) - 1));
+          const dataStartIndex = Math.max(headerRowIndex + 1, (parseInt(appSettings.dataStartRow, 10) || (headerRowIndex + 2)) - 1);
+          const header = (rows[headerRowIndex] || []).map(h => cleanCellValue(h));
+          const dataRows = rows.slice(dataStartIndex).filter(r => r.some(cell => cleanCellValue(cell) !== ""));
+          return { header, dataRows, rows, source: "csv" };
         } catch (err) {
           lastError = err;
           console.warn("CSV kaynağı okunamadı:", url, err);
@@ -1999,6 +2161,19 @@
       }
 
       throw lastError || new Error("Google Tablo CSV verisi alınamadı.");
+    }
+
+    async function fetchSheetRows(sheetName) {
+      try {
+        return await fetchSheetRowsViaJsonp(sheetName);
+      } catch (jsonpError) {
+        console.warn("Google Visualization JSONP okuması başarısız oldu, CSV deneniyor.", jsonpError);
+        try {
+          return await fetchSheetRowsViaCsv(sheetName);
+        } catch (csvError) {
+          throw new Error((jsonpError && jsonpError.message ? jsonpError.message : jsonpError) + " / CSV yedeği de başarısız: " + (csvError && csvError.message ? csvError.message : csvError));
+        }
+      }
     }
 
     function makeFirebaseSafeKey(value) {
@@ -2023,12 +2198,73 @@
       return Array.from(new Set(keys.filter(Boolean)));
     }
 
+    function getSnapshotPathByKey(key) {
+      return `${FIREBASE_BASE_PATH}/${key}`;
+    }
+
     function getSnapshotRefByKey(key) {
-      return ref(firebaseDb, `${FIREBASE_BASE_PATH}/${key}`);
+      return firebaseRef(getSnapshotPathByKey(key));
     }
 
     function getSnapshotRef() {
       return getSnapshotRefByKey(getPrimarySnapshotKey());
+    }
+
+    function getLocalSnapshotStorageKey() {
+      return "ogrenci_listesi_snapshot__" + getPrimarySnapshotKey();
+    }
+
+    function loadLocalSnapshot() {
+      try {
+        const raw = localStorage.getItem(getLocalSnapshotStorageKey());
+        return normalizeSnapshotObject(raw ? JSON.parse(raw) : null);
+      } catch (e) {
+        console.warn("Yerel snapshot okunamadı", e);
+        return null;
+      }
+    }
+
+    function saveLocalSnapshot(snap) {
+      try {
+        localStorage.setItem(getLocalSnapshotStorageKey(), JSON.stringify(snap));
+      } catch (e) {
+        console.warn("Yerel snapshot kaydedilemedi", e);
+      }
+    }
+
+    function snapshotMatchScore(itemKey, itemValue) {
+      const normalized = normalizeSnapshotObject(itemValue);
+      if (!normalized) return 0;
+      let score = 1;
+      const activeId = getActiveSpreadsheetId();
+      const activeSheet = String(currentSheetName || "").trim();
+      if (String(normalized.spreadsheetId || "") === activeId) score += 10;
+      if (String(normalized.sheetName || "").trim() === activeSheet) score += 8;
+      if (String(itemKey || "").includes(getPrimarySnapshotKey())) score += 5;
+      if (String(itemKey || "").includes(makeFirebaseSafeKey(activeSheet))) score += 3;
+      return score;
+    }
+
+    async function findSnapshotInsideFirebaseBase() {
+      try {
+        const baseSnap = await firebaseGet(FIREBASE_BASE_PATH);
+        if (!baseSnap.exists()) return null;
+        const all = baseSnap.val();
+        if (!all || typeof all !== "object") return null;
+        let best = null;
+        Object.entries(all).forEach(([key, value]) => {
+          const normalized = normalizeSnapshotObject(value);
+          if (!normalized) return;
+          const score = snapshotMatchScore(key, value);
+          if (!best || score > best.score || (score === best.score && String(normalized.savedAt || "") > String(best.snapshot.savedAt || ""))) {
+            best = { key, snapshot: normalized, score };
+          }
+        });
+        return best && best.score > 1 ? best : null;
+      } catch (e) {
+        console.warn("Firebase snapshots ana dizini taranamadı", e);
+        return null;
+      }
     }
 
     function normalizeSnapshotObject(raw) {
@@ -2301,7 +2537,7 @@ function findPrevMatchForStudent(student, prevMap) {
         return;
       }
 
-      compareLabel.textContent = "Son Kaydetme Tarihi: " + formatDateTimeForBadge(snapshot.savedAt);
+      compareLabel.textContent = "Son Kaydetme Tarihi: " + formatDateTimeForBadge(snapshot.savedAt) + (snapshotSource ? " (" + (snapshotSource === "firebase" ? "Firebase" : snapshotSource === "local" ? "Yerel" : "Dosya") + ")" : "");
     }
 
     async function loadSnapshot() {
@@ -2310,9 +2546,8 @@ function findPrevMatchForStudent(student, prevMap) {
 
       for (const key of candidateKeys) {
         try {
-          const snapData = await get(getSnapshotRefByKey(key));
+          const snapData = await firebaseGet(getSnapshotPathByKey(key));
           if (!snapData.exists()) continue;
-
           const normalized = normalizeSnapshotObject(snapData.val());
           if (!normalized) continue;
 
@@ -2327,6 +2562,23 @@ function findPrevMatchForStudent(student, prevMap) {
         }
       }
 
+      const nested = await findSnapshotInsideFirebaseBase();
+      if (nested && nested.snapshot) {
+        snapshot = nested.snapshot;
+        snapshotSource = "firebase";
+        snapshot._firebaseKey = nested.key;
+        updateSnapshotLabels();
+        return;
+      }
+
+      const localSnap = loadLocalSnapshot();
+      if (localSnap) {
+        snapshot = localSnap;
+        snapshotSource = "local";
+        updateSnapshotLabels();
+        return;
+      }
+
       if (lastError) console.error("Snapshot yüklenemedi", lastError);
       snapshot = null;
       snapshotSource = "none";
@@ -2336,19 +2588,21 @@ function findPrevMatchForStudent(student, prevMap) {
     async function saveSnapshot(currentStudents) {
       const list = Array.isArray(currentStudents) ? currentStudents : [];
       if (!list.length) {
-        showToast("Kaydedilecek öğrenci yok. Önce listeyi yükleyin.");
+        showToast("Kaydedilecek öğrenci yok. Önce Google Tablo verisi yüklenmeli.");
         return;
       }
 
       const snap = buildSnapshotObject(list);
+      saveLocalSnapshot(snap);
+
       try {
         const primaryKey = getPrimarySnapshotKey();
-        await set(getSnapshotRefByKey(primaryKey), snap);
+        await firebaseSet(getSnapshotPathByKey(primaryKey), snap);
 
-        // Eski sürümlerin kullandığı yol da güncellensin; böylece eski kayıtlar ve yeni kayıtlar ayrışmaz.
+        // Eski sürümlerin okuduğu olası kısa yola da aynı kayıt yazılır.
         const legacyKey = getLegacySnapshotKey();
         if (legacyKey && legacyKey !== primaryKey) {
-          await set(getSnapshotRefByKey(legacyKey), snap).catch(e => console.warn("Eski snapshot yolu güncellenemedi", e));
+          await firebaseSet(getSnapshotPathByKey(legacyKey), snap).catch(e => console.warn("Eski snapshot yolu güncellenemedi", e));
         }
 
         snapshot = snap;
@@ -2358,7 +2612,10 @@ function findPrevMatchForStudent(student, prevMap) {
         showToast("Liste Firebase'e başarıyla kaydedildi.");
       } catch (e) {
         console.error("Snapshot kaydedilemedi", e);
-        showToast("Hata: Kayıt yapılamadı. Firebase kurallarını ve bağlantıyı kontrol edin.");
+        snapshot = snap;
+        snapshotSource = "local";
+        updateSnapshotLabels();
+        showToast("Firebase kaydı yapılamadı; geçici olarak yerel kopya kaydedildi. Firebase kurallarını kontrol edin.");
       }
     }
 
@@ -2517,32 +2774,28 @@ function findPrevMatchForStudent(student, prevMap) {
       document.getElementById("lastLoadedInfo").textContent = "Yükleniyor...";
 
       try {
-        const result = await fetchSheetCsv(currentSheetName);
-        const text = result.text;
-        const rows = parseCSV(text);
+        const sheetRows = await fetchSheetRows(currentSheetName);
+        const header = (sheetRows.header || []).map(h => cleanCellValue(h));
+        const dataRows = (sheetRows.dataRows || []).filter(r => r.some(cell => cleanCellValue(cell) !== ""));
 
-        if (!rows.length) {
+        if (!dataRows.length) {
           students = [];
           removedRecordsCache = [];
           duplicateOkulNoMap = {};
-          body.innerHTML = `<tr class="loading-row"><td colspan="${getTableColspan()}" style="text-align:center; padding:40px;">Google Tablo CSV olarak geldi fakat satır bulunamadı.</td></tr>`;
+          body.innerHTML = `<tr class="loading-row"><td colspan="${getTableColspan()}" style="text-align:center; padding:40px;">Google Tablo okundu fakat öğrenci satırı bulunamadı. Ayarlar bölümünde bölüm adı, başlık satırı ve veri başlangıcı kontrol edilmeli.</td></tr>`;
           updateSummary([]);
           updateListStatus([]);
           return;
         }
 
-        const headerRowIndex = Math.min(rows.length - 1, Math.max(0, (parseInt(appSettings.headerRow, 10) || 1) - 1));
-        const dataStartIndex = Math.max(headerRowIndex + 1, (parseInt(appSettings.dataStartRow, 10) || (headerRowIndex + 2)) - 1);
-        const header = (rows[headerRowIndex] || []).map(h => cleanCellValue(h));
-        const dataRows = rows.slice(dataStartIndex).filter(r => r.some(cell => cleanCellValue(cell) !== ""));
-
+        const dataStartRowNo = Math.max(1, parseInt(appSettings.dataStartRow, 10) || 2);
         const parsed = dataRows.map((row, index) => {
           const s = {};
           getDataFieldKeys().forEach(key => {
             s[key] = getMappedCell(row, header, key);
           });
           s.cinsiyet = cleanCellValue(s.cinsiyet).toLocaleUpperCase("tr-TR");
-          s.id = createStudentId(s) || `row_${index + dataStartIndex + 1}`;
+          s.id = createStudentId(s) || `row_${index + dataStartRowNo}`;
           s.dateObj = parseDateTR(s.tarih);
           s.status = "normal";
           return s;
