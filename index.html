@@ -1904,6 +1904,7 @@
     let snapshotSource = "none";
     let activeViewMode = "all";
     let duplicateOkulNoMap = {}; // { okulNo: [student, ...] }
+    let removedRecordsCache = [];
 
 
 // =======================
@@ -1950,6 +1951,23 @@
       document.getElementById("toastMessage").textContent = message;
       toast.classList.add("visible");
       setTimeout(() => toast.classList.remove("visible"), 3000);
+    }
+
+    function escapeHtml(value) {
+      return String(value ?? "")
+        .replace(/&/g, "&amp;")
+        .replace(/</g, "&lt;")
+        .replace(/>/g, "&gt;")
+        .replace(/"/g, "&quot;")
+        .replace(/'/g, "&#39;");
+    }
+
+    function makeSafeFilename(value) {
+      return String(value || "liste")
+        .trim()
+        .replace(/[\\/:*?"<>|]+/g, "_")
+        .replace(/\s+/g, "_")
+        .slice(0, 80) || "liste";
     }
 
     function parseCSV(text) {
@@ -2267,17 +2285,37 @@ function findPrevMatchForStudent(student, prevMap) {
         const field = appSettings.fields[key];
         const row = document.createElement("div");
         row.className = "mapping-row";
-        row.innerHTML = `
-          <div>
-            <div class="mapping-field-title">${field.label}</div>
-            <div class="mapping-field-sub">${field.hint || ""}</div>
-          </div>
-          <input type="text" data-setting-field="${key}" data-setting-part="source" value="${field.source || ""}" placeholder="Örn. A veya İsim*" />
-          <label class="mapping-visible">
-            <input type="checkbox" data-setting-field="${key}" data-setting-part="visible" ${field.visible ? "checked" : ""} />
-            Göster
-          </label>
-        `;
+
+        const info = document.createElement("div");
+        const title = document.createElement("div");
+        title.className = "mapping-field-title";
+        title.textContent = field.label;
+        const sub = document.createElement("div");
+        sub.className = "mapping-field-sub";
+        sub.textContent = field.hint || "";
+        info.appendChild(title);
+        info.appendChild(sub);
+
+        const input = document.createElement("input");
+        input.type = "text";
+        input.dataset.settingField = key;
+        input.dataset.settingPart = "source";
+        input.value = field.source || "";
+        input.placeholder = "Örn. A veya İsim*";
+
+        const visibleLabel = document.createElement("label");
+        visibleLabel.className = "mapping-visible";
+        const checkbox = document.createElement("input");
+        checkbox.type = "checkbox";
+        checkbox.dataset.settingField = key;
+        checkbox.dataset.settingPart = "visible";
+        checkbox.checked = Boolean(field.visible);
+        visibleLabel.appendChild(checkbox);
+        visibleLabel.appendChild(document.createTextNode(" Göster"));
+
+        row.appendChild(info);
+        row.appendChild(input);
+        row.appendChild(visibleLabel);
         container.appendChild(row);
       });
     }
@@ -2341,7 +2379,11 @@ function findPrevMatchForStudent(student, prevMap) {
 
         const rows = parseCSV(text);
         if (!rows.length) {
+          students = [];
+          removedRecordsCache = [];
+          duplicateOkulNoMap = {};
           body.innerHTML = `<tr class="loading-row"><td colspan="${getTableColspan()}">Tablo boş.</td></tr>`;
+          updateSummary([]);
           updateListStatus([]);
           return;
         }
@@ -2407,6 +2449,7 @@ function findPrevMatchForStudent(student, prevMap) {
           }
         }
 
+        removedRecordsCache = removed;
         students = parsed;
         duplicateOkulNoMap = detectDuplicateOkulNos(parsed);
         renderHeader();
@@ -2421,6 +2464,8 @@ function findPrevMatchForStudent(student, prevMap) {
         console.error(err);
         body.innerHTML = `<tr class="loading-row"><td colspan="${getTableColspan()}" style="color:red; text-align:center; padding:40px;">Hata: ${err.message}</td></tr>`;
         document.getElementById("lastLoadedInfo").textContent = "Hata oluştu.";
+        removedRecordsCache = [];
+        updateSummary([]);
         updateListStatus([]);
       }
     }
@@ -2460,10 +2505,15 @@ function findPrevMatchForStudent(student, prevMap) {
         label.style.display = "flex";
         label.style.alignItems = "center";
         label.style.gap = "6px";
-        label.innerHTML = `
-          <input type="checkbox" id="${id}" data-field="${col.key}" checked />
-          <span>${col.label}</span>
-        `;
+        const checkbox = document.createElement("input");
+        checkbox.type = "checkbox";
+        checkbox.id = id;
+        checkbox.dataset.field = col.key;
+        checkbox.checked = true;
+        const span = document.createElement("span");
+        span.textContent = col.label;
+        label.appendChild(checkbox);
+        label.appendChild(span);
         printContainer.appendChild(label);
       });
     }
@@ -2473,12 +2523,16 @@ function findPrevMatchForStudent(student, prevMap) {
       const classes = Array.from(new Set(students.map(s => s.sinif).filter(Boolean))).sort();
       container.innerHTML = "";
       classes.forEach(cls => {
-        const id = "class-filter-" + cls.replace(/\s+/g, "_");
+        const id = "class-filter-" + String(cls).replace(/\s+/g, "_").replace(/[^\w\-ığüşöçİĞÜŞÖÇ]/gi, "_");
         const label = document.createElement("label");
-        label.innerHTML = `
-          <input type="checkbox" id="${id}" value="${cls}">
-          <span>${cls}</span>
-        `;
+        const checkbox = document.createElement("input");
+        checkbox.type = "checkbox";
+        checkbox.id = id;
+        checkbox.value = cls;
+        const span = document.createElement("span");
+        span.textContent = cls;
+        label.appendChild(checkbox);
+        label.appendChild(span);
         container.appendChild(label);
       });
     }
@@ -2520,8 +2574,14 @@ function findPrevMatchForStudent(student, prevMap) {
         items.forEach(s => {
           const d = isRemoved ? (s.data || {}) : s;
           const li = document.createElement("li");
+          const strong = document.createElement("b");
+          strong.textContent = d.okulNo || "?";
           const fullName = [d.isim, d.soyisim].filter(Boolean).join(" ").trim() || "İsimsiz";
-          li.innerHTML = `<b>${d.okulNo || "?"}</b> ${fullName} <small>(${d.sinif || "-"})</small>`;
+          const small = document.createElement("small");
+          small.textContent = `(${d.sinif || "-"})`;
+          li.appendChild(strong);
+          li.appendChild(document.createTextNode(" " + fullName + " "));
+          li.appendChild(small);
           el.appendChild(li);
         });
       };
@@ -2535,12 +2595,23 @@ function findPrevMatchForStudent(student, prevMap) {
       const dupEl = document.getElementById("dupList");
       if (dupEl) {
         dupEl.innerHTML = "";
-        dupGroups.sort((a,b) => parseInt(a||"0") - parseInt(b||"0"));
+        dupGroups.sort((a,b) => {
+          const na = parseInt(a || "0", 10);
+          const nb = parseInt(b || "0", 10);
+          if (!Number.isNaN(na) && !Number.isNaN(nb) && na !== nb) return na - nb;
+          return String(a).localeCompare(String(b), "tr");
+        });
         dupGroups.forEach(no => {
           const arr = duplicateOkulNoMap[no] || [];
           const li = document.createElement("li");
-          const details = arr.map(x => `${[x.isim, x.soyisim].filter(Boolean).join(" ").trim()} <small>(${x.sinif || '-'})</small>`).join(" • ");
-          li.innerHTML = `<b>${no}</b> <span style="opacity:0.9">${details}</span>`;
+          const strong = document.createElement("b");
+          strong.textContent = no;
+          const span = document.createElement("span");
+          span.style.opacity = "0.9";
+          span.textContent = arr.map(x => `${[x.isim, x.soyisim].filter(Boolean).join(" ").trim()} (${x.sinif || '-'})`).join(" • ");
+          li.appendChild(strong);
+          li.appendChild(document.createTextNode(" "));
+          li.appendChild(span);
           dupEl.appendChild(li);
         });
       }
@@ -2571,8 +2642,9 @@ function findPrevMatchForStudent(student, prevMap) {
       }
     }
 
-    function applyFilters(removedRecords = []) {
-      const searchText = document.getElementById("searchInput").value.trim().toLowerCase();
+    function applyFilters(removedRecords = null) {
+      removedRecords = Array.isArray(removedRecords) ? removedRecords : removedRecordsCache;
+      const searchText = document.getElementById("searchInput").value.trim().toLocaleLowerCase("tr-TR");
       const genderVal = document.getElementById("genderFilter").value;
       const scholarVal = document.getElementById("scholarFilter").value;
       const statusVal = document.getElementById("statusFilter").value;
@@ -2604,7 +2676,7 @@ function findPrevMatchForStudent(student, prevMap) {
         if (toDate && s.dateObj && s.dateObj > toDate) return false;
         
         if (searchText) {
-          const combined = Object.values(s).join(" ").toLowerCase();
+          const combined = Object.values(s).join(" ").toLocaleLowerCase("tr-TR");
           if (!combined.includes(searchText)) return false;
         }
         return true;
@@ -2666,13 +2738,13 @@ function findPrevMatchForStudent(student, prevMap) {
             const span = document.createElement("span");
             if (s.status === "new") {
               span.className = "status-badge new";
-              span.innerHTML = `✨ YENİ`;
+              span.textContent = `✨ YENİ`;
             } else if (s.status === "updated") {
               span.className = "status-badge updated";
-              span.innerHTML = `📝 GÜNCEL`;
+              span.textContent = `📝 GÜNCEL`;
             } else {
               span.className = "status-badge normal";
-              span.innerHTML = `NORMAL`;
+              span.textContent = `NORMAL`;
             }
             td.appendChild(span);
           } else {
@@ -2835,7 +2907,7 @@ function findPrevMatchForStudent(student, prevMap) {
         const url = URL.createObjectURL(blob);
         const a = document.createElement("a");
         a.href = url;
-        a.download = `liste_${currentSheetName}.txt`;
+        a.download = `liste_${makeSafeFilename(currentSheetName)}.txt`;
         document.body.appendChild(a);
         a.click();
         document.body.removeChild(a);
@@ -2874,6 +2946,8 @@ function findPrevMatchForStudent(student, prevMap) {
       let diffHtml = "";
       let dupHtml = "";
       const displayName = [s.isim, s.soyisim].filter(Boolean).join(" ").trim() || "Öğrenci";
+      const displayNameSafe = escapeHtml(displayName);
+      const okulNoSafe = escapeHtml(s.okulNo || "");
 
       if (s.status === "new") {
         statusHtml = `<span class="status-badge new" style="font-size:14px; padding:6px 12px;">✨ Yeni Kayıt</span>`;
@@ -2889,7 +2963,7 @@ function findPrevMatchForStudent(student, prevMap) {
                 const oldVal = String(oldData[key] || "").trim();
                 const newVal = String(s[key] || "").trim();
                 if(oldVal !== newVal) {
-                    changes.push(`<b>${getFieldLabel(key)}:</b> <br/> <span style="color:#b91c1c; text-decoration:line-through; font-size:12px;">${oldVal || '(Boş)'}</span> <span style="margin:0 4px">➞</span> <span style="color:#15803d; font-weight:600;">${newVal || '(Boş)'}</span>`);
+                    changes.push(`<b>${escapeHtml(getFieldLabel(key))}:</b> <br/> <span style="color:#b91c1c; text-decoration:line-through; font-size:12px;">${escapeHtml(oldVal || '(Boş)')}</span> <span style="margin:0 4px">➞</span> <span style="color:#15803d; font-weight:600;">${escapeHtml(newVal || '(Boş)')}</span>`);
                 }
             });
 
@@ -2909,7 +2983,7 @@ function findPrevMatchForStudent(student, prevMap) {
       const myNo = String(s.okulNo || "").trim();
       if (myNo && duplicateOkulNoMap && duplicateOkulNoMap[myNo] && duplicateOkulNoMap[myNo].length >= 2) {
         const others = (duplicateOkulNoMap[myNo] || []).filter(x => !(x.id === s.id));
-        const listHtml = others.map(x => `<li>${[x.isim, x.soyisim].filter(Boolean).join(" ").trim()} <small>(${x.sinif || '-'})</small></li>`).join("");
+        const listHtml = others.map(x => `<li>${escapeHtml([x.isim, x.soyisim].filter(Boolean).join(" ").trim())} <small>(${escapeHtml(x.sinif || '-')})</small></li>`).join("");
         dupHtml = `<div class="change-log-box" style="background: var(--danger-bg); border-color: #fca5a5; color: var(--danger-text);">
           <div style="font-weight:800; margin-bottom:6px;">⚠️ Okul No Çakışması</div>
           <div style="font-size:12px; opacity:0.9; margin-bottom:8px;">Bu okul numarası listede birden fazla öğrenciye atanmış.</div>
@@ -2919,13 +2993,13 @@ function findPrevMatchForStudent(student, prevMap) {
 
       const detailFields = getVisibleDataFieldKeys().filter(key => key !== "isim" && key !== "soyisim");
       const detailHtml = detailFields.map(key => `
-        <div class="detail-row"><span class="detail-label">${getFieldLabel(key)}:</span> <span class="detail-val">${s[key] || "-"}</span></div>
+        <div class="detail-row"><span class="detail-label">${escapeHtml(getFieldLabel(key))}:</span> <span class="detail-val">${escapeHtml(s[key] || "-")}</span></div>
       `).join("");
 
       content.innerHTML = `
         <div style="text-align:center; margin-bottom:20px;">
-            <div style="font-size:24px; font-weight:700;">${displayName}</div>
-            <div style="font-size:14px; color:var(--text-muted);">${s.okulNo || ""}</div>
+            <div style="font-size:24px; font-weight:700;">${displayNameSafe}</div>
+            <div style="font-size:14px; color:var(--text-muted);">${okulNoSafe}</div>
             <div style="margin-top:10px;">${statusHtml}</div>
         </div>
 
