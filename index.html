@@ -1815,6 +1815,7 @@
 
     const FIELD_ORDER = Object.keys(DEFAULT_APP_SETTINGS.fields);
     const STATUS_COLUMN = { key: "status", label: "DURUM" };
+    const REQUIRED_SOURCE_FIELDS = ["isim", "sinif", "okulNo"];
 
     function cloneDefaultSettings() {
       return JSON.parse(JSON.stringify(DEFAULT_APP_SETTINGS));
@@ -1830,16 +1831,28 @@
         dataStartRow: Math.max(1, parseInt(source.dataStartRow || base.dataStartRow, 10) || base.dataStartRow),
         fields: {}
       };
+
       FIELD_ORDER.forEach(key => {
         const current = (source.fields && source.fields[key]) ? source.fields[key] : {};
+        const baseField = base.fields[key] || {};
+        const visible = Boolean(current.visible ?? baseField.visible);
+        let mappedSource = String((current.source ?? baseField.source ?? "")).trim();
+
+        // Eski/bozuk localStorage ayarlarında zorunlu alanların kaynak sütunu boş kalabiliyordu.
+        // Bu durumda tablo satırı gelse bile hücreler boş görünüyordu. Zorunlu alanları güvenli varsayılana döndür.
+        if (!mappedSource && (visible || REQUIRED_SOURCE_FIELDS.includes(key))) {
+          mappedSource = String(baseField.source || "").trim();
+        }
+
         out.fields[key] = {
-          ...base.fields[key],
+          ...baseField,
           ...current,
-          label: String((current.label || base.fields[key].label || key)).trim(),
-          source: String((current.source ?? base.fields[key].source ?? "")).trim(),
-          visible: Boolean(current.visible ?? base.fields[key].visible)
+          label: String((current.label || baseField.label || key)).trim(),
+          source: mappedSource,
+          visible
         };
       });
+
       if (out.dataStartRow <= out.headerRow) out.dataStartRow = out.headerRow + 1;
       return out;
     }
@@ -1930,20 +1943,126 @@
     // =======================
     // ARAÇLAR
     // =======================
+    function getSheetCsvUrls(sheetName) {
+      const sheet = String(sheetName || "").trim() || "Sayfa1";
+      const id = getActiveSpreadsheetId();
+      const encodedSheet = encodeURIComponent(sheet);
+      return [
+        "https://docs.google.com/spreadsheets/d/" + id + "/gviz/tq?tqx=out:csv&sheet=" + encodedSheet,
+        "https://docs.google.com/spreadsheets/d/" + id + "/gviz/tq?tqx=out:csv&headers=1&sheet=" + encodedSheet
+      ];
+    }
+
     function getSheetCsvUrl(sheetName) {
-      return "https://docs.google.com/spreadsheets/d/" +
-        getActiveSpreadsheetId() +
-        "/gviz/tq?tqx=out:csv&sheet=" +
-        encodeURIComponent(sheetName);
+      return getSheetCsvUrls(sheetName)[0];
+    }
+
+    function cleanCellValue(value) {
+      return String(value ?? "")
+        .replace(/^\uFEFF/, "")
+        .replace(/\u00A0/g, " ")
+        .trim();
+    }
+
+    function isLikelyHtmlResponse(text) {
+      const t = String(text || "").trim().slice(0, 250).toLowerCase();
+      return t.startsWith("<") || t.includes("<!doctype html") || t.includes("<html") || t.includes("servicelogin");
+    }
+
+    async function fetchSheetCsv(sheetName) {
+      const urls = getSheetCsvUrls(sheetName);
+      let lastError = null;
+
+      for (const url of urls) {
+        try {
+          const res = await fetch(url, { cache: "no-store" });
+          const text = await res.text();
+
+          if (!res.ok) {
+            throw new Error("Ağ hatası: " + res.status + " " + (res.statusText || ""));
+          }
+
+          if (isLikelyHtmlResponse(text)) {
+            throw new Error("CSV yerine HTML geldi. Google Tablo paylaşım/yayın ayarlarını ve sayfa adını kontrol edin.");
+          }
+
+          const trimmed = text.trim();
+          if (/^Error\s*:/i.test(trimmed) || /Unable to parse|Invalid query|not found/i.test(trimmed)) {
+            throw new Error(trimmed.slice(0, 180));
+          }
+
+          return { text, url };
+        } catch (err) {
+          lastError = err;
+          console.warn("CSV kaynağı okunamadı:", url, err);
+        }
+      }
+
+      throw lastError || new Error("Google Tablo CSV verisi alınamadı.");
     }
 
     function makeFirebaseSafeKey(value) {
       return String(value || "default").replace(/[.#$\[\]\/]/g, "_").slice(0, 240) || "default";
     }
 
+    function getPrimarySnapshotKey() {
+      return makeFirebaseSafeKey(`${getActiveSpreadsheetId()}__${currentSheetName || "default"}`);
+    }
+
+    function getLegacySnapshotKey() {
+      return encodeURIComponent(currentSheetName || "default");
+    }
+
+    function getSnapshotKeyCandidates() {
+      const keys = [
+        getPrimarySnapshotKey(),
+        getLegacySnapshotKey(),
+        makeFirebaseSafeKey(currentSheetName || "default"),
+        "default"
+      ];
+      return Array.from(new Set(keys.filter(Boolean)));
+    }
+
+    function getSnapshotRefByKey(key) {
+      return ref(firebaseDb, `${FIREBASE_BASE_PATH}/${key}`);
+    }
+
     function getSnapshotRef() {
-      const sourceKey = `${getActiveSpreadsheetId()}__${currentSheetName || 'default'}`;
-      return ref(firebaseDb, `${FIREBASE_BASE_PATH}/${makeFirebaseSafeKey(sourceKey)}`);
+      return getSnapshotRefByKey(getPrimarySnapshotKey());
+    }
+
+    function normalizeSnapshotObject(raw) {
+      if (!raw || typeof raw !== "object") return null;
+
+      const sourceRecords = raw.records || raw.data || raw.students || null;
+      let records = {};
+
+      if (Array.isArray(sourceRecords)) {
+        sourceRecords.forEach((item, index) => {
+          const entry = item && typeof item === "object" ? item : {};
+          const data = entry.data && typeof entry.data === "object" ? entry.data : entry;
+          const id = String(entry.id || createStudentId(data) || `row_${index + 1}`).trim();
+          records[id] = { id, data: buildStudentDataObject(data) };
+        });
+      } else if (sourceRecords && typeof sourceRecords === "object") {
+        Object.entries(sourceRecords).forEach(([key, item]) => {
+          const entry = item && typeof item === "object" ? item : {};
+          const data = entry.data && typeof entry.data === "object" ? entry.data : entry;
+          const id = String(entry.id || key || createStudentId(data)).trim();
+          if (!id) return;
+          records[id] = { id, data: buildStudentDataObject(data) };
+        });
+      }
+
+      if (!Object.keys(records).length) return null;
+
+      return {
+        ...raw,
+        savedAt: raw.savedAt || raw.kayitTarihi || raw.updatedAt || "",
+        sheetName: raw.sheetName || currentSheetName,
+        spreadsheetId: raw.spreadsheetId || getActiveSpreadsheetId(),
+        records
+      };
     }
 
     function showToast(message) {
@@ -1984,11 +2103,11 @@
         } else if (c === '"') {
           inQuotes = !inQuotes;
         } else if (c === "," && !inQuotes) {
-          currentRow.push(current);
+          currentRow.push(cleanCellValue(current));
           current = "";
         } else if ((c === "\n" || c === "\r") && !inQuotes) {
           if (current !== "" || currentRow.length > 0) {
-            currentRow.push(current);
+            currentRow.push(cleanCellValue(current));
             rows.push(currentRow);
             currentRow = [];
             current = "";
@@ -1998,7 +2117,7 @@
         }
       }
       if (current !== "" || currentRow.length > 0) {
-        currentRow.push(current);
+        currentRow.push(cleanCellValue(current));
         rows.push(currentRow);
       }
       return rows.filter(r => r.length > 0);
@@ -2031,14 +2150,18 @@
     function buildStudentDataObject(student) {
       const data = {};
       getDataFieldKeys().forEach(key => {
-        data[key] = String(student[key] || "").trim();
+        data[key] = cleanCellValue(student && student[key]);
       });
       return data;
     }
 
     function sameStudentData(prevData, currentData) {
+      const prev = prevData && typeof prevData === "object" ? prevData : {};
+      const curr = currentData && typeof currentData === "object" ? currentData : {};
       return getDataFieldKeys().every(key => {
-        return String((prevData && prevData[key]) || "").trim() === String((currentData && currentData[key]) || "").trim();
+        // Eski snapshotlarda sonradan eklenen sütunlar yoksa bunları değişiklik sayma.
+        if (!Object.prototype.hasOwnProperty.call(prev, key)) return true;
+        return cleanCellValue(prev[key]) === cleanCellValue(curr[key]);
       });
     }
 
@@ -2182,47 +2305,70 @@ function findPrevMatchForStudent(student, prevMap) {
     }
 
     async function loadSnapshot() {
-      try {
-        const snapRef = getSnapshotRef();
-        const snapData = await get(snapRef);
-        if (!snapData.exists()) {
-          snapshot = null;
-          snapshotSource = "none";
+      const candidateKeys = getSnapshotKeyCandidates();
+      let lastError = null;
+
+      for (const key of candidateKeys) {
+        try {
+          const snapData = await get(getSnapshotRefByKey(key));
+          if (!snapData.exists()) continue;
+
+          const normalized = normalizeSnapshotObject(snapData.val());
+          if (!normalized) continue;
+
+          snapshot = normalized;
+          snapshotSource = "firebase";
+          snapshot._firebaseKey = key;
           updateSnapshotLabels();
           return;
+        } catch (e) {
+          lastError = e;
+          console.warn("Snapshot yolu okunamadı:", key, e);
         }
-        snapshot = snapData.val();
-        snapshotSource = "firebase";
-        updateSnapshotLabels();
-      } catch (e) {
-        console.error("Snapshot yüklenemedi", e);
-        snapshot = null;
-        snapshotSource = "none";
-        updateSnapshotLabels();
       }
+
+      if (lastError) console.error("Snapshot yüklenemedi", lastError);
+      snapshot = null;
+      snapshotSource = "none";
+      updateSnapshotLabels();
     }
 
     async function saveSnapshot(currentStudents) {
-      const snap = buildSnapshotObject(currentStudents);
+      const list = Array.isArray(currentStudents) ? currentStudents : [];
+      if (!list.length) {
+        showToast("Kaydedilecek öğrenci yok. Önce listeyi yükleyin.");
+        return;
+      }
+
+      const snap = buildSnapshotObject(list);
       try {
-        const snapRef = getSnapshotRef();
-        await set(snapRef, snap);
+        const primaryKey = getPrimarySnapshotKey();
+        await set(getSnapshotRefByKey(primaryKey), snap);
+
+        // Eski sürümlerin kullandığı yol da güncellensin; böylece eski kayıtlar ve yeni kayıtlar ayrışmaz.
+        const legacyKey = getLegacySnapshotKey();
+        if (legacyKey && legacyKey !== primaryKey) {
+          await set(getSnapshotRefByKey(legacyKey), snap).catch(e => console.warn("Eski snapshot yolu güncellenemedi", e));
+        }
+
         snapshot = snap;
         snapshotSource = "firebase";
+        snapshot._firebaseKey = primaryKey;
         updateSnapshotLabels();
         showToast("Liste Firebase'e başarıyla kaydedildi.");
       } catch (e) {
         console.error("Snapshot kaydedilemedi", e);
-        showToast("Hata: Kayıt yapılamadı.");
+        showToast("Hata: Kayıt yapılamadı. Firebase kurallarını ve bağlantıyı kontrol edin.");
       }
     }
 
     function applySnapshotFromFile(obj) {
-      if (!obj || !obj.records) {
+      const normalized = normalizeSnapshotObject(obj);
+      if (!normalized) {
         showToast("Hatalı dosya formatı.");
         return;
       }
-      snapshot = obj;
+      snapshot = normalized;
       snapshotSource = "file";
       updateSnapshotLabels();
       showToast("TXT yüklendi, karşılaştırma yapılıyor.");
@@ -2270,7 +2416,7 @@ function findPrevMatchForStudent(student, prevMap) {
       const field = appSettings.fields[key] || {};
       const idx = sourceSpecToIndex(field.source, header);
       if (idx < 0) return "";
-      return String(row[idx] || "").trim();
+      return cleanCellValue(row[idx]);
     }
 
     function renderColumnSettingsForm() {
@@ -2366,23 +2512,20 @@ function findPrevMatchForStudent(student, prevMap) {
     // =======================
     async function loadData() {
       const body = document.getElementById("tableBody");
+      renderHeader();
       body.innerHTML = `<tr class="loading-row"><td colspan="${getTableColspan()}" style="text-align:center; padding:40px;">Google Tablo'dan veriler alınıyor...</td></tr>`;
       document.getElementById("lastLoadedInfo").textContent = "Yükleniyor...";
 
       try {
-        const url = getSheetCsvUrl(currentSheetName);
-        const res = await fetch(url);
-        if (!res.ok) throw new Error("Ağ hatası: " + res.status);
-        const text = await res.text();
-
-        if (text.startsWith("<")) throw new Error("CSV yerine HTML geldi. Tablo yayın ayarlarını ve sayfa adını kontrol edin.");
-
+        const result = await fetchSheetCsv(currentSheetName);
+        const text = result.text;
         const rows = parseCSV(text);
+
         if (!rows.length) {
           students = [];
           removedRecordsCache = [];
           duplicateOkulNoMap = {};
-          body.innerHTML = `<tr class="loading-row"><td colspan="${getTableColspan()}">Tablo boş.</td></tr>`;
+          body.innerHTML = `<tr class="loading-row"><td colspan="${getTableColspan()}" style="text-align:center; padding:40px;">Google Tablo CSV olarak geldi fakat satır bulunamadı.</td></tr>`;
           updateSummary([]);
           updateListStatus([]);
           return;
@@ -2390,22 +2533,32 @@ function findPrevMatchForStudent(student, prevMap) {
 
         const headerRowIndex = Math.min(rows.length - 1, Math.max(0, (parseInt(appSettings.headerRow, 10) || 1) - 1));
         const dataStartIndex = Math.max(headerRowIndex + 1, (parseInt(appSettings.dataStartRow, 10) || (headerRowIndex + 2)) - 1);
-        const header = (rows[headerRowIndex] || []).map(h => String(h || "").trim());
-        const dataRows = rows.slice(dataStartIndex).filter(r => r.some(cell => String(cell || "").trim() !== ""));
+        const header = (rows[headerRowIndex] || []).map(h => cleanCellValue(h));
+        const dataRows = rows.slice(dataStartIndex).filter(r => r.some(cell => cleanCellValue(cell) !== ""));
 
-        const parsed = dataRows.map(row => {
+        const parsed = dataRows.map((row, index) => {
           const s = {};
           getDataFieldKeys().forEach(key => {
             s[key] = getMappedCell(row, header, key);
           });
-          s.cinsiyet = (s.cinsiyet || "").trim().toLocaleUpperCase("tr-TR");
-          s.id = createStudentId(s);
+          s.cinsiyet = cleanCellValue(s.cinsiyet).toLocaleUpperCase("tr-TR");
+          s.id = createStudentId(s) || `row_${index + dataStartIndex + 1}`;
           s.dateObj = parseDateTR(s.tarih);
           s.status = "normal";
           return s;
         }).filter(s => {
-          return getDataFieldKeys().some(key => String(s[key] || "").trim() !== "");
+          return ["isim", "soyisim", "sinif", "okulNo", "veliTelefon", "veli2Telefon"].some(key => cleanCellValue(s[key]) !== "");
         });
+
+        if (!parsed.length) {
+          students = [];
+          removedRecordsCache = [];
+          duplicateOkulNoMap = {};
+          updateSummary([]);
+          updateListStatus([]);
+          body.innerHTML = `<tr class="loading-row"><td colspan="${getTableColspan()}" style="color:#9a4f3f; text-align:center; padding:40px;">CSV alındı fakat okunabilir öğrenci kaydı oluşmadı. Ayarlar bölümünde sayfa adı, başlık satırı, veri başlangıcı ve kaynak sütunları kontrol edin.</td></tr>`;
+          return;
+        }
 
         let removed = [];
         if (snapshot && snapshot.records) {
@@ -2429,9 +2582,10 @@ function findPrevMatchForStudent(student, prevMap) {
               }
             } else {
               comparePrevId = s.id;
+              matchedPrevIds.add(comparePrevId);
             }
 
-            const prevData = prevMap[comparePrevId].data;
+            const prevData = (prevMap[comparePrevId] && prevMap[comparePrevId].data) ? prevMap[comparePrevId].data : {};
             const currentSlim = buildStudentDataObject(s);
 
             if (!sameStudentData(prevData, currentSlim)) {
@@ -2462,9 +2616,11 @@ function findPrevMatchForStudent(student, prevMap) {
 
       } catch (err) {
         console.error(err);
-        body.innerHTML = `<tr class="loading-row"><td colspan="${getTableColspan()}" style="color:red; text-align:center; padding:40px;">Hata: ${err.message}</td></tr>`;
-        document.getElementById("lastLoadedInfo").textContent = "Hata oluştu.";
+        students = [];
         removedRecordsCache = [];
+        duplicateOkulNoMap = {};
+        body.innerHTML = `<tr class="loading-row"><td colspan="${getTableColspan()}" style="color:red; text-align:center; padding:40px;">Hata: ${escapeHtml(err.message || err)}<br><span style="color:var(--text-muted); font-size:12px;">Ayarlar → E-tablo adresi/ID, bölüm adı ve Google Tablo paylaşım ayarlarını kontrol edin.</span></td></tr>`;
+        document.getElementById("lastLoadedInfo").textContent = "Hata oluştu.";
         updateSummary([]);
         updateListStatus([]);
       }
@@ -3013,6 +3169,7 @@ function findPrevMatchForStudent(student, prevMap) {
 
     document.addEventListener("DOMContentLoaded", async () => {
       renderSheetTabs();
+      renderHeader();
       setupEventListeners();
       await loadSnapshot();
       await loadData();
@@ -3020,5 +3177,3 @@ function findPrevMatchForStudent(student, prevMap) {
   </script>
 </body>
 </html>
-
-
