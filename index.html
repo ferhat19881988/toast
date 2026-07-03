@@ -988,6 +988,328 @@
 
 
 
+
+
+    /* Ekran görünümü için modern, taşmayan ve mobil uyumlu tablo sistemi */
+    @media screen{
+      .table-scroll-area{
+        max-width:100%;
+        overflow:auto;
+        overscroll-behavior:contain;
+        -webkit-overflow-scrolling:touch;
+        scrollbar-gutter: stable both-edges;
+        border-radius: 0 0 var(--radius-lg) var(--radius-lg);
+      }
+
+      .table-scroll-area::-webkit-scrollbar{
+        height: 12px;
+        width: 12px;
+      }
+
+      .table-scroll-area::-webkit-scrollbar-track{
+        background: rgba(236,242,255,.72);
+        border-radius: 999px;
+      }
+
+      .table-scroll-area::-webkit-scrollbar-thumb{
+        background: linear-gradient(180deg, rgba(125,142,247,.52), rgba(116,196,182,.44));
+        border: 3px solid rgba(236,242,255,.72);
+        border-radius: 999px;
+      }
+
+      #studentsTable{
+        width:max-content;
+        min-width:100%;
+        table-layout:auto;
+      }
+
+      #studentsTable thead th,
+      #studentsTable tbody td{
+        white-space:nowrap;
+        word-break:normal;
+        overflow-wrap:normal;
+        overflow:hidden;
+        text-overflow:ellipsis;
+      }
+
+      #studentsTable tbody td{
+        max-width: 240px;
+      }
+
+      #studentsTable th[data-field],
+      #studentsTable td[data-field]{
+        width:auto;
+      }
+
+      #studentsTable th[data-field="status"], #studentsTable td[data-field="status"]{ min-width:118px; max-width:128px; }
+      #studentsTable th[data-field="isim"], #studentsTable td[data-field="isim"]{ min-width:180px; max-width:230px; }
+      #studentsTable th[data-field="soyisim"], #studentsTable td[data-field="soyisim"]{ min-width:142px; max-width:190px; }
+      #studentsTable th[data-field="cinsiyet"], #studentsTable td[data-field="cinsiyet"]{ min-width:92px; max-width:105px; text-align:center; }
+      #studentsTable th[data-field="sinif"], #studentsTable td[data-field="sinif"]{ min-width:92px; max-width:110px; text-align:center; }
+      #studentsTable th[data-field="okulNo"], #studentsTable td[data-field="okulNo"]{ min-width:96px; max-width:112px; text-align:center; }
+      #studentsTable th[data-field="veliAdi"], #studentsTable td[data-field="veliAdi"]{ min-width:160px; max-width:220px; }
+      #studentsTable th[data-field="veliSoyadi"], #studentsTable td[data-field="veliSoyadi"]{ min-width:142px; max-width:190px; }
+      #studentsTable th[data-field="veliTelefon"], #studentsTable td[data-field="veliTelefon"]{ min-width:150px; max-width:176px; }
+      #studentsTable th[data-field="veli2Adi"], #studentsTable td[data-field="veli2Adi"]{ min-width:160px; max-width:220px; }
+      #studentsTable th[data-field="veli2Telefon"], #studentsTable td[data-field="veli2Telefon"]{ min-width:150px; max-width:176px; }
+      #studentsTable th[data-field="yil"], #studentsTable td[data-field="yil"]{ min-width:82px; max-width:98px; text-align:center; }
+      #studentsTable th[data-field="tarih"], #studentsTable td[data-field="tarih"]{ min-width:112px; max-width:130px; text-align:center; }
+      #studentsTable th[data-field="burslu"], #studentsTable td[data-field="burslu"]{ min-width:108px; max-width:126px; text-align:center; }
+    }
+
+    @media screen and (max-width: 1100px){
+      .toolbar-header{
+        align-items:stretch;
+      }
+
+      .toolbar-header .table-toolbar-left,
+      .toolbar-header .table-toolbar-right{
+        width:100%;
+      }
+
+      .toolbar-header .table-toolbar-right{
+        justify-content:flex-start;
+      }
+
+      .sheet-tabs,
+      .view-toggles{
+        max-width:100%;
+        overflow-x:auto;
+        -webkit-overflow-scrolling:touch;
+      }
+    }
+
+    @media screen and (max-width: 760px){
+      .app-shell{
+        padding:12px;
+        gap:14px;
+      }
+
+      header.app-header{
+        padding:18px;
+        border-radius:20px;
+      }
+
+      .app-title-block h1{
+        font-size:21px;
+        line-height:1.25;
+      }
+
+      .app-title-block h1 span.icon{
+        width:44px;
+        height:44px;
+        border-radius:15px;
+        font-size:21px;
+        flex:0 0 auto;
+      }
+
+      .header-meta,
+      .header-meta .chip{
+        width:100%;
+      }
+
+      .stats-container{
+        grid-template-columns:repeat(2, minmax(0, 1fr));
+        gap:10px;
+      }
+
+      .stat-card{
+        padding:14px;
+        border-radius:18px;
+      }
+
+      .stat-value{
+        font-size:28px;
+      }
+
+      .panel,
+      .table-tools-container{
+        border-radius:20px;
+      }
+
+      .toolbar-header{
+        padding:14px;
+        gap:12px;
+      }
+
+      .sheet-tabs{
+        flex-wrap:nowrap;
+      }
+
+      .sheet-tab,
+      .view-toggles button,
+      .table-toolbar-right .btn{
+        flex:1 1 auto;
+      }
+
+      .view-toggles,
+      .table-toolbar-right{
+        width:100% !important;
+      }
+
+      .table-toolbar-right .btn{
+        min-width:calc(50% - 6px);
+      }
+
+      #listStatusBar{
+        padding:10px 14px !important;
+        line-height:1.55;
+      }
+
+      .table-tools-container > .no-print{
+        padding:10px 14px !important;
+      }
+
+      .table-scroll-area{
+        max-height:none;
+        overflow:visible;
+        padding:12px;
+        background: linear-gradient(180deg, rgba(248,251,255,.96), rgba(241,246,255,.96));
+      }
+
+      #studentsTable,
+      #studentsTable thead,
+      #studentsTable tbody,
+      #studentsTable tr,
+      #studentsTable td{
+        display:block;
+        width:100%;
+        min-width:0;
+        max-width:none;
+      }
+
+      #studentsTable{
+        min-width:0;
+        border-spacing:0;
+      }
+
+      #studentsTable thead{
+        display:none;
+      }
+
+      #studentsTable tbody{
+        display:flex;
+        flex-direction:column;
+        gap:12px;
+      }
+
+      #studentsTable tbody tr{
+        background: rgba(255,255,255,.96);
+        border: 1px solid rgba(148,163,184,.24);
+        border-radius:18px;
+        overflow:hidden;
+        box-shadow: 0 12px 26px rgba(125,142,247,.09);
+        padding:6px 0;
+      }
+
+      #studentsTable tbody tr:hover{
+        background: rgba(255,255,255,.98);
+        transform:none;
+      }
+
+      #studentsTable tbody tr.new-row{
+        border-color: rgba(116,196,182,.36);
+        background: linear-gradient(180deg, rgba(244,255,252,.98), rgba(255,255,255,.97));
+      }
+
+      #studentsTable tbody tr.updated-row{
+        border-color: rgba(255,188,165,.46);
+        background: linear-gradient(180deg, rgba(255,248,245,.98), rgba(255,255,255,.97));
+      }
+
+      #studentsTable tbody td{
+        display:grid;
+        grid-template-columns:minmax(96px, 36%) minmax(0, 1fr);
+        gap:10px;
+        align-items:start;
+        padding:10px 14px;
+        border-bottom:1px solid rgba(226,232,240,.86);
+        color: var(--ink-1);
+        font-size:13px;
+        line-height:1.4;
+        white-space:normal;
+        word-break:normal;
+        overflow-wrap:anywhere;
+        overflow:visible;
+        text-overflow:clip;
+        text-align:left !important;
+        background:transparent !important;
+      }
+
+      #studentsTable tbody td:last-child{
+        border-bottom:none;
+      }
+
+      #studentsTable tbody td::before{
+        content:attr(data-label);
+        color: rgba(71,85,105,.78);
+        font-size:10.5px;
+        font-weight:900;
+        letter-spacing:.06em;
+        text-transform:uppercase;
+      }
+
+      #studentsTable tbody td[data-empty="true"]::after{
+        content:"—";
+        color: rgba(100,116,139,.72);
+      }
+
+      #studentsTable tbody td[data-field="status"]{
+        grid-template-columns:1fr;
+        padding:10px 14px 8px;
+      }
+
+      #studentsTable tbody td[data-field="status"]::before,
+      #studentsTable tbody td[data-field="status"][data-empty="true"]::after{
+        display:none;
+      }
+
+      #studentsTable tbody td[data-field="status"] .status-badge{
+        width:100%;
+        min-width:0;
+        padding:8px 10px;
+        border-radius:13px;
+      }
+
+      #studentsTable tbody tr.loading-row,
+      #studentsTable tbody tr.empty-state-row{
+        background:rgba(255,255,255,.95);
+        border-radius:18px;
+        padding:0;
+      }
+
+      #studentsTable tbody tr.loading-row td,
+      #studentsTable tbody tr.empty-state-row td{
+        display:block;
+        text-align:center !important;
+        padding:26px 18px !important;
+      }
+
+      #studentsTable tbody tr.loading-row td::before,
+      #studentsTable tbody tr.loading-row td::after,
+      #studentsTable tbody tr.empty-state-row td::before,
+      #studentsTable tbody tr.empty-state-row td::after{
+        display:none;
+      }
+    }
+
+    @media screen and (max-width: 480px){
+      .stats-container{
+        grid-template-columns:1fr;
+      }
+
+      .table-toolbar-right .btn{
+        min-width:100%;
+      }
+
+      #studentsTable tbody td{
+        grid-template-columns:1fr;
+        gap:3px;
+        padding:10px 12px;
+      }
+    }
+
+
     /* Source Settings Modal */
     .settings-modal-card{
       max-width: 860px;
@@ -2944,7 +3266,7 @@ function compareCurrentStudentsWithSnapshot(currentStudents, snap) {
       body.innerHTML = "";
 
       if (!rows.length) {
-        body.innerHTML = `<tr><td colspan="${getTableColspan()}" style="text-align:center; padding:30px; color:var(--text-muted)">Eşleşen kayıt bulunamadı.</td></tr>`;
+        body.innerHTML = `<tr class="empty-state-row"><td colspan="${getTableColspan()}" style="text-align:center; padding:30px; color:var(--text-muted)">Eşleşen kayıt bulunamadı.</td></tr>`;
         return;
       }
 
@@ -2957,26 +3279,29 @@ function compareCurrentStudentsWithSnapshot(currentStudents, snap) {
         COLUMNS.forEach((col, index) => {
           const td = document.createElement("td");
           td.dataset.field = col.key;
+          td.dataset.label = col.label;
           
           if (col.key === "status") {
             const span = document.createElement("span");
             if (s.status === "new") {
               span.className = "status-badge new";
               span.textContent = `✨ YENİ`;
+              td.title = "Durum: Yeni kayıt";
             } else if (s.status === "updated") {
               span.className = "status-badge updated";
               span.textContent = `📝 GÜNCEL`;
+              td.title = "Durum: Güncellenen kayıt";
             } else {
               span.className = "status-badge normal";
               span.textContent = `NORMAL`;
+              td.title = "Durum: Değişiklik yok";
             }
             td.appendChild(span);
           } else {
-              if (col.key === "veliTelefon") {
-                td.textContent = s[col.key] || "";
-              } else {
-                td.textContent = s[col.key] || "";
-              }
+            const value = String(s[col.key] || "").trim();
+            td.textContent = value;
+            td.dataset.empty = value ? "false" : "true";
+            if (value) td.title = `${col.label}: ${value}`;
           }
           tr.appendChild(td);
         });
