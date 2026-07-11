@@ -1416,6 +1416,56 @@
     }
 
 
+    /* Yoklama Listesi */
+    .attendance-modal-card{ max-width:680px; }
+    .attendance-help{
+      margin-bottom:16px;
+      padding:12px 14px;
+      border:1px solid rgba(125,142,247,.20);
+      border-radius:16px;
+      background:linear-gradient(180deg, rgba(236,242,255,.96), rgba(247,250,255,.94));
+      color:rgba(30,41,59,.82);
+      font-size:12.5px;
+      font-weight:700;
+    }
+    .attendance-date-list{ display:flex; flex-direction:column; gap:10px; }
+    .attendance-date-row{
+      display:grid;
+      grid-template-columns:42px minmax(0,1fr) 42px;
+      gap:10px;
+      align-items:center;
+    }
+    .attendance-date-index{
+      width:36px;
+      height:36px;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      border-radius:12px;
+      background:var(--primary-light);
+      color:var(--primary-dark);
+      font-weight:900;
+    }
+    .attendance-remove-date{
+      width:38px;
+      height:38px;
+      padding:0;
+      border-radius:12px;
+    }
+    .attendance-actions{
+      display:flex;
+      justify-content:space-between;
+      align-items:center;
+      gap:10px;
+      margin-top:18px;
+      flex-wrap:wrap;
+    }
+    @media (max-width:560px){
+      .attendance-date-row{ grid-template-columns:34px minmax(0,1fr) 38px; gap:7px; }
+      .attendance-date-index{ width:32px; height:32px; }
+      .attendance-actions > *{ width:100%; }
+    }
+
     /* Toast */
     .toast{
       position:fixed;
@@ -1993,6 +2043,9 @@
             <button class="btn btn-secondary btn-sm no-print" id="uploadTxtBtn">
               📤 Karşılaştır
             </button>
+            <button class="btn btn-secondary btn-sm no-print" id="attendanceBtn" type="button">
+              ☑️ Yoklama Listesi
+            </button>
             <button class="btn btn-secondary btn-sm no-print" id="printBtn">
               🖨️ Yazdır
             </button>
@@ -2050,6 +2103,34 @@
     </div>
   </div>
 
+
+  <div class="modal-overlay" id="attendanceModal">
+    <div class="modal-card attendance-modal-card">
+      <form id="attendanceForm">
+        <div class="modal-header">
+          <div>
+            <div class="modal-title">Yoklama Listesi Oluştur</div>
+            <div class="muted-text">Listede görüntülenen öğrenciler isimlerine göre A'dan Z'ye sıralanır.</div>
+          </div>
+          <button class="modal-close" type="button" id="attendanceCloseBtn">×</button>
+        </div>
+        <div class="modal-body">
+          <div class="attendance-help">
+            Yoklamanın kullanılacağı tarihleri ekleyin. En fazla dört tarih seçilebilir. Çıktıda her öğrenci için 1, 2, 3 ve 4 numaralı dört boş yoklama kutusu bulunur.
+          </div>
+          <div class="field-label" style="margin-bottom:9px;">Yoklama Tarihleri</div>
+          <div class="attendance-date-list" id="attendanceDateList"></div>
+          <div class="attendance-actions">
+            <button class="btn btn-secondary btn-sm" id="addAttendanceDateBtn" type="button">＋ Tarih Ekle</button>
+            <div style="display:flex; gap:8px; flex-wrap:wrap; justify-content:flex-end;">
+              <button class="btn btn-secondary btn-sm" type="button" id="attendanceCancelBtn">Vazgeç</button>
+              <button class="btn btn-primary btn-sm" type="submit">🖨️ Yoklamayı Yazdır</button>
+            </div>
+          </div>
+        </div>
+      </form>
+    </div>
+  </div>
 
   <div class="modal-overlay" id="sourceSettingsModal">
     <div class="modal-card settings-modal-card">
@@ -2227,6 +2308,7 @@
     let activeViewMode = "all";
     let duplicateOkulNoMap = {}; // { okulNo: [student, ...] }
     let removedRecordsCache = [];
+    let currentFilteredStudents = [];
 
 
 // =======================
@@ -3256,6 +3338,7 @@ function compareCurrentStudentsWithSnapshot(currentStudents, snap) {
 
       if (recentOnly && filtered.length > 30) filtered = filtered.slice(0, 30);
 
+      currentFilteredStudents = filtered.slice();
       renderTable(filtered);
       updateSummary(removedRecords);
       updateListStatus(filtered);
@@ -3327,6 +3410,139 @@ function compareCurrentStudentsWithSnapshot(currentStudents, snap) {
       });
     }
 
+    function escapeHtml(value) {
+      return String(value ?? "")
+        .replace(/&/g, "&amp;")
+        .replace(/</g, "&lt;")
+        .replace(/>/g, "&gt;")
+        .replace(/"/g, "&quot;")
+        .replace(/'/g, "&#039;");
+    }
+
+    function formatAttendanceDate(value) {
+      if (!value) return "";
+      const parts = String(value).split("-");
+      return parts.length === 3 ? `${parts[2]}.${parts[1]}.${parts[0]}` : value;
+    }
+
+    function refreshAttendanceDateRows() {
+      const list = document.getElementById("attendanceDateList");
+      const rows = Array.from(list.querySelectorAll(".attendance-date-row"));
+      rows.forEach((row, index) => {
+        row.querySelector(".attendance-date-index").textContent = index + 1;
+        const input = row.querySelector("input[type='date']");
+        input.setAttribute("aria-label", `${index + 1}. yoklama tarihi`);
+        row.querySelector(".attendance-remove-date").style.visibility = rows.length === 1 ? "hidden" : "visible";
+      });
+      document.getElementById("addAttendanceDateBtn").disabled = rows.length >= 4;
+    }
+
+    function addAttendanceDateRow(value = "") {
+      const list = document.getElementById("attendanceDateList");
+      if (list.children.length >= 4) return;
+      const row = document.createElement("div");
+      row.className = "attendance-date-row";
+      row.innerHTML = `
+        <span class="attendance-date-index"></span>
+        <input type="date" value="${escapeHtml(value)}" required>
+        <button class="btn btn-secondary attendance-remove-date" type="button" title="Tarihi kaldır">×</button>
+      `;
+      row.querySelector(".attendance-remove-date").addEventListener("click", () => {
+        row.remove();
+        refreshAttendanceDateRows();
+      });
+      list.appendChild(row);
+      refreshAttendanceDateRows();
+    }
+
+    function openAttendanceModal() {
+      const list = document.getElementById("attendanceDateList");
+      list.innerHTML = "";
+      addAttendanceDateRow();
+      document.getElementById("attendanceModal").classList.add("active");
+    }
+
+    function closeAttendanceModal() {
+      document.getElementById("attendanceModal").classList.remove("active");
+    }
+
+    function getAttendanceStudents() {
+      return currentFilteredStudents.slice().sort((a, b) => {
+        const nameA = [a.isim, a.soyisim].filter(Boolean).join(" ").trim();
+        const nameB = [b.isim, b.soyisim].filter(Boolean).join(" ").trim();
+        const byName = nameA.localeCompare(nameB, "tr", { sensitivity: "base" });
+        if (byName !== 0) return byName;
+        return String(a.okulNo || "").localeCompare(String(b.okulNo || ""), "tr", { numeric: true });
+      });
+    }
+
+    function printAttendanceList(dates) {
+      const attendanceStudents = getAttendanceStudents();
+      if (!attendanceStudents.length) {
+        showToast("Yoklama listesi için görüntülenen öğrenci bulunmuyor.");
+        return;
+      }
+
+      const dateItems = dates.map((date, index) => `<span><b>${index + 1}.</b> ${escapeHtml(formatAttendanceDate(date))}</span>`).join("");
+      const rows = attendanceStudents.map(student => {
+        const fullName = [student.isim, student.soyisim].filter(Boolean).join(" ").trim();
+        const boxes = [1, 2, 3, 4].map(() => `<td class="check-cell"><span class="check-box"></span></td>`).join("");
+        return `<tr>
+          <td class="number-cell">${escapeHtml(student.okulNo || "")}</td>
+          <td class="name-cell">${escapeHtml(fullName)}</td>
+          <td class="class-cell">${escapeHtml(student.sinif || "")}</td>
+          ${boxes}
+        </tr>`;
+      }).join("");
+
+      const printWindow = window.open("", "_blank", "noopener,noreferrer");
+      if (!printWindow) {
+        showToast("Yazdırma penceresi açılamadı. Tarayıcı açılır pencere iznini kontrol edin.");
+        return;
+      }
+
+      printWindow.document.write(`<!DOCTYPE html>
+<html lang="tr"><head><meta charset="UTF-8"><title>Fenomen Eğitim Konuları Yoklama Listesi</title>
+<style>
+  @page{size:A4 portrait;margin:10mm}
+  *{box-sizing:border-box}
+  body{margin:0;color:#000;font-family:Arial,'Segoe UI',sans-serif}
+  h1{margin:0;text-align:center;font-size:20px;letter-spacing:.6px;text-transform:uppercase}
+  .dates{display:flex;flex-wrap:wrap;justify-content:center;gap:8px 20px;margin:9px 0 14px;font-size:12px;min-height:18px}
+  .dates span{white-space:nowrap}
+  table{width:100%;border-collapse:collapse;table-layout:fixed}
+  th,td{border:1.2px solid #000;padding:5px 6px;font-size:11px}
+  th{text-align:center;font-weight:700;background:#fff}
+  tbody tr{height:28px;break-inside:avoid}
+  .number-cell,.class-cell{text-align:center}
+  .number-col{width:13%}.name-col{width:43%}.class-col{width:12%}.check-col{width:8%}
+  .check-cell{text-align:center;vertical-align:middle;padding:3px}
+  .check-box{display:inline-block;width:15px;height:15px;border:1.4px solid #000}
+  .check-number{display:block;font-size:11px;font-weight:700;line-height:1}
+  thead{display:table-header-group}
+</style></head><body>
+<h1>FENOMEN EĞİTİM KONULARI YOKLAMA LİSTESİ</h1>
+<div class="dates">${dateItems}</div>
+<table>
+  <thead><tr>
+    <th class="number-col" rowspan="2">ÖĞRENCİ NO</th>
+    <th class="name-col" rowspan="2">ÖĞRENCİNİN ADI SOYADI</th>
+    <th class="class-col" rowspan="2">SINIFI</th>
+    <th colspan="4">YOKLAMA</th>
+  </tr><tr>
+    <th class="check-col"><span class="check-number">1</span></th>
+    <th class="check-col"><span class="check-number">2</span></th>
+    <th class="check-col"><span class="check-number">3</span></th>
+    <th class="check-col"><span class="check-number">4</span></th>
+  </tr></thead>
+  <tbody>${rows}</tbody>
+</table>
+<script>window.addEventListener('load',()=>{setTimeout(()=>window.print(),100)});<\/script>
+</body></html>`);
+      printWindow.document.close();
+      closeAttendanceModal();
+    }
+
     // =======================
     // INIT & EVENTS
     // =======================
@@ -3369,6 +3585,26 @@ function compareCurrentStudentsWithSnapshot(currentStudents, snap) {
         await loadData();
       });
       document.getElementById("saveSnapshotBtn").addEventListener("click", () => saveSnapshot(students));
+
+      document.getElementById("attendanceBtn").addEventListener("click", openAttendanceModal);
+      document.getElementById("attendanceCloseBtn").addEventListener("click", closeAttendanceModal);
+      document.getElementById("attendanceCancelBtn").addEventListener("click", closeAttendanceModal);
+      document.getElementById("addAttendanceDateBtn").addEventListener("click", () => addAttendanceDateRow());
+      document.getElementById("attendanceModal").addEventListener("click", (e) => {
+        if (e.target === document.getElementById("attendanceModal")) closeAttendanceModal();
+      });
+      document.getElementById("attendanceForm").addEventListener("submit", (e) => {
+        e.preventDefault();
+        const dates = Array.from(document.querySelectorAll("#attendanceDateList input[type='date']"))
+          .map(input => input.value)
+          .filter(Boolean);
+        if (!dates.length) {
+          showToast("En az bir yoklama tarihi seçin.");
+          return;
+        }
+        printAttendanceList(dates);
+      });
+
       document.getElementById("printBtn").addEventListener("click", () => {
         syncPrintColumnVisibility();
         document.body.classList.add("print-preparing");
