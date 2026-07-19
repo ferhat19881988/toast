@@ -1416,6 +1416,149 @@
     }
 
 
+
+    /* Gelişmiş Ayarlar ve Dinamik Filtreler */
+    .settings-modal-card{ max-width:1180px; }
+    .settings-tabbar{
+      display:flex;
+      gap:8px;
+      padding:5px;
+      margin-bottom:18px;
+      border:1px solid rgba(148,163,184,.24);
+      border-radius:16px;
+      background:rgba(236,242,255,.72);
+      overflow-x:auto;
+    }
+    .settings-tab{
+      flex:1 1 0;
+      min-width:160px;
+      min-height:40px;
+      border:0;
+      border-radius:12px;
+      background:transparent;
+      color:rgba(30,41,59,.72);
+      font-weight:900;
+      cursor:pointer;
+    }
+    .settings-tab.active{
+      background:#fff;
+      color:var(--primary-dark);
+      box-shadow:0 10px 18px rgba(125,142,247,.12);
+    }
+    .settings-tab-panel{ display:none; }
+    .settings-tab-panel.active{ display:block; }
+    .source-settings-list{ display:flex; flex-direction:column; gap:14px; margin-bottom:14px; }
+    .source-settings-card{
+      border:1px solid rgba(148,163,184,.25);
+      border-radius:18px;
+      padding:16px;
+      background:rgba(255,255,255,.78);
+      box-shadow:0 12px 22px rgba(125,142,247,.06);
+    }
+    .source-card-head{
+      display:flex;
+      align-items:center;
+      gap:10px;
+      justify-content:space-between;
+      margin-bottom:12px;
+    }
+    .source-name-input{ font-weight:900 !important; }
+    .source-card-actions{ display:flex; align-items:center; gap:10px; flex:0 0 auto; }
+    .source-basic-grid{
+      display:grid;
+      grid-template-columns:minmax(260px,1.5fr) minmax(170px,.8fr) 110px 110px;
+      gap:10px;
+      align-items:end;
+    }
+    .source-mapping-details{ margin-top:12px; }
+    .source-mapping-details summary{
+      cursor:pointer;
+      font-size:13px;
+      font-weight:900;
+      color:var(--primary-dark);
+      padding:8px 0;
+    }
+    .source-mapping-grid{
+      display:grid;
+      grid-template-columns:repeat(2,minmax(0,1fr));
+      gap:9px;
+      padding-top:8px;
+    }
+    .source-map-row{
+      display:grid;
+      grid-template-columns:minmax(120px,.9fr) minmax(110px,1.1fr);
+      gap:8px;
+      align-items:center;
+      padding:8px 10px;
+      border:1px solid rgba(226,232,240,.9);
+      border-radius:13px;
+      background:rgba(248,251,255,.86);
+    }
+    .source-map-label{ font-size:12px; font-weight:800; color:var(--ink-1); }
+    .source-map-row input{ min-height:38px; padding:7px 10px; }
+    .field-settings-head,.field-settings-row{
+      display:grid;
+      grid-template-columns:minmax(120px,.7fr) minmax(180px,1.3fr) 150px 90px 54px;
+      gap:10px;
+      align-items:center;
+      padding:10px 14px;
+    }
+    .field-settings-head,.filter-settings-head{
+      background:linear-gradient(180deg,rgba(245,248,255,.98),rgba(238,244,255,.96));
+      color:rgba(51,65,85,.88);
+      font-size:11px;
+      font-weight:900;
+      text-transform:uppercase;
+      letter-spacing:.08em;
+      border-bottom:1px solid rgba(226,232,240,.92);
+    }
+    .field-settings-row,.filter-settings-row{ border-bottom:1px solid rgba(226,232,240,.78); }
+    .field-settings-row:last-child,.filter-settings-row:last-child{ border-bottom:0; }
+    .field-key-badge{
+      display:inline-flex;
+      width:max-content;
+      max-width:100%;
+      padding:5px 8px;
+      border-radius:9px;
+      background:var(--primary-light);
+      color:var(--primary-dark);
+      font-size:11px;
+      font-weight:900;
+      overflow:hidden;
+      text-overflow:ellipsis;
+    }
+    .filter-settings-head,.filter-settings-row{
+      display:grid;
+      grid-template-columns:minmax(180px,1.5fr) 130px 110px 160px;
+      gap:10px;
+      align-items:center;
+      padding:10px 14px;
+    }
+    .settings-check{ display:flex; align-items:center; gap:7px; font-size:12px; font-weight:800; }
+    .dynamic-filters{ display:flex; flex-direction:column; gap:14px; }
+    .dynamic-filter-row{ display:flex; flex-direction:column; gap:7px; }
+    .dynamic-date-grid{ display:grid; grid-template-columns:1fr 1fr; gap:10px; }
+    .dynamic-filter-empty{
+      padding:12px 14px;
+      border:1px dashed rgba(148,163,184,.38);
+      border-radius:14px;
+      color:var(--text-muted);
+      font-size:12px;
+      font-weight:700;
+      background:rgba(255,255,255,.56);
+    }
+    @media(max-width:900px){
+      .source-basic-grid{ grid-template-columns:1fr 1fr; }
+      .source-mapping-grid{ grid-template-columns:1fr; }
+      .field-settings-head,.field-settings-row,.filter-settings-head,.filter-settings-row{ grid-template-columns:1fr; }
+    }
+    @media(max-width:560px){
+      .source-basic-grid{ grid-template-columns:1fr; }
+      .source-card-head{ align-items:flex-start; flex-direction:column; }
+      .source-card-actions{ width:100%; justify-content:space-between; }
+      .dynamic-date-grid{ grid-template-columns:1fr; }
+    }
+
     /* Yoklama Listesi */
     .attendance-modal-card{ max-width:680px; }
     .attendance-help{
@@ -1939,65 +2082,16 @@
           <div class="filters-stack">
             <div class="field-group">
               <div class="field-label">Genel Arama</div>
-              <input type="text" id="searchInput" placeholder="İsim, No, Veli..." />
+              <input type="text" id="searchInput" placeholder="Görünen tüm alanlarda ara..." />
             </div>
 
-            <div style="display:grid; grid-template-columns: 1fr 1fr; gap:10px;">
-              <div class="field-group">
-                <div class="field-label">Cinsiyet</div>
-                <select id="genderFilter">
-                  <option value="">Tümü</option>
-                  <option value="KIZ">Kız</option>
-                  <option value="ERKEK">Erkek</option>
-                </select>
-              </div>
-              <div class="field-group">
-                <div class="field-label">Burs</div>
-                <select id="scholarFilter">
-                  <option value="">Tümü</option>
-                  <option value="nonempty">Burslu</option>
-                  <option value="empty">Burssuz</option>
-                </select>
-              </div>
-            </div>
+            <div id="dynamicFiltersContainer" class="dynamic-filters"></div>
 
-            <div class="field-group">
-              <div class="field-label">Kayıt Durumu</div>
-              <select id="statusFilter">
-                <option value="">Tüm Durumlar</option>
-                <option value="new">Sadece Yeni</option>
-                <option value="updated">Güncellenenler</option>
-                <option value="normal">Değişiklik Yok</option>
+            <div class="field-group" id="sortFieldGroup">
+              <div class="field-label">Sıralama</div>
+              <select id="generalSortOrder">
+                <option value="">Otomatik (Durum öncelikli)</option>
               </select>
-            </div>
-
-            <div style="display:grid; grid-template-columns: 1fr 1fr; gap:10px;">
-              <div class="field-group">
-                <div class="field-label">Başlangıç Tarihi</div>
-                <input type="date" id="dateFrom" />
-              </div>
-              <div class="field-group">
-                <div class="field-label">Bitiş Tarihi</div>
-                <input type="date" id="dateTo" />
-              </div>
-            </div>
-
-            <div class="field-group">
-                <div class="field-label">Sıralama Seçenekleri</div>
-                <select id="generalSortOrder">
-                    <option value="">Otomatik (Durum Öncelikli)</option>
-                    <option value="name_asc">İsim (A → Z)</option>
-                    <option value="name_desc">İsim (Z → A)</option>
-                    <option value="num_asc">Numara (Küçük → Büyük)</option>
-                    <option value="num_desc">Numara (Büyük → Küçük)</option>
-                    <option value="date_desc">Tarih (Yeniden → Eskiye)</option>
-                    <option value="date_asc">Tarih (Eskiden → Yeniye)</option>
-                </select>
-            </div>
-
-            <div class="field-group">
-              <div class="field-label">Sınıflar</div>
-              <div id="classFilterContainer" class="class-chips"></div>
             </div>
 
             <div class="field-group">
@@ -2006,9 +2100,11 @@
                 <span>Sadece son 30 kayıt</span>
               </label>
             </div>
-            
+
+            <div id="activeFilterInfo" class="settings-help" style="display:none; margin:0;"></div>
+
             <hr style="border:0; border-top:1px solid var(--border); width:100%;">
-            
+
             <div style="display:flex; flex-direction:column; gap:8px;">
                <button class="btn btn-secondary" id="reloadBtn" type="button">
                  🔄 Verileri Yenile
@@ -2137,49 +2233,56 @@
       <form id="sourceSettingsForm">
         <div class="modal-header">
           <div>
-            <div class="modal-title">Veri Kaynağı Ayarları</div>
-            <div class="muted-text">E-tablo adresini, bölüm adını ve okunacak sütunları buradan değiştirin.</div>
+            <div class="modal-title">Gelişmiş Sistem Ayarları</div>
+            <div class="muted-text">Veri kaynaklarını, alanları, sütun eşlemelerini ve filtreleri tek yerden yönetin.</div>
           </div>
-          <button class="modal-close" type="button" onclick="closeSourceSettingsModal()">×</button>
+          <button class="modal-close" type="button" id="sourceSettingsCloseBtn">×</button>
         </div>
         <div class="modal-body">
-          <div class="settings-help">
-            Varsayılan ayar: aynı Google e-tablosu, <b>2026 YAZ LGS</b> bölümü. Sütun kutularına <b>A, B, C</b> gibi harf, <b>1, 2, 3</b> gibi sıra numarası veya doğrudan başlık adı yazabilirsiniz. Aynı isimli sütunlar için harf kullanmanız önerilir.
+          <div class="settings-tabbar" role="tablist" aria-label="Ayar bölümleri">
+            <button type="button" class="settings-tab active" data-settings-tab="sources">Veri Kaynakları</button>
+            <button type="button" class="settings-tab" data-settings-tab="fields">Alanlar ve Sütunlar</button>
+            <button type="button" class="settings-tab" data-settings-tab="filters">Filtreler ve Sıralama</button>
           </div>
 
-          <div class="settings-grid">
-            <div class="field-group">
-              <div class="field-label">E-tablo adresi veya ID</div>
-              <input type="text" id="settingsSheetUrl" placeholder="Google Sheets linki veya ID" />
+          <section class="settings-tab-panel active" data-settings-panel="sources">
+            <div class="settings-help">
+              Birden fazla Google e-tablo kaynağı ekleyebilirsiniz. Etkin kaynaklar birlikte okunur ve tek listede birleştirilir. Her kaynağın sütun eşlemesi ayrı tutulur.
             </div>
-            <div class="field-group">
-              <div class="field-label">Bölüm / Sayfa adı</div>
-              <input type="text" id="settingsSheetName" placeholder="2026 YAZ LGS" />
-            </div>
-            <div class="field-group">
-              <div class="field-label">Başlık satırı</div>
-              <input type="text" id="settingsHeaderRow" placeholder="1" />
-            </div>
-            <div class="field-group">
-              <div class="field-label">Veri başlangıcı</div>
-              <input type="text" id="settingsDataStartRow" placeholder="2" />
-            </div>
-          </div>
+            <div id="sourceSettingsRows" class="source-settings-list"></div>
+            <button class="btn btn-secondary btn-sm" id="addSourceBtn" type="button">＋ Veri Kaynağı Ekle</button>
+          </section>
 
-          <div class="mapping-list">
-            <div class="mapping-head">
-              <div>Alan</div>
-              <div>Kaynak sütun</div>
-              <div>Tabloda göster</div>
+          <section class="settings-tab-panel" data-settings-panel="fields">
+            <div class="settings-help">
+              Buradan tablo alanlarını ekleyip kaldırabilir, ekrandaki sütun başlığını ve veri türünü değiştirebilirsiniz. Öğrenci adı ve öğrenci numarası kimlik eşleştirmesi için korunur; istenirse tabloda gizlenebilir.
             </div>
-            <div id="columnMappingRows"></div>
-          </div>
+            <div class="mapping-list">
+              <div class="field-settings-head">
+                <div>Alan</div><div>Başlık</div><div>Tür</div><div>Göster</div><div></div>
+              </div>
+              <div id="fieldSettingsRows"></div>
+            </div>
+            <button class="btn btn-secondary btn-sm" id="addFieldBtn" type="button" style="margin-top:12px;">＋ Yeni Alan Ekle</button>
+          </section>
+
+          <section class="settings-tab-panel" data-settings-panel="filters">
+            <div class="settings-help">
+              Yalnızca işaretlenen ve etkin kaynaklarda dolu verisi bulunan alanlar filtre veya sıralama seçeneği olarak gösterilir. Böylece olmayan cinsiyet, burs veya tarih alanları ekranda yer kaplamaz.
+            </div>
+            <div class="mapping-list">
+              <div class="filter-settings-head">
+                <div>Alan</div><div>Dinamik filtre</div><div>Sıralama</div><div>Veri türü</div>
+              </div>
+              <div id="filterSettingsRows"></div>
+            </div>
+          </section>
 
           <div class="settings-actions">
             <button class="btn btn-secondary btn-sm" id="resetSourceSettingsBtn" type="button">↩️ Varsayılana Dön</button>
             <div style="display:flex; gap:8px; flex-wrap:wrap; justify-content:flex-end;">
-              <button class="btn btn-secondary btn-sm" type="button" onclick="closeSourceSettingsModal()">Vazgeç</button>
-              <button class="btn btn-primary btn-sm" type="submit">✅ Kaydet ve Yenile</button>
+              <button class="btn btn-secondary btn-sm" type="button" id="sourceSettingsCancelBtn">Vazgeç</button>
+              <button class="btn btn-primary btn-sm" type="submit">✅ Firebase'e Kaydet ve Yenile</button>
             </div>
           </div>
         </div>
@@ -2192,73 +2295,79 @@
     // KONFİGÜRASYON
     // =======================
     const DEFAULT_SPREADSHEET_INPUT = "16BD_BrNLYBaXviCzB8yDKBGS2Vdj5DHi";
-    const SETTINGS_STORAGE_KEY = "ogrenci_listesi_source_settings_v4";
+    const SETTINGS_STORAGE_KEY = "ogrenci_listesi_source_settings_v5";
+    const FIREBASE_APP_BASE_PATH = "studentListManager/v5";
 
-    const DEFAULT_APP_SETTINGS = {
-      spreadsheetInput: DEFAULT_SPREADSHEET_INPUT,
-      sheetName: "2026 YAZ LGS",
-      headerRow: 1,
-      dataStartRow: 2,
-      fields: {
-        isim:         { label: "İSİM / TAM AD", source: "A", visible: true,  hint: "Örn. İsim*" },
-        soyisim:      { label: "SOYİSİM",       source: "",  visible: false, hint: "Ayrı soyisim sütunu varsa" },
-        cinsiyet:     { label: "CİNSİYET",      source: "",  visible: false, hint: "Kız / Erkek" },
-        sinif:        { label: "SINIF",         source: "B", visible: true,  hint: "Örn. Sınıf*" },
-        okulNo:       { label: "ÖĞRENCİ NO",    source: "C", visible: true,  hint: "Örn. Öğrenci No" },
-        veliAdi:      { label: "VELİ 1 ADI",    source: "D", visible: true,  hint: "İlk veli adı" },
-        veliSoyadi:   { label: "VELİ 1 SOYADI", source: "",  visible: false, hint: "Ayrı soyadı sütunu varsa" },
-        veliTelefon:  { label: "VELİ 1 TELEFON",source: "E", visible: true,  hint: "İlk telefon" },
-        veli2Adi:     { label: "VELİ 2 ADI",    source: "F", visible: true,  hint: "İkinci veli adı" },
-        veli2Telefon: { label: "VELİ 2 TELEFON",source: "G", visible: true,  hint: "İkinci telefon" },
-        yil:          { label: "YIL",           source: "",  visible: false, hint: "Varsa" },
-        tarih:        { label: "TARİH",         source: "",  visible: false, hint: "gg.aa.yyyy" },
-        burslu:       { label: "BURSLU MU?",    source: "",  visible: false, hint: "Varsa" }
-      }
+    const DEFAULT_FIELD_DEFINITIONS = {
+      isim:         { label: "İSİM / TAM AD", type: "text",   visible: true,  filterable: false, sortable: true,  locked: true,  hint: "Öğrenci adı" },
+      soyisim:      { label: "SOYİSİM",       type: "text",   visible: false, filterable: false, sortable: true,  locked: false, hint: "Ayrı soyisim alanı" },
+      cinsiyet:     { label: "CİNSİYET",      type: "select", visible: false, filterable: true,  sortable: true,  locked: false, hint: "Kız / Erkek" },
+      sinif:        { label: "SINIF",         type: "select", visible: true,  filterable: true,  sortable: true,  locked: false, hint: "Sınıf veya grup" },
+      okulNo:       { label: "ÖĞRENCİ NO",    type: "number", visible: true,  filterable: false, sortable: true,  locked: true,  hint: "Öğrenci numarası" },
+      veliAdi:      { label: "VELİ 1 ADI",    type: "text",   visible: true,  filterable: false, sortable: true,  locked: false, hint: "İlk veli adı" },
+      veliSoyadi:   { label: "VELİ 1 SOYADI", type: "text",   visible: false, filterable: false, sortable: true,  locked: false, hint: "İlk veli soyadı" },
+      veliTelefon:  { label: "VELİ 1 TELEFON",type: "phone",  visible: true,  filterable: false, sortable: false, locked: false, hint: "İlk telefon" },
+      veli2Adi:     { label: "VELİ 2 ADI",    type: "text",   visible: true,  filterable: false, sortable: true,  locked: false, hint: "İkinci veli adı" },
+      veli2Telefon: { label: "VELİ 2 TELEFON",type: "phone",  visible: true,  filterable: false, sortable: false, locked: false, hint: "İkinci telefon" },
+      yil:          { label: "YIL",           type: "number", visible: false, filterable: true,  sortable: true,  locked: false, hint: "Kayıt yılı" },
+      tarih:        { label: "TARİH",         type: "date",   visible: false, filterable: true,  sortable: true,  locked: false, hint: "gg.aa.yyyy" },
+      burslu:       { label: "BURSLU MU?",    type: "select", visible: false, filterable: true,  sortable: true,  locked: false, hint: "Burs bilgisi" }
     };
 
-    const FIELD_ORDER = Object.keys(DEFAULT_APP_SETTINGS.fields);
+    const DEFAULT_SOURCE_MAPPINGS = {
+      isim: "A", soyisim: "", cinsiyet: "", sinif: "B", okulNo: "C",
+      veliAdi: "D", veliSoyadi: "", veliTelefon: "E", veli2Adi: "F",
+      veli2Telefon: "G", yil: "", tarih: "", burslu: ""
+    };
+
+    const DEFAULT_APP_SETTINGS = {
+      version: 5,
+      sources: [{
+        id: "source_default",
+        name: "2026 YAZ LGS",
+        spreadsheetInput: DEFAULT_SPREADSHEET_INPUT,
+        sheetName: "2026 YAZ LGS",
+        headerRow: 1,
+        dataStartRow: 2,
+        enabled: true,
+        mappings: { ...DEFAULT_SOURCE_MAPPINGS }
+      }],
+      fieldOrder: Object.keys(DEFAULT_FIELD_DEFINITIONS),
+      fields: JSON.parse(JSON.stringify(DEFAULT_FIELD_DEFINITIONS)),
+      options: { recentLimit: 30 }
+    };
+
     const STATUS_COLUMN = { key: "status", label: "DURUM" };
+    const FIELD_TYPES = [
+      ["text", "Metin"], ["select", "Seçenek"], ["number", "Sayı"],
+      ["date", "Tarih"], ["phone", "Telefon"]
+    ];
+
+    function deepClone(value) {
+      return JSON.parse(JSON.stringify(value));
+    }
 
     function cloneDefaultSettings() {
-      return JSON.parse(JSON.stringify(DEFAULT_APP_SETTINGS));
+      return deepClone(DEFAULT_APP_SETTINGS);
     }
 
-    function normalizeAppSettings(raw) {
-      const base = cloneDefaultSettings();
-      const source = raw && typeof raw === "object" ? raw : {};
-      const out = {
-        spreadsheetInput: String(source.spreadsheetInput || base.spreadsheetInput).trim() || base.spreadsheetInput,
-        sheetName: String(source.sheetName || base.sheetName).trim() || base.sheetName,
-        headerRow: Math.max(1, parseInt(source.headerRow || base.headerRow, 10) || base.headerRow),
-        dataStartRow: Math.max(1, parseInt(source.dataStartRow || base.dataStartRow, 10) || base.dataStartRow),
-        fields: {}
-      };
-      FIELD_ORDER.forEach(key => {
-        const current = (source.fields && source.fields[key]) ? source.fields[key] : {};
-        out.fields[key] = {
-          ...base.fields[key],
-          ...current,
-          label: String((current.label || base.fields[key].label || key)).trim(),
-          source: String((current.source ?? base.fields[key].source ?? "")).trim(),
-          visible: Boolean(current.visible ?? base.fields[key].visible)
-        };
-      });
-      if (out.dataStartRow <= out.headerRow) out.dataStartRow = out.headerRow + 1;
-      return out;
+    function createSafeId(prefix = "item") {
+      return `${prefix}_${Date.now().toString(36)}_${Math.random().toString(36).slice(2, 8)}`;
     }
 
-    function loadAppSettings() {
-      try {
-        const raw = localStorage.getItem(SETTINGS_STORAGE_KEY);
-        return normalizeAppSettings(raw ? JSON.parse(raw) : null);
-      } catch (e) {
-        console.warn("Ayarlar okunamadı, varsayılan kullanılacak.", e);
-        return normalizeAppSettings(null);
-      }
-    }
-
-    function saveAppSettings() {
-      localStorage.setItem(SETTINGS_STORAGE_KEY, JSON.stringify(appSettings));
+    function normalizeFieldKey(value, fallback = "alan") {
+      const raw = String(value || "").trim();
+      const canonicalDefault = Object.keys(DEFAULT_FIELD_DEFINITIONS).find(key =>
+        key.toLocaleLowerCase("tr-TR") === raw.toLocaleLowerCase("tr-TR")
+      );
+      if (canonicalDefault) return canonicalDefault;
+      const key = raw
+        .toLocaleLowerCase("tr-TR")
+        .replace(/ı/g, "i").replace(/ğ/g, "g").replace(/ü/g, "u")
+        .replace(/ş/g, "s").replace(/ö/g, "o").replace(/ç/g, "c")
+        .replace(/[^a-z0-9]+/g, "_")
+        .replace(/^_+|_+$/g, "");
+      return key || fallback;
     }
 
     function extractSpreadsheetId(value) {
@@ -2270,10 +2379,138 @@
       return idMatch ? idMatch[0] : DEFAULT_SPREADSHEET_INPUT;
     }
 
-    function getActiveSpreadsheetId() {
-      return extractSpreadsheetId(appSettings.spreadsheetInput);
+    function normalizeAppSettings(raw) {
+      const base = cloneDefaultSettings();
+      const source = raw && typeof raw === "object" ? raw : {};
+      const rawFields = source.fields && typeof source.fields === "object" ? source.fields : {};
+      const hasExplicitFieldOrder = Array.isArray(source.fieldOrder) && source.fieldOrder.length > 0;
+      const requestedOrder = hasExplicitFieldOrder ? source.fieldOrder : [];
+      const requiredKeys = Object.keys(DEFAULT_FIELD_DEFINITIONS).filter(key => DEFAULT_FIELD_DEFINITIONS[key].locked);
+      const keyCandidates = hasExplicitFieldOrder
+        ? [...requestedOrder, ...Object.keys(rawFields), ...requiredKeys]
+        : [...Object.keys(rawFields), ...base.fieldOrder];
+      const allKeys = [];
+
+      keyCandidates.forEach(originalKey => {
+        const key = normalizeFieldKey(originalKey, "alan");
+        if (!allKeys.includes(key)) allKeys.push(key);
+      });
+
+      const fields = {};
+      allKeys.forEach(key => {
+        const defaultField = DEFAULT_FIELD_DEFINITIONS[key] || {
+          label: key.replace(/_/g, " ").replace(/\b\w/g, c => c.toLocaleUpperCase("tr-TR")),
+          type: "text", visible: true, filterable: false, sortable: true, locked: false, hint: "Özel alan"
+        };
+        const current = rawFields[key] || {};
+        fields[key] = {
+          ...defaultField,
+          ...current,
+          label: String(current.label || defaultField.label || key).trim() || key,
+          type: FIELD_TYPES.some(([type]) => type === current.type) ? current.type : defaultField.type,
+          visible: Boolean(current.visible ?? defaultField.visible),
+          filterable: Boolean(current.filterable ?? defaultField.filterable),
+          sortable: Boolean(current.sortable ?? defaultField.sortable),
+          locked: Boolean(defaultField.locked || current.locked),
+          hint: String(current.hint || defaultField.hint || "").trim()
+        };
+        delete fields[key].source;
+      });
+
+      let rawSources = Array.isArray(source.sources) ? source.sources : null;
+      if (!rawSources || !rawSources.length) {
+        const legacyMappings = {};
+        allKeys.forEach(key => {
+          const legacyField = rawFields[key] || {};
+          legacyMappings[key] = String(legacyField.source ?? DEFAULT_SOURCE_MAPPINGS[key] ?? "").trim();
+        });
+        rawSources = [{
+          id: "source_default",
+          name: source.sheetName || "2026 YAZ LGS",
+          spreadsheetInput: source.spreadsheetInput || DEFAULT_SPREADSHEET_INPUT,
+          sheetName: source.sheetName || "2026 YAZ LGS",
+          headerRow: source.headerRow || 1,
+          dataStartRow: source.dataStartRow || 2,
+          enabled: true,
+          mappings: legacyMappings
+        }];
+      }
+
+      const usedIds = new Set();
+      const sources = rawSources.map((item, index) => {
+        const current = item && typeof item === "object" ? item : {};
+        let id = normalizeFieldKey(current.id || `source_${index + 1}`, `source_${index + 1}`);
+        while (usedIds.has(id)) id = `${id}_${index + 1}`;
+        usedIds.add(id);
+        const headerRow = Math.max(1, parseInt(current.headerRow || 1, 10) || 1);
+        const dataStartRow = Math.max(headerRow + 1, parseInt(current.dataStartRow || (headerRow + 1), 10) || (headerRow + 1));
+        const mappings = {};
+        allKeys.forEach(key => {
+          const legacyNested = current.fields && current.fields[key] ? current.fields[key].source : undefined;
+          mappings[key] = String(current.mappings?.[key] ?? legacyNested ?? (index === 0 ? DEFAULT_SOURCE_MAPPINGS[key] : "") ?? "").trim();
+        });
+        return {
+          id,
+          name: String(current.name || current.sheetName || `Kaynak ${index + 1}`).trim() || `Kaynak ${index + 1}`,
+          spreadsheetInput: String(current.spreadsheetInput || DEFAULT_SPREADSHEET_INPUT).trim() || DEFAULT_SPREADSHEET_INPUT,
+          sheetName: String(current.sheetName || current.name || "Sayfa1").trim() || "Sayfa1",
+          headerRow,
+          dataStartRow,
+          enabled: Boolean(current.enabled ?? true),
+          mappings
+        };
+      });
+
+      if (!sources.some(item => item.enabled)) sources[0].enabled = true;
+
+      return {
+        version: 5,
+        sources,
+        fieldOrder: allKeys,
+        fields,
+        options: {
+          recentLimit: Math.max(1, parseInt(source.options?.recentLimit || base.options.recentLimit, 10) || base.options.recentLimit)
+        }
+      };
     }
 
+    function loadCachedAppSettings() {
+      try {
+        const raw = localStorage.getItem(SETTINGS_STORAGE_KEY);
+        return normalizeAppSettings(raw ? JSON.parse(raw) : null);
+      } catch (e) {
+        console.warn("Yerel ayarlar okunamadı, varsayılan kullanılacak.", e);
+        return normalizeAppSettings(null);
+      }
+    }
+
+    function saveAppSettingsCache() {
+      try {
+        localStorage.setItem(SETTINGS_STORAGE_KEY, JSON.stringify(appSettings));
+      } catch (error) {
+        console.warn("Yerel ayar önbelleği yazılamadı.", error);
+      }
+    }
+
+    function getEnabledSources(settings = appSettings) {
+      return (settings.sources || []).filter(source => source.enabled);
+    }
+
+    function getPrimarySource(settings = appSettings) {
+      return getEnabledSources(settings)[0] || settings.sources?.[0] || cloneDefaultSettings().sources[0];
+    }
+
+    function getActiveSpreadsheetId() {
+      return extractSpreadsheetId(getPrimarySource().spreadsheetInput);
+    }
+
+    function getCombinedListName(settings = appSettings) {
+      const sources = getEnabledSources(settings);
+      if (sources.length === 1) return sources[0].name || sources[0].sheetName || "Öğrenci Listesi";
+      return sources.length > 1 ? `Birleşik Liste (${sources.length} kaynak)` : "Öğrenci Listesi";
+    }
+
+    let FIELD_ORDER = [];
     function getDataFieldKeys() {
       return FIELD_ORDER.slice();
     }
@@ -2287,35 +2524,45 @@
     }
 
     function buildColumnsFromSettings() {
-      const cols = [STATUS_COLUMN];
-      getVisibleDataFieldKeys().forEach(key => {
-        cols.push({ key, label: getFieldLabel(key) });
-      });
-      return cols;
+      return [STATUS_COLUMN, ...getVisibleDataFieldKeys().map(key => ({ key, label: getFieldLabel(key) }))];
     }
 
     function getTableColspan() {
       return Math.max(1, (COLUMNS && COLUMNS.length) || 1);
     }
 
-    let appSettings = loadAppSettings();
-    let currentSheetName = appSettings.sheetName;
-    let COLUMNS = buildColumnsFromSettings();
+    let appSettings = loadCachedAppSettings();
+    let currentSheetName = "";
+    let COLUMNS = [];
+    let settingsDraft = null;
+    let activeSettingsTab = "sources";
+    let activeSourceView = "all";
+
+    function syncDerivedSettings() {
+      FIELD_ORDER = (appSettings.fieldOrder || []).filter(key => appSettings.fields[key]);
+      Object.keys(appSettings.fields || {}).forEach(key => {
+        if (!FIELD_ORDER.includes(key)) FIELD_ORDER.push(key);
+      });
+      currentSheetName = getCombinedListName();
+      COLUMNS = buildColumnsFromSettings();
+    }
+    syncDerivedSettings();
 
     let students = [];
     let snapshot = null;
     let snapshotSource = "none";
     let activeViewMode = "all";
-    let duplicateOkulNoMap = {}; // { okulNo: [student, ...] }
+    let duplicateOkulNoMap = {};
     let removedRecordsCache = [];
     let currentFilteredStudents = [];
 
 
 // =======================
+    // FIREBASE// =======================
     // FIREBASE
     // =======================
     import { initializeApp } from 'https://www.gstatic.com/firebasejs/9.23.0/firebase-app.js';
-    import { getDatabase, ref, get, set } from 'https://www.gstatic.com/firebasejs/9.23.0/firebase-database.js';
+    import { getDatabase, ref, get, set, remove } from 'https://www.gstatic.com/firebasejs/9.23.0/firebase-database.js';
 
     const firebaseConfig = {
       apiKey: "AIzaSyAIzu6aNQstwQCdMWODyIwiaVVBm63OeGw",
@@ -2329,16 +2576,18 @@
 
     const firebaseApp = initializeApp(firebaseConfig);
     const firebaseDb = getDatabase(firebaseApp);
-    const FIREBASE_BASE_PATH = 'snapshots';
+    const FIREBASE_CURRENT_SNAPSHOT_PATH = `${FIREBASE_APP_BASE_PATH}/snapshot`;
+    const FIREBASE_SETTINGS_PATH = `${FIREBASE_APP_BASE_PATH}/settings`;
+    const LEGACY_FIREBASE_BASE_PATH = "snapshots";
 
     // =======================
     // ARAÇLAR
     // =======================
-    function getSheetCsvUrl(sheetName) {
+    function getSheetCsvUrl(source) {
       return "https://docs.google.com/spreadsheets/d/" +
-        getActiveSpreadsheetId() +
+        extractSpreadsheetId(source.spreadsheetInput) +
         "/gviz/tq?tqx=out:csv&sheet=" +
-        encodeURIComponent(sheetName);
+        encodeURIComponent(source.sheetName);
     }
 
     function makeFirebaseSafeKey(value) {
@@ -2346,8 +2595,42 @@
     }
 
     function getSnapshotRef() {
-      const sourceKey = `${getActiveSpreadsheetId()}__${currentSheetName || 'default'}`;
-      return ref(firebaseDb, `${FIREBASE_BASE_PATH}/${makeFirebaseSafeKey(sourceKey)}`);
+      return ref(firebaseDb, FIREBASE_CURRENT_SNAPSHOT_PATH);
+    }
+
+    function getSettingsRef() {
+      return ref(firebaseDb, FIREBASE_SETTINGS_PATH);
+    }
+
+    function getLegacySnapshotRef() {
+      const source = getPrimarySource();
+      const sourceKey = `${extractSpreadsheetId(source.spreadsheetInput)}__${source.sheetName || "default"}`;
+      return ref(firebaseDb, `${LEGACY_FIREBASE_BASE_PATH}/${makeFirebaseSafeKey(sourceKey)}`);
+    }
+
+    async function loadAppSettingsFromFirebase() {
+      try {
+        const settingsData = await get(getSettingsRef());
+        if (settingsData.exists()) {
+          appSettings = normalizeAppSettings(settingsData.val());
+        } else {
+          await set(getSettingsRef(), appSettings);
+        }
+        syncDerivedSettings();
+        saveAppSettingsCache();
+        return true;
+      } catch (error) {
+        console.warn("Firebase ayarları okunamadı; yerel ayarlar kullanılacak.", error);
+        syncDerivedSettings();
+        return false;
+      }
+    }
+
+    async function persistAppSettingsToFirebase() {
+      appSettings = normalizeAppSettings(appSettings);
+      syncDerivedSettings();
+      saveAppSettingsCache();
+      await set(getSettingsRef(), appSettings);
     }
 
     function showToast(message) {
@@ -2425,11 +2708,13 @@
     }
 
     function createStudentId(row) {
-      const num = (row.okulNo || "").trim();
-      const name = (row.isim || "").trim().toLocaleUpperCase("tr-TR");
-      const surname = (row.soyisim || "").trim().toLocaleUpperCase("tr-TR");
+      const num = String(row.okulNo || "").trim();
+      const name = String(row.isim || "").trim().toLocaleUpperCase("tr-TR");
+      const surname = String(row.soyisim || "").trim().toLocaleUpperCase("tr-TR");
       if (num) return `${num}__${name}__${surname}`;
-      return `${name}__${surname}`.trim();
+      if (name || surname) return `${name}__${surname}`;
+      const firstValue = getDataFieldKeys().map(key => String(row[key] || "").trim()).find(Boolean);
+      return firstValue ? `veri__${normalizeTextForCompare(firstValue)}` : String(row._rowKey || "");
     }
 
     function buildStudentDataObject(student) {
@@ -2462,17 +2747,18 @@
     }
 
     function normalizeFieldValueForCompare(key, value) {
-      if (key === "veliTelefon" || key === "veli2Telefon") return normalizePhoneForCompare(value);
-      if (key === "tarih") return normalizeDateForCompare(value);
-      if (["isim", "soyisim", "cinsiyet", "sinif", "veliAdi", "veliSoyadi", "veli2Adi", "burslu"].includes(key)) {
-        return normalizeTextForCompare(value);
+      const type = appSettings.fields[key]?.type || "text";
+      if (type === "phone") return normalizePhoneForCompare(value);
+      if (type === "date") return normalizeDateForCompare(value);
+      if (type === "number") {
+        const numeric = Number(String(value ?? "").replace(",", "."));
+        return Number.isFinite(numeric) ? String(numeric) : String(value ?? "").trim();
       }
-      return String(value ?? "").trim().replace(/\s+/g, " ");
+      return normalizeTextForCompare(value);
     }
 
     function isFieldMappedForCompare(key) {
-      const field = appSettings.fields[key] || {};
-      return String(field.source || "").trim() !== "";
+      return getEnabledSources().some(source => String(source.mappings?.[key] || "").trim() !== "");
     }
 
     function getComparableFieldKeys(prevData = {}, currentData = {}) {
@@ -2806,18 +3092,23 @@ function compareCurrentStudentsWithSnapshot(currentStudents, snap) {
         const record = {
           id: stableId,
           rowIndex: index,
+          sourceIds: Array.isArray(s._sourceIds) ? s._sourceIds : [s._sourceId].filter(Boolean),
           data: buildStudentDataObject(s)
         };
-        // Firebase key içinde nokta, slash vb. özel karakter olursa kayıt/okuma sorun çıkarabilir.
-        // Bu yüzden key güvenli; gerçek öğrenci id'si record.id içinde saklanıyor.
         records[makeFirebaseSafeKey(stableId) || `row_${index + 1}`] = record;
         recordsList.push(record);
       });
       return {
-        version: 2,
+        version: 3,
         savedAt: new Date().toISOString(),
-        sheetName: currentSheetName,
-        spreadsheetId: getActiveSpreadsheetId(),
+        listName: currentSheetName,
+        sourceCount: getEnabledSources().length,
+        sources: getEnabledSources().map(source => ({
+          id: source.id,
+          name: source.name,
+          spreadsheetId: extractSpreadsheetId(source.spreadsheetInput),
+          sheetName: source.sheetName
+        })),
         sourceSettings: appSettings,
         recordCount: recordsList.length,
         records,
@@ -2840,16 +3131,14 @@ function compareCurrentStudentsWithSnapshot(currentStudents, snap) {
 
     async function loadSnapshot() {
       try {
-        const snapRef = getSnapshotRef();
-        const snapData = await get(snapRef);
+        let snapData = await get(getSnapshotRef());
         if (!snapData.exists()) {
-          snapshot = null;
-          snapshotSource = "none";
-          updateSnapshotLabels();
-          return;
+          snapData = await get(getLegacySnapshotRef());
+          snapshotSource = snapData.exists() ? "firebase-legacy" : "none";
+        } else {
+          snapshotSource = "firebase";
         }
-        snapshot = snapData.val();
-        snapshotSource = "firebase";
+        snapshot = snapData.exists() ? snapData.val() : null;
         updateSnapshotLabels();
       } catch (e) {
         console.error("Snapshot yüklenemedi", e);
@@ -2866,15 +3155,18 @@ function compareCurrentStudentsWithSnapshot(currentStudents, snap) {
       }
       const snap = buildSnapshotObject(currentStudents);
       try {
-        const snapRef = getSnapshotRef();
-        await set(snapRef, snap);
+        await persistAppSettingsToFirebase();
+        // set() bu sabit konumdaki bütün eski çocukları değiştirir; push/update kullanılmaz.
+        await set(getSnapshotRef(), snap);
+        // Eski sürümün kaynak adına göre çoğalan snapshot düğümleri artık kullanılmıyor.
+        await remove(ref(firebaseDb, LEGACY_FIREBASE_BASE_PATH));
         snapshot = snap;
         snapshotSource = "firebase";
         updateSnapshotLabels();
-        showToast("Liste Firebase'e başarıyla kaydedildi.");
+        showToast("Eski Firebase kayıtları temizlendi; yalnızca güncel liste kaydedildi.");
       } catch (e) {
         console.error("Snapshot kaydedilemedi", e);
-        showToast("Hata: Kayıt yapılamadı.");
+        showToast("Hata: Firebase kaydı tamamlanamadı.");
       }
     }
 
@@ -2927,164 +3219,325 @@ function compareCurrentStudentsWithSnapshot(currentStudents, snap) {
       });
     }
 
-    function getMappedCell(row, header, key) {
-      const field = appSettings.fields[key] || {};
-      const idx = sourceSpecToIndex(field.source, header);
+    function getMappedCell(row, header, key, source) {
+      const idx = sourceSpecToIndex(source.mappings?.[key], header);
       if (idx < 0) return "";
       return String(row[idx] || "").trim();
     }
 
-    function renderColumnSettingsForm() {
-      document.getElementById("settingsSheetUrl").value = appSettings.spreadsheetInput || "";
-      document.getElementById("settingsSheetName").value = appSettings.sheetName || "";
-      document.getElementById("settingsHeaderRow").value = appSettings.headerRow || 1;
-      document.getElementById("settingsDataStartRow").value = appSettings.dataStartRow || 2;
+    function setSettingsTab(tabName) {
+      activeSettingsTab = tabName;
+      document.querySelectorAll("[data-settings-tab]").forEach(button => {
+        button.classList.toggle("active", button.dataset.settingsTab === tabName);
+      });
+      document.querySelectorAll("[data-settings-panel]").forEach(panel => {
+        panel.classList.toggle("active", panel.dataset.settingsPanel === tabName);
+      });
+    }
 
-      const container = document.getElementById("columnMappingRows");
+    function fieldTypeOptions(selectedType) {
+      return FIELD_TYPES.map(([value, label]) => `<option value="${value}"${value === selectedType ? " selected" : ""}>${label}</option>`).join("");
+    }
+
+    function renderSourceSettingsRows() {
+      const container = document.getElementById("sourceSettingsRows");
       container.innerHTML = "";
-      FIELD_ORDER.forEach(key => {
-        const field = appSettings.fields[key];
+      settingsDraft.sources.forEach((source, sourceIndex) => {
+        const card = document.createElement("div");
+        card.className = "source-settings-card";
+        card.dataset.sourceId = source.id;
+        const removeDisabled = settingsDraft.sources.length <= 1;
+        card.innerHTML = `
+          <div class="source-card-head">
+            <input class="source-name-input" type="text" data-source-part="name" value="${escapeHtml(source.name)}" placeholder="Kaynak adı" />
+            <div class="source-card-actions">
+              <label class="settings-check"><input type="checkbox" data-source-part="enabled" ${source.enabled ? "checked" : ""}/> Etkin</label>
+              <button class="btn btn-secondary btn-sm" type="button" data-remove-source="${escapeHtml(source.id)}" ${removeDisabled ? "disabled" : ""}>Kaldır</button>
+            </div>
+          </div>
+          <div class="source-basic-grid">
+            <div class="field-group"><div class="field-label">E-tablo adresi veya ID</div><input type="text" data-source-part="spreadsheetInput" value="${escapeHtml(source.spreadsheetInput)}" /></div>
+            <div class="field-group"><div class="field-label">Sayfa adı</div><input type="text" data-source-part="sheetName" value="${escapeHtml(source.sheetName)}" /></div>
+            <div class="field-group"><div class="field-label">Başlık satırı</div><input type="text" data-source-part="headerRow" value="${source.headerRow}" /></div>
+            <div class="field-group"><div class="field-label">Veri başlangıcı</div><input type="text" data-source-part="dataStartRow" value="${source.dataStartRow}" /></div>
+          </div>
+          <details class="source-mapping-details" ${sourceIndex === 0 ? "open" : ""}>
+            <summary>Sütun eşleştirmeleri</summary>
+            <div class="source-mapping-grid">
+              ${settingsDraft.fieldOrder.map(key => {
+                const field = settingsDraft.fields[key];
+                return `<label class="source-map-row"><span class="source-map-label">${escapeHtml(field.label)}</span><input type="text" data-source-map-field="${escapeHtml(key)}" value="${escapeHtml(source.mappings?.[key] || "")}" placeholder="A, 1 veya başlık" /></label>`;
+              }).join("")}
+            </div>
+          </details>`;
+        container.appendChild(card);
+      });
+    }
+
+    function renderFieldSettingsRows() {
+      const container = document.getElementById("fieldSettingsRows");
+      container.innerHTML = "";
+      settingsDraft.fieldOrder.forEach(key => {
+        const field = settingsDraft.fields[key];
         const row = document.createElement("div");
-        row.className = "mapping-row";
-
-        const info = document.createElement("div");
-        const title = document.createElement("div");
-        title.className = "mapping-field-title";
-        title.textContent = field.label;
-        const sub = document.createElement("div");
-        sub.className = "mapping-field-sub";
-        sub.textContent = field.hint || "";
-        info.appendChild(title);
-        info.appendChild(sub);
-
-        const input = document.createElement("input");
-        input.type = "text";
-        input.dataset.settingField = key;
-        input.dataset.settingPart = "source";
-        input.value = field.source || "";
-        input.placeholder = "Örn. A veya İsim*";
-
-        const visibleLabel = document.createElement("label");
-        visibleLabel.className = "mapping-visible";
-        const checkbox = document.createElement("input");
-        checkbox.type = "checkbox";
-        checkbox.dataset.settingField = key;
-        checkbox.dataset.settingPart = "visible";
-        checkbox.checked = Boolean(field.visible);
-        visibleLabel.appendChild(checkbox);
-        visibleLabel.appendChild(document.createTextNode(" Göster"));
-
-        row.appendChild(info);
-        row.appendChild(input);
-        row.appendChild(visibleLabel);
+        row.className = "field-settings-row";
+        row.dataset.fieldKey = key;
+        row.innerHTML = `
+          <div><span class="field-key-badge">${escapeHtml(key)}</span></div>
+          <input type="text" data-field-part="label" value="${escapeHtml(field.label)}" />
+          <select data-field-part="type">${fieldTypeOptions(field.type)}</select>
+          <label class="settings-check"><input type="checkbox" data-field-part="visible" ${field.visible ? "checked" : ""}/> Göster</label>
+          <button class="btn btn-secondary btn-sm" type="button" data-remove-field="${escapeHtml(key)}" ${field.locked ? "disabled title=\"Kimlik alanı korunur\"" : ""}>×</button>`;
         container.appendChild(row);
       });
     }
 
+    function renderFilterSettingsRows() {
+      const container = document.getElementById("filterSettingsRows");
+      container.innerHTML = "";
+      settingsDraft.fieldOrder.forEach(key => {
+        const field = settingsDraft.fields[key];
+        const mappedCount = settingsDraft.sources.filter(source => source.enabled && String(source.mappings?.[key] || "").trim()).length;
+        const row = document.createElement("div");
+        row.className = "filter-settings-row";
+        row.dataset.fieldKey = key;
+        row.innerHTML = `
+          <div><div class="mapping-field-title">${escapeHtml(field.label)}</div><div class="mapping-field-sub">${mappedCount ? `${mappedCount} kaynakta eşlendi` : "Kaynak sütunu eşlenmedi"}</div></div>
+          <label class="settings-check"><input type="checkbox" data-filter-part="filterable" ${field.filterable ? "checked" : ""}/> Filtrele</label>
+          <label class="settings-check"><input type="checkbox" data-filter-part="sortable" ${field.sortable ? "checked" : ""}/> Sırala</label>
+          <span class="field-key-badge">${escapeHtml(FIELD_TYPES.find(([type]) => type === field.type)?.[1] || field.type)}</span>`;
+        container.appendChild(row);
+      });
+    }
+
+    function renderSettingsForm() {
+      renderSourceSettingsRows();
+      renderFieldSettingsRows();
+      renderFilterSettingsRows();
+      setSettingsTab(activeSettingsTab);
+    }
+
+    function captureSettingsDraftFromForm() {
+      if (!settingsDraft) settingsDraft = deepClone(appSettings);
+
+      document.querySelectorAll("#sourceSettingsRows .source-settings-card").forEach(card => {
+        const source = settingsDraft.sources.find(item => item.id === card.dataset.sourceId);
+        if (!source) return;
+        card.querySelectorAll("[data-source-part]").forEach(input => {
+          const part = input.dataset.sourcePart;
+          source[part] = input.type === "checkbox" ? input.checked : input.value;
+        });
+        source.mappings = source.mappings || {};
+        card.querySelectorAll("[data-source-map-field]").forEach(input => {
+          source.mappings[input.dataset.sourceMapField] = String(input.value || "").trim();
+        });
+      });
+
+      document.querySelectorAll("#fieldSettingsRows [data-field-key]").forEach(row => {
+        const key = row.dataset.fieldKey;
+        const field = settingsDraft.fields[key];
+        if (!field) return;
+        row.querySelectorAll("[data-field-part]").forEach(input => {
+          const part = input.dataset.fieldPart;
+          field[part] = input.type === "checkbox" ? input.checked : input.value;
+        });
+      });
+
+      document.querySelectorAll("#filterSettingsRows [data-field-key]").forEach(row => {
+        const key = row.dataset.fieldKey;
+        const field = settingsDraft.fields[key];
+        if (!field) return;
+        row.querySelectorAll("[data-filter-part]").forEach(input => {
+          field[input.dataset.filterPart] = input.checked;
+        });
+      });
+
+      settingsDraft = normalizeAppSettings(settingsDraft);
+      return settingsDraft;
+    }
+
     function readSettingsFromForm() {
-      const next = normalizeAppSettings({
-        spreadsheetInput: document.getElementById("settingsSheetUrl").value,
-        sheetName: document.getElementById("settingsSheetName").value,
-        headerRow: document.getElementById("settingsHeaderRow").value,
-        dataStartRow: document.getElementById("settingsDataStartRow").value,
-        fields: appSettings.fields
-      });
+      return normalizeAppSettings(captureSettingsDraftFromForm());
+    }
 
-      document.querySelectorAll("#columnMappingRows [data-setting-field]").forEach(input => {
-        const key = input.dataset.settingField;
-        const part = input.dataset.settingPart;
-        if (!next.fields[key]) return;
-        if (part === "visible") next.fields[key].visible = input.checked;
-        if (part === "source") next.fields[key].source = String(input.value || "").trim();
+    function addSettingsSource() {
+      captureSettingsDraftFromForm();
+      const id = createSafeId("source");
+      const mappings = {};
+      settingsDraft.fieldOrder.forEach(key => { mappings[key] = ""; });
+      settingsDraft.sources.push({
+        id,
+        name: `Kaynak ${settingsDraft.sources.length + 1}`,
+        spreadsheetInput: "",
+        sheetName: "Sayfa1",
+        headerRow: 1,
+        dataStartRow: 2,
+        enabled: true,
+        mappings
       });
+      renderSettingsForm();
+      setSettingsTab("sources");
+    }
 
-      return normalizeAppSettings(next);
+    function addSettingsField() {
+      captureSettingsDraftFromForm();
+      let counter = 1;
+      let key = `alan_${counter}`;
+      while (settingsDraft.fields[key]) key = `alan_${++counter}`;
+      settingsDraft.fields[key] = {
+        label: `Yeni Alan ${counter}`,
+        type: "text",
+        visible: true,
+        filterable: false,
+        sortable: true,
+        locked: false,
+        hint: "Özel alan"
+      };
+      settingsDraft.fieldOrder.push(key);
+      settingsDraft.sources.forEach(source => { source.mappings[key] = ""; });
+      renderSettingsForm();
+      setSettingsTab("fields");
+    }
+
+    function removeSettingsSource(sourceId) {
+      captureSettingsDraftFromForm();
+      if (settingsDraft.sources.length <= 1) return;
+      settingsDraft.sources = settingsDraft.sources.filter(source => source.id !== sourceId);
+      if (!settingsDraft.sources.some(source => source.enabled)) settingsDraft.sources[0].enabled = true;
+      renderSettingsForm();
+    }
+
+    function removeSettingsField(key) {
+      captureSettingsDraftFromForm();
+      if (settingsDraft.fields[key]?.locked) return;
+      delete settingsDraft.fields[key];
+      settingsDraft.fieldOrder = settingsDraft.fieldOrder.filter(item => item !== key);
+      settingsDraft.sources.forEach(source => { delete source.mappings[key]; });
+      renderSettingsForm();
     }
 
     async function applySourceSettings(nextSettings, options = {}) {
       appSettings = normalizeAppSettings(nextSettings);
-      currentSheetName = appSettings.sheetName;
-      COLUMNS = buildColumnsFromSettings();
-      saveAppSettings();
+      activeSourceView = "all";
+      syncDerivedSettings();
+      try {
+        await persistAppSettingsToFirebase();
+      } catch (error) {
+        console.error("Ayarlar Firebase'e kaydedilemedi", error);
+        showToast("Ayarlar yerelde güncellendi ancak Firebase kaydı başarısız oldu.");
+      }
       renderSheetTabs();
       renderHeader();
       await loadSnapshot();
       await loadData();
-      if (!options.silent) showToast("Veri kaynağı ayarları kaydedildi.");
+      if (!options.silent) showToast("Ayarlar Firebase'e kaydedildi ve liste yenilendi.");
     }
 
     function openSourceSettingsModal() {
-      renderColumnSettingsForm();
+      settingsDraft = deepClone(appSettings);
+      activeSettingsTab = "sources";
+      renderSettingsForm();
       document.getElementById("sourceSettingsModal").classList.add("active");
     }
 
     window.closeSourceSettingsModal = function() {
       document.getElementById("sourceSettingsModal").classList.remove("active");
+      settingsDraft = null;
     };
 
     // =======================
     // VERİ YÜKLEME
     // =======================
-    async function loadData() {
-      const body = document.getElementById("tableBody");
-      body.innerHTML = `<tr class="loading-row"><td colspan="${getTableColspan()}" style="text-align:center; padding:40px;">Google Tablo'dan veriler alınıyor...</td></tr>`;
-      document.getElementById("lastLoadedInfo").textContent = "Yükleniyor...";
+    function parseSourceRows(source, csvText) {
+      if (csvText.startsWith("<")) throw new Error("CSV yerine HTML geldi. Yayın ayarlarını ve sayfa adını kontrol edin.");
+      const rows = parseCSV(csvText);
+      if (!rows.length) return [];
+      const headerRowIndex = Math.min(rows.length - 1, Math.max(0, source.headerRow - 1));
+      const dataStartIndex = Math.max(headerRowIndex + 1, source.dataStartRow - 1);
+      const header = (rows[headerRowIndex] || []).map(value => String(value || "").trim());
+      return rows.slice(dataStartIndex)
+        .filter(row => row.some(cell => String(cell || "").trim() !== ""))
+        .map((row, rowIndex) => {
+          const student = { _sourceId: source.id, _sourceName: source.name, _sourceIds: [source.id], _sourceNames: [source.name] };
+          getDataFieldKeys().forEach(key => {
+            student[key] = getMappedCell(row, header, key, source);
+          });
+          if (student.cinsiyet) student.cinsiyet = student.cinsiyet.toLocaleUpperCase("tr-TR");
+          student._rowKey = `${source.id}__row_${rowIndex + dataStartIndex + 1}`;
+          student.id = createStudentId(student) || student._rowKey;
+          student.dateObj = parseDateTR(student.tarih);
+          student.status = "normal";
+          return student;
+        })
+        .filter(student => getDataFieldKeys().some(key => String(student[key] || "").trim() !== ""));
+    }
 
-      try {
-        const url = getSheetCsvUrl(currentSheetName);
-        const res = await fetch(url);
-        if (!res.ok) throw new Error("Ağ hatası: " + res.status);
-        const text = await res.text();
+    async function fetchSourceStudents(source) {
+      const response = await fetch(getSheetCsvUrl(source));
+      if (!response.ok) throw new Error(`Ağ hatası: ${response.status}`);
+      return parseSourceRows(source, await response.text());
+    }
 
-        if (text.startsWith("<")) throw new Error("CSV yerine HTML geldi. Tablo yayın ayarlarını ve sayfa adını kontrol edin.");
-
-        const rows = parseCSV(text);
-        if (!rows.length) {
-          students = [];
-          removedRecordsCache = [];
-          duplicateOkulNoMap = {};
-          body.innerHTML = `<tr class="loading-row"><td colspan="${getTableColspan()}">Tablo boş.</td></tr>`;
-          updateSummary([]);
-          updateListStatus([]);
+    function mergeSourceStudents(sourceLists) {
+      const merged = [];
+      const byId = new Map();
+      sourceLists.flat().forEach(student => {
+        const existing = byId.get(student.id);
+        if (!existing) {
+          byId.set(student.id, student);
+          merged.push(student);
           return;
         }
+        getDataFieldKeys().forEach(key => {
+          if (!String(existing[key] || "").trim() && String(student[key] || "").trim()) existing[key] = student[key];
+        });
+        existing._sourceIds = Array.from(new Set([...(existing._sourceIds || []), ...(student._sourceIds || [])]));
+        existing._sourceNames = Array.from(new Set([...(existing._sourceNames || []), ...(student._sourceNames || [])]));
+        existing._sourceName = existing._sourceNames.join(", ");
+      });
+      return merged;
+    }
 
-        const headerRowIndex = Math.min(rows.length - 1, Math.max(0, (parseInt(appSettings.headerRow, 10) || 1) - 1));
-        const dataStartIndex = Math.max(headerRowIndex + 1, (parseInt(appSettings.dataStartRow, 10) || (headerRowIndex + 2)) - 1);
-        const header = (rows[headerRowIndex] || []).map(h => String(h || "").trim());
-        const dataRows = rows.slice(dataStartIndex).filter(r => r.some(cell => String(cell || "").trim() !== ""));
+    async function loadData() {
+      const body = document.getElementById("tableBody");
+      body.innerHTML = `<tr class="loading-row"><td colspan="${getTableColspan()}" style="text-align:center; padding:40px;">Etkin veri kaynakları okunuyor...</td></tr>`;
+      document.getElementById("lastLoadedInfo").textContent = "Yükleniyor...";
 
-        const parsed = dataRows.map(row => {
-          const s = {};
-          getDataFieldKeys().forEach(key => {
-            s[key] = getMappedCell(row, header, key);
-          });
-          s.cinsiyet = (s.cinsiyet || "").trim().toLocaleUpperCase("tr-TR");
-          s.id = createStudentId(s);
-          s.dateObj = parseDateTR(s.tarih);
-          s.status = "normal";
-          return s;
-        }).filter(s => {
-          return getDataFieldKeys().some(key => String(s[key] || "").trim() !== "");
+      const sources = getEnabledSources();
+      if (!sources.length) {
+        students = [];
+        body.innerHTML = `<tr class="loading-row"><td colspan="${getTableColspan()}">Etkin veri kaynağı yok.</td></tr>`;
+        return;
+      }
+
+      try {
+        const results = await Promise.allSettled(sources.map(fetchSourceStudents));
+        const successfulLists = [];
+        const errors = [];
+        results.forEach((result, index) => {
+          if (result.status === "fulfilled") successfulLists.push(result.value);
+          else errors.push(`${sources[index].name}: ${result.reason?.message || "Okunamadı"}`);
         });
 
-        const comparison = compareCurrentStudentsWithSnapshot(parsed, snapshot);
-        let removed = comparison.removed || [];
+        students = mergeSourceStudents(successfulLists);
+        const comparison = compareCurrentStudentsWithSnapshot(students, snapshot);
+        removedRecordsCache = comparison.removed || [];
+        duplicateOkulNoMap = detectDuplicateOkulNos(students);
 
-        removedRecordsCache = removed;
-        students = parsed;
-        duplicateOkulNoMap = detectDuplicateOkulNos(parsed);
         renderHeader();
-        populateFilters();
-        updateSummary(removed);
-        applyFilters(removed);
-        document.getElementById("lastLoadedInfo").textContent = `${currentSheetName} | ${formatDateTimeForBadge(new Date().toISOString())}`;
-        const _dupKeys = duplicateOkulNoMap ? Object.keys(duplicateOkulNoMap) : [];
-        if (_dupKeys.length) showToast(`Uyarı: ${_dupKeys.length} okul numarası çakışması bulundu. (⚠️ Okul No Çakışmaları bölümüne bakın)`);
+        renderDynamicFilters();
+        updateSummary(removedRecordsCache);
+        applyFilters(removedRecordsCache);
+        renderSheetTabs();
 
+        document.getElementById("lastLoadedInfo").textContent = `${sources.length} kaynak | ${formatDateTimeForBadge(new Date().toISOString())}`;
+        if (errors.length) showToast(`${successfulLists.length} kaynak okundu, ${errors.length} kaynakta hata var.`);
+        const duplicateKeys = Object.keys(duplicateOkulNoMap || {});
+        if (duplicateKeys.length) showToast(`Uyarı: ${duplicateKeys.length} okul numarası çakışması bulundu.`);
+        if (!students.length && errors.length) throw new Error(errors.join(" | "));
       } catch (err) {
         console.error(err);
-        body.innerHTML = `<tr class="loading-row"><td colspan="${getTableColspan()}" style="color:red; text-align:center; padding:40px;">Hata: ${err.message}</td></tr>`;
+        body.innerHTML = `<tr class="loading-row"><td colspan="${getTableColspan()}" style="color:red; text-align:center; padding:40px;">Hata: ${escapeHtml(err.message)}</td></tr>`;
         document.getElementById("lastLoadedInfo").textContent = "Hata oluştu.";
         removedRecordsCache = [];
         updateSummary([]);
@@ -3098,13 +3551,22 @@ function compareCurrentStudentsWithSnapshot(currentStudents, snap) {
     function renderSheetTabs() {
       const container = document.getElementById("sheetTabs");
       container.innerHTML = "";
-      const btn = document.createElement("button");
-      btn.type = "button";
-      btn.className = "sheet-tab active";
-      btn.textContent = currentSheetName || "Sayfa";
-      btn.title = "Bölüm adını değiştirmek için Ayarlar modalını kullanın.";
-      btn.addEventListener("click", openSourceSettingsModal);
-      container.appendChild(btn);
+      const sources = getEnabledSources();
+      const tabs = [{ id: "all", label: sources.length > 1 ? `Birleşik Liste (${sources.length})` : (sources[0]?.name || "Liste") },
+        ...sources.map(source => ({ id: source.id, label: source.name || source.sheetName }))];
+      const visibleTabs = sources.length > 1 ? tabs : tabs.slice(0, 1);
+      visibleTabs.forEach(tab => {
+        const button = document.createElement("button");
+        button.type = "button";
+        button.className = "sheet-tab" + (activeSourceView === tab.id ? " active" : "");
+        button.textContent = tab.label;
+        button.addEventListener("click", () => {
+          activeSourceView = tab.id;
+          renderSheetTabs();
+          applyFilters();
+        });
+        container.appendChild(button);
+      });
     }
 
     function renderHeader() {
@@ -3140,30 +3602,118 @@ function compareCurrentStudentsWithSnapshot(currentStudents, snap) {
       });
     }
 
-    function populateFilters() {
-      const container = document.getElementById("classFilterContainer");
-      const classes = Array.from(new Set(students.map(s => s.sinif).filter(Boolean))).sort();
-      container.innerHTML = "";
-      classes.forEach(cls => {
-        const id = "class-filter-" + String(cls).replace(/\s+/g, "_").replace(/[^\w\-ığüşöçİĞÜŞÖÇ]/gi, "_");
-        const label = document.createElement("label");
-        const checkbox = document.createElement("input");
-        checkbox.type = "checkbox";
-        checkbox.id = id;
-        checkbox.value = cls;
-        const span = document.createElement("span");
-        span.textContent = cls;
-        label.appendChild(checkbox);
-        label.appendChild(span);
-        container.appendChild(label);
-      });
+    function getFieldValues(key) {
+      return students.map(student => String(student[key] || "").trim()).filter(Boolean);
     }
 
-    function getSelectedClasses() {
-      const boxes = document.querySelectorAll("#classFilterContainer input[type='checkbox']");
-      const selected = [];
-      boxes.forEach(cb => { if (cb.checked) selected.push(cb.value); });
-      return selected;
+    function fieldHasData(key) {
+      return getFieldValues(key).length > 0;
+    }
+
+    function createFilterSelect(key, values, placeholder = "Tümü") {
+      const select = document.createElement("select");
+      select.dataset.filterKey = key;
+      select.dataset.filterMode = "exact";
+      select.innerHTML = `<option value="">${escapeHtml(placeholder)}</option>`;
+      values.forEach(value => {
+        const option = document.createElement("option");
+        option.value = value;
+        option.textContent = value;
+        select.appendChild(option);
+      });
+      return select;
+    }
+
+    function captureDynamicFilterState() {
+      const state = {};
+      document.querySelectorAll("#dynamicFiltersContainer [data-filter-key]").forEach(control => {
+        state[`${control.dataset.filterKey}__${control.dataset.filterMode || "exact"}`] = control.value;
+      });
+      return state;
+    }
+
+    function renderDynamicFilters() {
+      const previousState = captureDynamicFilterState();
+      const container = document.getElementById("dynamicFiltersContainer");
+      container.innerHTML = "";
+      let renderedCount = 0;
+
+      if (snapshot) {
+        const row = document.createElement("div");
+        row.className = "dynamic-filter-row";
+        row.innerHTML = `<div class="field-label">Kayıt Durumu</div>`;
+        row.appendChild(createFilterSelect("status", ["new", "updated", "normal"], "Tüm durumlar"));
+        const select = row.querySelector("select");
+        Array.from(select.options).forEach(option => {
+          if (option.value === "new") option.textContent = "Sadece yeni";
+          if (option.value === "updated") option.textContent = "Güncellenenler";
+          if (option.value === "normal") option.textContent = "Değişiklik yok";
+        });
+        container.appendChild(row);
+        renderedCount++;
+      }
+
+      getDataFieldKeys().forEach(key => {
+        const field = appSettings.fields[key];
+        if (!field?.filterable || !fieldHasData(key)) return;
+        const row = document.createElement("div");
+        row.className = "dynamic-filter-row";
+        const label = document.createElement("div");
+        label.className = "field-label";
+        label.textContent = field.label;
+        row.appendChild(label);
+
+        if (field.type === "date") {
+          const grid = document.createElement("div");
+          grid.className = "dynamic-date-grid";
+          ["from", "to"].forEach(mode => {
+            const input = document.createElement("input");
+            input.type = "date";
+            input.dataset.filterKey = key;
+            input.dataset.filterMode = mode;
+            grid.appendChild(input);
+          });
+          row.appendChild(grid);
+        } else {
+          const uniqueValues = Array.from(new Set(getFieldValues(key))).sort((a, b) => a.localeCompare(b, "tr", { numeric: true }));
+          if (field.type === "select" || uniqueValues.length <= 24) {
+            row.appendChild(createFilterSelect(key, uniqueValues));
+          } else {
+            const input = document.createElement("input");
+            input.type = "text";
+            input.placeholder = `${field.label} içinde ara...`;
+            input.dataset.filterKey = key;
+            input.dataset.filterMode = "contains";
+            row.appendChild(input);
+          }
+        }
+        container.appendChild(row);
+        renderedCount++;
+      });
+
+      if (!renderedCount) {
+        container.innerHTML = `<div class="dynamic-filter-empty">Mevcut verilerde kullanılabilir ek filtre bulunamadı. Ayarlar bölümünden alanları filtrelenebilir yapabilirsiniz.</div>`;
+      }
+
+      document.querySelectorAll("#dynamicFiltersContainer [data-filter-key]").forEach(control => {
+        const stateKey = `${control.dataset.filterKey}__${control.dataset.filterMode || "exact"}`;
+        if (previousState[stateKey] !== undefined) control.value = previousState[stateKey];
+      });
+
+      const sort = document.getElementById("generalSortOrder");
+      const previousSort = sort.value;
+      sort.innerHTML = `<option value="">Otomatik (Durum öncelikli)</option>`;
+      getDataFieldKeys().forEach(key => {
+        const field = appSettings.fields[key];
+        if (!field?.sortable || !fieldHasData(key)) return;
+        [["asc", "Artan"], ["desc", "Azalan"]].forEach(([direction, label]) => {
+          const option = document.createElement("option");
+          option.value = `${key}:${direction}`;
+          option.textContent = `${field.label} (${label})`;
+          sort.appendChild(option);
+        });
+      });
+      if (Array.from(sort.options).some(option => option.value === previousSort)) sort.value = previousSort;
     }
 
     function updateSummary(removedRecords = []) {
@@ -3270,78 +3820,90 @@ function compareCurrentStudentsWithSnapshot(currentStudents, snap) {
       }
     }
 
+    function parseFilterDate(value) {
+      if (!value) return null;
+      if (/^\d{4}-\d{2}-\d{2}$/.test(value)) return new Date(`${value}T00:00:00`);
+      return parseDateTR(value);
+    }
+
+    function compareFieldValues(a, b, key, direction) {
+      const type = appSettings.fields[key]?.type || "text";
+      let result = 0;
+      if (type === "number") {
+        const left = Number(String(a[key] || "").replace(",", "."));
+        const right = Number(String(b[key] || "").replace(",", "."));
+        result = (Number.isFinite(left) ? left : -Infinity) - (Number.isFinite(right) ? right : -Infinity);
+      } else if (type === "date") {
+        result = (parseFilterDate(a[key])?.getTime() || 0) - (parseFilterDate(b[key])?.getTime() || 0);
+      } else {
+        result = String(a[key] || "").localeCompare(String(b[key] || ""), "tr", { numeric: true, sensitivity: "base" });
+      }
+      return direction === "desc" ? -result : result;
+    }
+
     function applyFilters(removedRecords = null) {
       removedRecords = Array.isArray(removedRecords) ? removedRecords : removedRecordsCache;
       const searchText = document.getElementById("searchInput").value.trim().toLocaleLowerCase("tr-TR");
-      const genderVal = document.getElementById("genderFilter").value;
-      const scholarVal = document.getElementById("scholarFilter").value;
-      const statusVal = document.getElementById("statusFilter").value;
       const recentOnly = document.getElementById("recentOnly").checked;
-      const dateFromVal = document.getElementById("dateFrom").value;
-      const dateToVal = document.getElementById("dateTo").value;
-      const selectedClasses = getSelectedClasses();
-      const sortOrder = document.getElementById("generalSortOrder") ? document.getElementById("generalSortOrder").value : "";
+      const sortOrder = document.getElementById("generalSortOrder")?.value || "";
+      const filterControls = Array.from(document.querySelectorAll("#dynamicFiltersContainer [data-filter-key]"));
 
-      let fromDate = null;
-      let toDate = null;
-      if (dateFromVal) fromDate = new Date(dateFromVal + "T00:00:00");
-      if (dateToVal)    toDate    = new Date(dateToVal    + "T23:59:59");
+      let filtered = students.filter(student => {
+        if (activeSourceView !== "all" && !(student._sourceIds || []).includes(activeSourceView)) return false;
+        if (activeViewMode === "new-updated" && !["new", "updated"].includes(student.status)) return false;
 
-      let filtered = students.slice();
-
-      filtered = filtered.filter(s => {
-        if (activeViewMode === "new-updated" && !(s.status === "new" || s.status === "updated")) return false;
-        if (statusVal) {
-          if (statusVal === "normal" && s.status !== "normal") return false;
-          if (statusVal === "new" && s.status !== "new") return false;
-          if (statusVal === "updated" && s.status !== "updated") return false;
+        for (const control of filterControls) {
+          const expected = String(control.value || "").trim();
+          if (!expected) continue;
+          const key = control.dataset.filterKey;
+          const mode = control.dataset.filterMode || "exact";
+          const actual = key === "status" ? student.status : String(student[key] || "").trim();
+          if (mode === "exact" && normalizeTextForCompare(actual) !== normalizeTextForCompare(expected)) return false;
+          if (mode === "contains" && !actual.toLocaleLowerCase("tr-TR").includes(expected.toLocaleLowerCase("tr-TR"))) return false;
+          if (mode === "from" || mode === "to") {
+            const actualDate = parseFilterDate(actual);
+            const expectedDate = parseFilterDate(expected);
+            if (!actualDate || !expectedDate) return false;
+            if (mode === "from" && actualDate < expectedDate) return false;
+            if (mode === "to") {
+              expectedDate.setHours(23, 59, 59, 999);
+              if (actualDate > expectedDate) return false;
+            }
+          }
         }
-        if (selectedClasses.length && !selectedClasses.includes(s.sinif)) return false;
-        if (genderVal && s.cinsiyet !== genderVal) return false;
-        if (scholarVal === "nonempty" && !s.burslu) return false;
-        if (scholarVal === "empty" && s.burslu) return false;
-        if (fromDate && s.dateObj && s.dateObj < fromDate) return false;
-        if (toDate && s.dateObj && s.dateObj > toDate) return false;
-        
+
         if (searchText) {
-          const combined = Object.values(s).join(" ").toLocaleLowerCase("tr-TR");
+          const combined = getDataFieldKeys().map(key => student[key]).join(" ").toLocaleLowerCase("tr-TR");
           if (!combined.includes(searchText)) return false;
         }
         return true;
       });
 
-      // --- SIRALAMA MANTIĞI ---
       const statusOrder = { new: 0, updated: 1, normal: 2 };
-      
-      filtered.sort((a, b) => {
-        // 1. İsim Sıralama
-        if (sortOrder === "name_asc") return a.isim.localeCompare(b.isim, 'tr');
-        if (sortOrder === "name_desc") return b.isim.localeCompare(a.isim, 'tr');
+      if (sortOrder.includes(":")) {
+        const [key, direction] = sortOrder.split(":");
+        filtered.sort((a, b) => compareFieldValues(a, b, key, direction));
+      } else {
+        filtered.sort((a, b) => {
+          const statusDiff = (statusOrder[a.status] ?? 2) - (statusOrder[b.status] ?? 2);
+          if (statusDiff) return statusDiff;
+          const preferredKey = fieldHasData("okulNo") ? "okulNo" : (fieldHasData("isim") ? "isim" : getDataFieldKeys()[0]);
+          return preferredKey ? compareFieldValues(a, b, preferredKey, preferredKey === "okulNo" ? "desc" : "asc") : 0;
+        });
+      }
 
-        // 2. Numara Sıralama (Okul No)
-        if (sortOrder === "num_asc") return parseInt(a.okulNo || "0") - parseInt(b.okulNo || "0");
-        if (sortOrder === "num_desc") return parseInt(b.okulNo || "0") - parseInt(a.okulNo || "0");
-
-        // 3. Tarih Sıralama
-        if (sortOrder === "date_asc" || sortOrder === "date_desc") {
-            const da = a.dateObj ? a.dateObj.getTime() : 0;
-            const db = b.dateObj ? b.dateObj.getTime() : 0;
-            return sortOrder === "date_desc" ? db - da : da - db;
-        }
-
-        // 4. Varsayılan (Otomatik: Durum -> Numara)
-        const sa = statusOrder[a.status] ?? 2;
-        const sb = statusOrder[b.status] ?? 2;
-        if (sa !== sb) return sa - sb;
-        return parseInt(b.okulNo || "0") - parseInt(a.okulNo || "0");
-      });
-
-      if (recentOnly && filtered.length > 30) filtered = filtered.slice(0, 30);
+      const limit = appSettings.options?.recentLimit || 30;
+      if (recentOnly && filtered.length > limit) filtered = filtered.slice(0, limit);
 
       currentFilteredStudents = filtered.slice();
       renderTable(filtered);
       updateSummary(removedRecords);
       updateListStatus(filtered);
+
+      const info = document.getElementById("activeFilterInfo");
+      const activeCount = filterControls.filter(control => String(control.value || "").trim()).length + (searchText ? 1 : 0);
+      info.style.display = activeCount ? "block" : "none";
+      info.textContent = activeCount ? `${activeCount} filtre etkin. Yalnızca mevcut sütun ve verilere göre süzme yapılıyor.` : "";
     }
 
     function renderTable(rows) {
@@ -3549,40 +4111,58 @@ function compareCurrentStudentsWithSnapshot(currentStudents, snap) {
     // INIT & EVENTS
     // =======================
     function setupEventListeners() {
-      const ids = ["searchInput", "genderFilter", "scholarFilter", "statusFilter", "dateFrom", "dateTo", "recentOnly", "generalSortOrder"];
-      ids.forEach(id => {
-          const el = document.getElementById(id);
-          if(el) el.addEventListener("input", () => applyFilters());
-      });
-      
-      document.getElementById("classFilterContainer").addEventListener("change", () => applyFilters());
+      document.getElementById("searchInput").addEventListener("input", () => applyFilters());
+      document.getElementById("recentOnly").addEventListener("change", () => applyFilters());
+      document.getElementById("generalSortOrder").addEventListener("change", () => applyFilters());
+      document.getElementById("dynamicFiltersContainer").addEventListener("input", () => applyFilters());
+      document.getElementById("dynamicFiltersContainer").addEventListener("change", () => applyFilters());
 
       document.getElementById("sourceSettingsBtn").addEventListener("click", openSourceSettingsModal);
-      document.getElementById("sourceSettingsForm").addEventListener("submit", async (e) => {
-        e.preventDefault();
-        window.closeSourceSettingsModal();
-        await applySourceSettings(readSettingsFromForm());
+      document.getElementById("sourceSettingsCloseBtn").addEventListener("click", window.closeSourceSettingsModal);
+      document.getElementById("sourceSettingsCancelBtn").addEventListener("click", window.closeSourceSettingsModal);
+      document.querySelector(".settings-tabbar").addEventListener("click", event => {
+        const button = event.target.closest("[data-settings-tab]");
+        if (!button) return;
+        captureSettingsDraftFromForm();
+        setSettingsTab(button.dataset.settingsTab);
       });
-      document.getElementById("resetSourceSettingsBtn").addEventListener("click", async () => {
-        window.closeSourceSettingsModal();
-        await applySourceSettings(cloneDefaultSettings());
+      document.getElementById("addSourceBtn").addEventListener("click", addSettingsSource);
+      document.getElementById("addFieldBtn").addEventListener("click", addSettingsField);
+      document.getElementById("sourceSettingsRows").addEventListener("click", event => {
+        const button = event.target.closest("[data-remove-source]");
+        if (button) removeSettingsSource(button.dataset.removeSource);
       });
-      document.getElementById("sourceSettingsModal").addEventListener("click", (e) => {
-        if (e.target === document.getElementById("sourceSettingsModal")) window.closeSourceSettingsModal();
+      document.getElementById("fieldSettingsRows").addEventListener("click", event => {
+        const button = event.target.closest("[data-remove-field]");
+        if (button) removeSettingsField(button.dataset.removeField);
+      });
+      document.getElementById("sourceSettingsForm").addEventListener("submit", async event => {
+        event.preventDefault();
+        const nextSettings = readSettingsFromForm();
+        window.closeSourceSettingsModal();
+        await applySourceSettings(nextSettings);
+      });
+      document.getElementById("resetSourceSettingsBtn").addEventListener("click", () => {
+        settingsDraft = cloneDefaultSettings();
+        renderSettingsForm();
+        setSettingsTab("sources");
+      });
+      document.getElementById("sourceSettingsModal").addEventListener("click", event => {
+        if (event.target === document.getElementById("sourceSettingsModal")) window.closeSourceSettingsModal();
       });
 
       document.getElementById("clearFiltersBtn").addEventListener("click", () => {
-        ids.forEach(id => {
-            const el = document.getElementById(id);
-            if(el) {
-                if(el.type==='checkbox') el.checked=false; else el.value="";
-            }
-        });
-        document.querySelectorAll("#classFilterContainer input").forEach(cb => cb.checked=false);
+        document.getElementById("searchInput").value = "";
+        document.getElementById("recentOnly").checked = false;
+        document.getElementById("generalSortOrder").value = "";
+        document.querySelectorAll("#dynamicFiltersContainer input, #dynamicFiltersContainer select").forEach(control => { control.value = ""; });
         applyFilters();
       });
 
       document.getElementById("reloadBtn").addEventListener("click", async () => {
+        await loadAppSettingsFromFirebase();
+        renderSheetTabs();
+        renderHeader();
         await loadSnapshot();
         await loadData();
       });
@@ -3592,132 +4172,90 @@ function compareCurrentStudentsWithSnapshot(currentStudents, snap) {
       document.getElementById("attendanceCloseBtn").addEventListener("click", closeAttendanceModal);
       document.getElementById("attendanceCancelBtn").addEventListener("click", closeAttendanceModal);
       document.getElementById("addAttendanceDateBtn").addEventListener("click", () => addAttendanceDateRow());
-      document.getElementById("attendanceModal").addEventListener("click", (e) => {
-        if (e.target === document.getElementById("attendanceModal")) closeAttendanceModal();
+      document.getElementById("attendanceModal").addEventListener("click", event => {
+        if (event.target === document.getElementById("attendanceModal")) closeAttendanceModal();
       });
-      document.getElementById("attendanceForm").addEventListener("submit", (e) => {
-        e.preventDefault();
-        const dates = Array.from(document.querySelectorAll("#attendanceDateList input[type='date']"))
-          .map(input => input.value)
-          .filter(Boolean);
-        if (!dates.length) {
-          showToast("En az bir yoklama tarihi seçin.");
-          return;
-        }
+      document.getElementById("attendanceForm").addEventListener("submit", event => {
+        event.preventDefault();
+        const dates = Array.from(document.querySelectorAll("#attendanceDateList input[type='date']")).map(input => input.value).filter(Boolean);
+        if (!dates.length) return showToast("En az bir yoklama tarihi seçin.");
         printAttendanceList(dates);
       });
 
       document.getElementById("printBtn").addEventListener("click", () => {
         syncPrintColumnVisibility();
         document.body.classList.add("print-preparing");
-        requestAnimationFrame(() => {
-          requestAnimationFrame(() => {
-            setTimeout(() => {
-              window.print();
-            }, 60);
-          });
-        });
+        requestAnimationFrame(() => requestAnimationFrame(() => setTimeout(() => window.print(), 60)));
       });
-
-      window.addEventListener("afterprint", () => {
-        document.body.classList.remove("print-preparing");
-      });
-
+      window.addEventListener("afterprint", () => document.body.classList.remove("print-preparing"));
       window.addEventListener("beforeprint", () => {
         document.body.classList.add("print-preparing");
         syncPrintColumnVisibility();
       });
       document.getElementById("printColsContainer").addEventListener("change", syncPrintColumnVisibility);
 
-      document.getElementById("viewAllBtn").addEventListener("click", (e) => {
+      document.getElementById("viewAllBtn").addEventListener("click", event => {
         activeViewMode = "all";
-        document.querySelectorAll(".view-toggles button").forEach(b => b.classList.remove("active"));
-        e.target.classList.add("active");
+        document.querySelectorAll(".view-toggles button").forEach(button => button.classList.remove("active"));
+        event.target.classList.add("active");
         applyFilters();
       });
-
-      document.getElementById("viewNewUpdatedBtn").addEventListener("click", (e) => {
+      document.getElementById("viewNewUpdatedBtn").addEventListener("click", event => {
         activeViewMode = "new-updated";
-        document.querySelectorAll(".view-toggles button").forEach(b => b.classList.remove("active"));
-        e.target.classList.add("active");
+        document.querySelectorAll(".view-toggles button").forEach(button => button.classList.remove("active"));
+        event.target.classList.add("active");
         applyFilters();
       });
 
-      // Tablo Satırına Tıklama (Modal Açma)
-      // ============================================================
-      // GÜNCELLENEN ALAN: Tablo Etkileşimleri (Tıklama ve Çift Tıklama)
-      // ============================================================
-
-      // 1. Tek Tıklama (Sadece DURUM sütununda Modal açar)
-      document.getElementById("tableBody").addEventListener("click", e => {
-        const tr = e.target.closest("tr");
-        const td = e.target.closest("td");
-        
-        // Satır yoksa veya yükleniyor satırıysa işlem yapma
-        if (!tr || tr.classList.contains("loading-row") || !td) return;
-
-        // EĞER tıklanan sütun "status" (Durum) değilse modal açma (buradan çık)
-        if (td.dataset.field !== "status") return;
-        
-        // Hangi öğrenci olduğunu bul
-        const rowId = tr.dataset.studentId;
-        const student = students.find(s => s.id === rowId);
-        if(student) openStudentModal(student);
+      document.getElementById("tableBody").addEventListener("click", event => {
+        const row = event.target.closest("tr");
+        const cell = event.target.closest("td");
+        if (!row || row.classList.contains("loading-row") || !cell || cell.dataset.field !== "status") return;
+        const student = students.find(item => item.id === row.dataset.studentId);
+        if (student) openStudentModal(student);
       });
-
-      // 2. Çift Tıklama (Durum haricindeki hücreleri kopyalar)
-      document.getElementById("tableBody").addEventListener("dblclick", async e => {
-        const td = e.target.closest("td");
-        if (!td) return;
-
-        // Durum sütununda kopyalama yapma (orası modal için)
-        if (td.dataset.field === "status") return;
-
-        const text = td.textContent.trim();
-        if (!text) return;
-
+      document.getElementById("tableBody").addEventListener("dblclick", async event => {
+        const cell = event.target.closest("td");
+        if (!cell || cell.dataset.field === "status") return;
+        const value = cell.textContent.trim();
+        if (!value) return;
         try {
-          await navigator.clipboard.writeText(text);
-          showToast(`Kopyalandı: ${text}`);
-        } catch (err) {
-          console.error("Kopyalama hatası:", err);
+          await navigator.clipboard.writeText(value);
+          showToast(`Kopyalandı: ${value}`);
+        } catch (error) {
+          console.error("Kopyalama hatası:", error);
         }
       });
-      
-      // Modal dışına tıklayınca kapat
-      document.getElementById("studentDetailModal").addEventListener("click", (e) => {
-        if(e.target === document.getElementById("studentDetailModal")) closeModal();
+      document.getElementById("studentDetailModal").addEventListener("click", event => {
+        if (event.target === document.getElementById("studentDetailModal")) closeModal();
       });
 
-      // TXT İndir
       document.getElementById("downloadTxtBtn").addEventListener("click", () => {
         if (!students.length) return showToast("Liste boş.");
-        const snap = buildSnapshotObject(students);
-        const blob = new Blob([JSON.stringify(snap, null, 2)], { type: "text/plain;charset=utf-8" });
+        const blob = new Blob([JSON.stringify(buildSnapshotObject(students), null, 2)], { type: "text/plain;charset=utf-8" });
         const url = URL.createObjectURL(blob);
-        const a = document.createElement("a");
-        a.href = url;
-        a.download = `liste_${makeSafeFilename(currentSheetName)}.txt`;
-        document.body.appendChild(a);
-        a.click();
-        document.body.removeChild(a);
-        showToast("TXT İndirildi.");
+        const anchor = document.createElement("a");
+        anchor.href = url;
+        anchor.download = `liste_${makeSafeFilename(currentSheetName)}.txt`;
+        document.body.appendChild(anchor);
+        anchor.click();
+        anchor.remove();
+        URL.revokeObjectURL(url);
+        showToast("TXT indirildi.");
       });
 
-      // TXT Yükle
       const uploadInput = document.getElementById("uploadTxtInput");
       document.getElementById("uploadTxtBtn").addEventListener("click", () => {
         uploadInput.value = "";
         uploadInput.click();
       });
-      uploadInput.addEventListener("change", e => {
-        const file = e.target.files && e.target.files[0];
+      uploadInput.addEventListener("change", event => {
+        const file = event.target.files?.[0];
         if (!file) return;
         const reader = new FileReader();
         reader.onload = () => {
-          try {
-            applySnapshotFromFile(JSON.parse(reader.result));
-          } catch(err) { showToast("Dosya okunamadı."); }
+          try { applySnapshotFromFile(JSON.parse(reader.result)); }
+          catch (error) { showToast("Dosya okunamadı."); }
         };
         reader.readAsText(file);
       });
@@ -3797,7 +4335,9 @@ function compareCurrentStudentsWithSnapshot(currentStudents, snap) {
     }
 
     document.addEventListener("DOMContentLoaded", async () => {
+      await loadAppSettingsFromFirebase();
       renderSheetTabs();
+      renderHeader();
       setupEventListeners();
       await loadSnapshot();
       await loadData();
