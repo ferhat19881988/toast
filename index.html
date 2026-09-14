@@ -4091,10 +4091,42 @@ function compareCurrentStudentsWithSnapshot(currentStudents, snap) {
       return select;
     }
 
+    function createMultiValueFilter(key, values) {
+      const wrapper = document.createElement("div");
+      wrapper.className = "class-chips";
+
+      values.forEach(value => {
+        const label = document.createElement("label");
+        const checkbox = document.createElement("input");
+        checkbox.type = "checkbox";
+        checkbox.value = value;
+        checkbox.dataset.filterKey = key;
+        checkbox.dataset.filterMode = "multi-exact";
+
+        const chip = document.createElement("span");
+        chip.textContent = value;
+
+        label.appendChild(checkbox);
+        label.appendChild(chip);
+        wrapper.appendChild(label);
+      });
+
+      return wrapper;
+    }
+
     function captureDynamicFilterState() {
       const state = {};
       document.querySelectorAll("#dynamicFiltersContainer [data-filter-key]").forEach(control => {
-        state[`${control.dataset.filterKey}__${control.dataset.filterMode || "exact"}`] = control.value;
+        const mode = control.dataset.filterMode || "exact";
+        const stateKey = `${control.dataset.filterKey}__${mode}`;
+
+        if (mode === "multi-exact") {
+          if (!Array.isArray(state[stateKey])) state[stateKey] = [];
+          if (control.checked) state[stateKey].push(control.value);
+          return;
+        }
+
+        state[stateKey] = control.value;
       });
       return state;
     }
@@ -4130,7 +4162,17 @@ function compareCurrentStudentsWithSnapshot(currentStudents, snap) {
         label.textContent = field.label;
         row.appendChild(label);
 
-        if (field.type === "date") {
+        const uniqueValues = Array.from(new Set(getFieldValues(key))).sort((a, b) => a.localeCompare(b, "tr", { numeric: true }));
+
+        if (key === "sinif") {
+          const hint = document.createElement("span");
+          hint.textContent = "Çoklu seçim";
+          hint.style.fontSize = "11px";
+          hint.style.fontWeight = "700";
+          hint.style.color = "var(--text-muted)";
+          label.appendChild(hint);
+          row.appendChild(createMultiValueFilter(key, uniqueValues));
+        } else if (field.type === "date") {
           const grid = document.createElement("div");
           grid.className = "dynamic-date-grid";
           ["from", "to"].forEach(mode => {
@@ -4141,18 +4183,15 @@ function compareCurrentStudentsWithSnapshot(currentStudents, snap) {
             grid.appendChild(input);
           });
           row.appendChild(grid);
+        } else if (field.type === "select" || uniqueValues.length <= 24) {
+          row.appendChild(createFilterSelect(key, uniqueValues));
         } else {
-          const uniqueValues = Array.from(new Set(getFieldValues(key))).sort((a, b) => a.localeCompare(b, "tr", { numeric: true }));
-          if (field.type === "select" || uniqueValues.length <= 24) {
-            row.appendChild(createFilterSelect(key, uniqueValues));
-          } else {
-            const input = document.createElement("input");
-            input.type = "text";
-            input.placeholder = `${field.label} içinde ara...`;
-            input.dataset.filterKey = key;
-            input.dataset.filterMode = "contains";
-            row.appendChild(input);
-          }
+          const input = document.createElement("input");
+          input.type = "text";
+          input.placeholder = `${field.label} içinde ara...`;
+          input.dataset.filterKey = key;
+          input.dataset.filterMode = "contains";
+          row.appendChild(input);
         }
         container.appendChild(row);
         renderedCount++;
@@ -4163,8 +4202,17 @@ function compareCurrentStudentsWithSnapshot(currentStudents, snap) {
       }
 
       document.querySelectorAll("#dynamicFiltersContainer [data-filter-key]").forEach(control => {
-        const stateKey = `${control.dataset.filterKey}__${control.dataset.filterMode || "exact"}`;
-        if (previousState[stateKey] !== undefined) control.value = previousState[stateKey];
+        const mode = control.dataset.filterMode || "exact";
+        const stateKey = `${control.dataset.filterKey}__${mode}`;
+        if (previousState[stateKey] === undefined) return;
+
+        if (mode === "multi-exact") {
+          const selectedValues = Array.isArray(previousState[stateKey]) ? previousState[stateKey] : [];
+          control.checked = selectedValues.includes(control.value);
+          return;
+        }
+
+        control.value = previousState[stateKey];
       });
 
       const sort = document.getElementById("generalSortOrder");
@@ -4313,11 +4361,33 @@ function compareCurrentStudentsWithSnapshot(currentStudents, snap) {
       const searchText = document.getElementById("searchInput").value.trim().toLocaleLowerCase("tr-TR");
       const recentOnly = document.getElementById("recentOnly").checked;
       const sortOrder = document.getElementById("generalSortOrder")?.value || "";
-      const filterControls = Array.from(document.querySelectorAll("#dynamicFiltersContainer [data-filter-key]"));
+      const allFilterControls = Array.from(document.querySelectorAll("#dynamicFiltersContainer [data-filter-key]"));
+      const filterControls = [];
+      const multiSelections = new Map();
+
+      allFilterControls.forEach(control => {
+        const key = control.dataset.filterKey;
+        const mode = control.dataset.filterMode || "exact";
+
+        if (mode === "multi-exact") {
+          if (!control.checked) return;
+          if (!multiSelections.has(key)) multiSelections.set(key, new Set());
+          multiSelections.get(key).add(normalizeTextForCompare(control.value));
+          return;
+        }
+
+        filterControls.push(control);
+      });
 
       let filtered = students.filter(student => {
         if (activeSourceView !== "all" && !(student._sourceIds || []).includes(activeSourceView)) return false;
         if (activeViewMode === "new-updated" && !["new", "updated"].includes(student.status)) return false;
+
+        for (const [key, selectedValues] of multiSelections.entries()) {
+          if (!selectedValues.size) continue;
+          const actual = key === "status" ? student.status : String(student[key] || "").trim();
+          if (!selectedValues.has(normalizeTextForCompare(actual))) return false;
+        }
 
         for (const control of filterControls) {
           const expected = String(control.value || "").trim();
@@ -4368,9 +4438,14 @@ function compareCurrentStudentsWithSnapshot(currentStudents, snap) {
       updateListStatus(filtered);
 
       const info = document.getElementById("activeFilterInfo");
-      const activeCount = filterControls.filter(control => String(control.value || "").trim()).length + (searchText ? 1 : 0);
+      const activeStandardCount = filterControls.filter(control => String(control.value || "").trim()).length;
+      const activeMultiCount = Array.from(multiSelections.values()).filter(selectedValues => selectedValues.size > 0).length;
+      const activeCount = activeStandardCount + activeMultiCount + (searchText ? 1 : 0);
+      const selectedClassCount = multiSelections.get("sinif")?.size || 0;
       info.style.display = activeCount ? "block" : "none";
-      info.textContent = activeCount ? `${activeCount} filtre etkin. Yalnızca mevcut sütun ve verilere göre süzme yapılıyor.` : "";
+      info.textContent = activeCount
+        ? `${activeCount} filtre etkin.${selectedClassCount ? ` ${selectedClassCount} sınıf birlikte seçili.` : ""} Yalnızca mevcut sütun ve verilere göre süzme yapılıyor.`
+        : "";
     }
 
     function renderTable(rows) {
@@ -4627,7 +4702,13 @@ function compareCurrentStudentsWithSnapshot(currentStudents, snap) {
         document.getElementById("searchInput").value = "";
         document.getElementById("recentOnly").checked = false;
         document.getElementById("generalSortOrder").value = "";
-        document.querySelectorAll("#dynamicFiltersContainer input, #dynamicFiltersContainer select").forEach(control => { control.value = ""; });
+        document.querySelectorAll("#dynamicFiltersContainer input, #dynamicFiltersContainer select").forEach(control => {
+          if ((control.type === "checkbox" || control.type === "radio") && control.dataset.filterMode === "multi-exact") {
+            control.checked = false;
+          } else {
+            control.value = "";
+          }
+        });
         applyFilters();
       });
 
