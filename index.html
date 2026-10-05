@@ -302,92 +302,6 @@
       z-index:1;
     }
 
-    /* Stats Cards */
-    .stats-container{
-      display:grid;
-      grid-template-columns: repeat(2, minmax(0, 1fr));
-      gap:12px;
-      margin-bottom:20px;
-    }
-
-    .stat-card{
-      background: linear-gradient(180deg, rgba(255,255,255,.96), rgba(246,249,255,.92));
-      border-radius: var(--radius-md);
-      padding: 16px;
-      display:flex;
-      flex-direction:column;
-      border: 1px solid rgba(255,255,255,.92);
-      transition: transform .18s ease, box-shadow .18s ease, border-color .18s ease;
-      box-shadow: 0 12px 24px rgba(125,142,247,.08);
-      position:relative;
-      overflow:hidden;
-      isolation:isolate;
-    }
-
-    .stat-card::before{
-      content:"";
-      position:absolute;
-      inset:0;
-      background: linear-gradient(135deg, rgba(255,255,255,.32), transparent 45%);
-      pointer-events:none;
-      z-index:-1;
-    }
-
-    .stat-card:hover{
-      transform: translateY(-2px);
-      box-shadow: 0 18px 34px rgba(125,142,247,.14);
-      border-color: rgba(125,142,247,.14);
-    }
-
-    .stat-card.total{
-      background:
-        linear-gradient(180deg, rgba(255,255,255,.98), rgba(245,248,255,.96)),
-        radial-gradient(440px 180px at 100% 0%, rgba(125,142,247,.14), transparent 72%);
-      grid-column: 1 / -1;
-    }
-
-    .stat-card.new{
-      background: linear-gradient(180deg, rgba(240,255,252,.98), rgba(232,250,246,.96));
-      color: var(--success-text);
-    }
-
-    .stat-card.updated{
-      background: linear-gradient(180deg, rgba(255,247,243,.98), rgba(255,240,235,.96));
-      color: var(--warning-text);
-    }
-
-    .stat-card.removed{
-      background: linear-gradient(180deg, rgba(255,243,246,.98), rgba(253,235,241,.96));
-      color: #b54763;
-    }
-
-    .stat-card.duplicate{
-      background: linear-gradient(180deg, rgba(255,250,236,.98), rgba(255,244,207,.96));
-      color: #a56a00;
-    }
-
-    .stat-label{
-      font-size: 11.5px;
-      font-weight: 800;
-      text-transform: uppercase;
-      letter-spacing: .08em;
-      opacity:.88;
-    }
-
-    .stat-value{
-      font-size: 34px;
-      font-weight: 900;
-      margin: 5px 0;
-      line-height: 1;
-      min-height: 34px;
-    }
-
-    .stat-desc{
-      font-size: 12px;
-      opacity: .78;
-      font-weight: 600;
-    }
-
     /* Filter Inputs */
     .filters-stack{
       display:flex;
@@ -674,6 +588,84 @@
       border-bottom:none;
     }
 
+    .change-list-note{
+      margin:0 16px 8px;
+      padding:9px 11px;
+      border-radius:12px;
+      background:rgba(248,250,252,.92);
+      border:1px solid rgba(203,213,225,.72);
+      color:rgba(71,85,105,.84);
+      font-size:11.5px;
+      font-weight:650;
+      line-height:1.45;
+    }
+
+    .change-list-item{
+      cursor:pointer;
+      border-radius:10px;
+      margin:0 -6px;
+      padding:10px 6px !important;
+      transition:background .16s ease, transform .16s ease;
+    }
+
+    .change-list-item:hover,
+    .change-list-item:focus-visible{
+      background:rgba(125,142,247,.08);
+      transform:translateX(2px);
+      outline:none;
+    }
+
+    .change-list-empty{
+      color:rgba(100,116,139,.74) !important;
+      font-style:italic;
+      cursor:default !important;
+    }
+
+    .group-records{
+      display:flex;
+      flex-wrap:wrap;
+      gap:6px;
+      margin-top:7px;
+    }
+
+    .group-record-button{
+      appearance:none;
+      border:1px solid rgba(148,163,184,.34);
+      background:rgba(255,255,255,.92);
+      color:var(--ink-1);
+      border-radius:999px;
+      padding:5px 9px;
+      font:inherit;
+      font-size:11px;
+      font-weight:800;
+      cursor:pointer;
+      transition:background .16s ease, border-color .16s ease, transform .16s ease;
+    }
+
+    .group-record-button:hover,
+    .group-record-button:focus-visible{
+      background:rgba(125,142,247,.10);
+      border-color:rgba(125,142,247,.38);
+      transform:translateY(-1px);
+      outline:none;
+    }
+
+    .twin-group-title{
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      gap:8px;
+      color:var(--ink-0);
+      font-weight:900;
+    }
+
+    .twin-group-reason{
+      margin-top:5px;
+      color:rgba(71,85,105,.82);
+      font-size:11.5px;
+      line-height:1.45;
+    }
+
     /* Table Toolbar */
     .table-tools-container{
       background:
@@ -955,6 +947,12 @@
       border-color: rgba(239,206,102,.95);
     }
 
+    .status-badge.twin{
+      background: rgba(239,246,255,.98);
+      color: #3657a7;
+      border-color: rgba(147,171,238,.95);
+    }
+
     td[data-field="status"] .status-badge{
       transition: transform .16s ease, box-shadow .16s ease, filter .16s ease, background .16s ease, border-color .16s ease, color .16s ease;
     }
@@ -1106,20 +1104,6 @@
       .header-meta,
       .header-meta .chip{
         width:100%;
-      }
-
-      .stats-container{
-        grid-template-columns:repeat(2, minmax(0, 1fr));
-        gap:10px;
-      }
-
-      .stat-card{
-        padding:14px;
-        border-radius:18px;
-      }
-
-      .stat-value{
-        font-size:28px;
       }
 
       .panel,
@@ -1294,9 +1278,6 @@
     }
 
     @media screen and (max-width: 480px){
-      .stats-container{
-        grid-template-columns:1fr;
-      }
 
       .table-toolbar-right .btn{
         min-width:100%;
@@ -2445,34 +2426,6 @@
       <div style="display: flex; flex-direction: column; gap: 24px;">
         
         <section>
-          <div class="stats-container">
-            <div class="stat-card total">
-              <div class="stat-label">Toplam Öğrenci</div>
-              <div class="stat-value" id="totalCount">–</div>
-              <div class="stat-desc">Aktif listedeki kayıt sayısı</div>
-            </div>
-            <div class="stat-card new">
-              <div class="stat-label">Yeni</div>
-              <div class="stat-value" id="newCount">–</div>
-              <div class="stat-desc">Önceki listeye göre</div>
-            </div>
-            <div class="stat-card updated">
-              <div class="stat-label">Güncel</div>
-              <div class="stat-value" id="updatedCount">–</div>
-              <div class="stat-desc">Bilgisi değişenler</div>
-            </div>
-            <div class="stat-card removed">
-              <div class="stat-label">Silinen</div>
-              <div class="stat-value" id="removedCount">–</div>
-              <div class="stat-desc">Listeden düşenler</div>
-            </div>
-            <div class="stat-card duplicate">
-              <div class="stat-label">Çakışma</div>
-              <div class="stat-value" id="dupCount">–</div>
-              <div class="stat-desc">Okul no çakışmaları</div>
-            </div>
-          </div>
-          
           <div class="change-lists">
             <details>
               <summary>🆕 Yeni Kayıtlar <span class="status-badge new" id="newTagCount">0</span></summary>
@@ -2489,6 +2442,11 @@
             <details>
               <summary>⚠️ Okul No Çakışmaları <span class="status-badge danger" id="dupTagCount">0</span></summary>
               <ul id="dupList"></ul>
+            </details>
+            <details class="twin-records">
+              <summary>👥 İkiz Kayıtlar <span class="status-badge twin" id="twinTagCount">0</span></summary>
+              <div class="change-list-note">Aynı öğrenci ad-soyadı ve veli doğrulamasıyla, farklı öğrenci numaralarında görünen mükerrer kayıt adayları.</div>
+              <ul id="twinList"></ul>
             </details>
           </div>
         </section>
@@ -2553,6 +2511,9 @@
             <button class="btn btn-primary btn-sm no-print" id="saveSnapshotBtn">
               💾 Kaydet
             </button>
+            <button class="btn btn-secondary btn-sm no-print" id="downloadExcelBtn">
+              📊 İndir (Excel)
+            </button>
             <button class="btn btn-secondary btn-sm no-print" id="downloadTxtBtn">
               📥 İndir (TXT)
             </button>
@@ -2596,6 +2557,7 @@
         
         <div id="printFooterNote" style="padding: 12px 24px; background: #f8fafc; border-top: 1px solid var(--border); font-size:12px; color:var(--text-muted); text-align:center;">
           <span id="lastSavedInfo">Son kayıt: Yok</span>
+          <span class="no-print" aria-hidden="true"> · </span><span class="no-print" id="appVersionLabel"></span>
         </div>
 
       </div>
@@ -2729,10 +2691,13 @@
     </div>
   </div>
 
+  <script src="https://cdn.jsdelivr.net/npm/exceljs@4.4.0/dist/exceljs.min.js"></script>
+
   <script type="module">
     // =======================
     // KONFİGÜRASYON
     // =======================
+    const APP_VERSION = "v1.0";
     const DEFAULT_SPREADSHEET_INPUT = "16BD_BrNLYBaXviCzB8yDKBGS2Vdj5DHi";
     const SETTINGS_STORAGE_KEY = "ogrenci_listesi_source_settings_v5";
     const FIREBASE_APP_BASE_PATH = "studentListManager/v5";
@@ -2992,6 +2957,8 @@
     let snapshotSource = "none";
     let activeViewMode = "all";
     let duplicateOkulNoMap = {};
+    let twinRecordGroups = [];
+    let twinRecordByStudentId = new Map();
     let removedRecordsCache = [];
     let currentFilteredStudents = [];
 
@@ -3253,6 +3220,169 @@
         if (buckets[no].length >= 2) dup[no] = buckets[no];
       });
       return dup;
+    }
+
+
+    function normalizeIdentityName(value) {
+      return normalizeTextForCompare(value)
+        .replace(/[.,;:()\[\]{}'"`´’_-]+/g, " ")
+        .replace(/\s+/g, " ")
+        .trim();
+    }
+
+    function combineIdentityName(firstPart, lastPart = "") {
+      const first = normalizeIdentityName(firstPart);
+      const last = normalizeIdentityName(lastPart);
+      if (!last) return first;
+      if (!first) return last;
+      if (first === last || first.endsWith(` ${last}`)) return first;
+      return `${first} ${last}`.trim();
+    }
+
+    function getStudentIdentityName(student) {
+      return combineIdentityName(student?.isim, student?.soyisim);
+    }
+
+    function normalizePhoneForIdentity(value) {
+      let digits = String(value ?? "").replace(/\D+/g, "");
+      if (digits.startsWith("0090") && digits.length >= 14) digits = digits.slice(4);
+      else if (digits.startsWith("90") && digits.length === 12) digits = digits.slice(2);
+      if (digits.startsWith("0") && digits.length === 11) digits = digits.slice(1);
+      if (digits.length > 10) digits = digits.slice(-10);
+      return digits;
+    }
+
+    function getGuardianIdentity(student, guardianIndex = 1) {
+      if (guardianIndex === 2) {
+        return {
+          name: normalizeIdentityName(student?.veli2Adi),
+          phone: normalizePhoneForIdentity(student?.veli2Telefon)
+        };
+      }
+      return {
+        name: combineIdentityName(student?.veliAdi, student?.veliSoyadi),
+        phone: normalizePhoneForIdentity(student?.veliTelefon)
+      };
+    }
+
+    function hasIdentityConflict(left, right) {
+      const nameConflict = Boolean(left.name && right.name && left.name !== right.name);
+      const phoneConflict = Boolean(left.phone && right.phone && left.phone !== right.phone);
+      return nameConflict || phoneConflict;
+    }
+
+    function hasCompleteIdentityMatch(left, right) {
+      return Boolean(left.name && left.phone && right.name && right.phone && left.name === right.name && left.phone === right.phone);
+    }
+
+    function evaluateTwinRecordPair(a, b) {
+      const studentNameA = getStudentIdentityName(a);
+      const studentNameB = getStudentIdentityName(b);
+      if (!studentNameA || studentNameA !== studentNameB) return null;
+
+      const noA = normalizeOkulNo(a?.okulNo);
+      const noB = normalizeOkulNo(b?.okulNo);
+      // İkiz kayıt bölümü, aynı kişiyi farklı öğrenci numaralarıyla yakalamak içindir.
+      if (!noA || !noB || noA === noB) return null;
+
+      const veli1A = getGuardianIdentity(a, 1);
+      const veli1B = getGuardianIdentity(b, 1);
+      const veli2A = getGuardianIdentity(a, 2);
+      const veli2B = getGuardianIdentity(b, 2);
+
+      const veli1Match = hasCompleteIdentityMatch(veli1A, veli1B);
+      const veli2Match = hasCompleteIdentityMatch(veli2A, veli2B);
+      const veli1Conflict = hasIdentityConflict(veli1A, veli1B);
+      const veli2Conflict = hasIdentityConflict(veli2A, veli2B);
+
+      if (veli1Match && !veli2Conflict) {
+        return {
+          level: veli2Match ? "both" : "veli1",
+          reason: veli2Match
+            ? "Öğrenci ad-soyadı ile Veli 1 ve Veli 2 adı/telefonu eşleşiyor."
+            : "Öğrenci ad-soyadı ile Veli 1 adı ve telefonu eşleşiyor."
+        };
+      }
+
+      // Veli 1 alanları eksik olduğunda, çelişki yoksa Veli 2 tam eşleşmesi yedek doğrulama olur.
+      if (!veli1Conflict && veli2Match) {
+        return {
+          level: "veli2",
+          reason: "Veli 1 bilgileri eksik olduğu için öğrenci ad-soyadı ve Veli 2 adı/telefonu ile doğrulandı."
+        };
+      }
+
+      return null;
+    }
+
+    function detectTwinRecords(list) {
+      const source = (list || []).filter(student => getStudentIdentityName(student) && normalizeOkulNo(student?.okulNo));
+      const byStudentName = new Map();
+      source.forEach(student => {
+        const key = getStudentIdentityName(student);
+        if (!byStudentName.has(key)) byStudentName.set(key, []);
+        byStudentName.get(key).push(student);
+      });
+
+      const matches = [];
+      byStudentName.forEach(group => {
+        if (group.length < 2) return;
+        for (let i = 0; i < group.length; i++) {
+          for (let j = i + 1; j < group.length; j++) {
+            const result = evaluateTwinRecordPair(group[i], group[j]);
+            if (result) matches.push({ a: group[i], b: group[j], ...result });
+          }
+        }
+      });
+
+      if (!matches.length) return [];
+
+      const parent = new Map();
+      const find = id => {
+        const p = parent.get(id) ?? id;
+        if (p === id) return id;
+        const root = find(p);
+        parent.set(id, root);
+        return root;
+      };
+      const union = (a, b) => {
+        if (!parent.has(a)) parent.set(a, a);
+        if (!parent.has(b)) parent.set(b, b);
+        const ra = find(a);
+        const rb = find(b);
+        if (ra !== rb) parent.set(rb, ra);
+      };
+
+      matches.forEach(match => union(match.a.id, match.b.id));
+      const grouped = new Map();
+      matches.forEach(match => {
+        const root = find(match.a.id);
+        if (!grouped.has(root)) grouped.set(root, { students: new Map(), reasons: new Set(), levels: new Set() });
+        const entry = grouped.get(root);
+        entry.students.set(match.a.id, match.a);
+        entry.students.set(match.b.id, match.b);
+        entry.reasons.add(match.reason);
+        entry.levels.add(match.level);
+      });
+
+      return Array.from(grouped.values()).map((entry, index) => ({
+        id: `twin_${index + 1}`,
+        students: Array.from(entry.students.values()).sort((a, b) => {
+          const left = parseInt(normalizeOkulNo(a.okulNo) || "0", 10);
+          const right = parseInt(normalizeOkulNo(b.okulNo) || "0", 10);
+          if (Number.isFinite(left) && Number.isFinite(right) && left !== right) return left - right;
+          return normalizeOkulNo(a.okulNo).localeCompare(normalizeOkulNo(b.okulNo), "tr", { numeric: true });
+        }),
+        reasons: Array.from(entry.reasons),
+        strongestLevel: entry.levels.has("both") ? "both" : (entry.levels.has("veli1") ? "veli1" : "veli2")
+      }));
+    }
+
+    function rebuildTwinRecordIndex() {
+      twinRecordByStudentId = new Map();
+      twinRecordGroups.forEach(group => {
+        group.students.forEach(student => twinRecordByStudentId.set(student.id, group));
+      });
     }
 
 // ID değiştiğinde (ör. isim/soyisim/okulNo düzeltmesi) aynı kişiyi "yeni" gibi göstermemek için
@@ -3973,7 +4103,13 @@ function compareCurrentStudentsWithSnapshot(currentStudents, snap) {
       const sources = getEnabledSources();
       if (!sources.length) {
         students = [];
+        removedRecordsCache = [];
+        duplicateOkulNoMap = {};
+        twinRecordGroups = [];
+        rebuildTwinRecordIndex();
         body.innerHTML = `<tr class="loading-row"><td colspan="${getTableColspan()}">Etkin veri kaynağı yok.</td></tr>`;
+        updateSummary([]);
+        updateListStatus([]);
         return;
       }
 
@@ -3990,6 +4126,8 @@ function compareCurrentStudentsWithSnapshot(currentStudents, snap) {
         const comparison = compareCurrentStudentsWithSnapshot(students, snapshot);
         removedRecordsCache = comparison.removed || [];
         duplicateOkulNoMap = detectDuplicateOkulNos(students);
+        twinRecordGroups = detectTwinRecords(students);
+        rebuildTwinRecordIndex();
 
         renderHeader();
         renderDynamicFilters();
@@ -4001,12 +4139,16 @@ function compareCurrentStudentsWithSnapshot(currentStudents, snap) {
         if (errors.length) showToast(`${successfulLists.length} kaynak okundu, ${errors.length} kaynakta hata var.`);
         const duplicateKeys = Object.keys(duplicateOkulNoMap || {});
         if (duplicateKeys.length) showToast(`Uyarı: ${duplicateKeys.length} okul numarası çakışması bulundu.`);
+        if (twinRecordGroups.length) showToast(`Uyarı: ${twinRecordGroups.length} ikiz kayıt grubu bulundu.`);
         if (!students.length && errors.length) throw new Error(errors.join(" | "));
       } catch (err) {
         console.error(err);
         body.innerHTML = `<tr class="loading-row"><td colspan="${getTableColspan()}" style="color:red; text-align:center; padding:40px;">Hata: ${escapeHtml(err.message)}</td></tr>`;
         document.getElementById("lastLoadedInfo").textContent = "Hata oluştu.";
         removedRecordsCache = [];
+        duplicateOkulNoMap = {};
+        twinRecordGroups = [];
+        rebuildTwinRecordIndex();
         updateSummary([]);
         updateListStatus([]);
       }
@@ -4232,32 +4374,66 @@ function compareCurrentStudentsWithSnapshot(currentStudents, snap) {
     }
 
     function updateSummary(removedRecords = []) {
-      const total = students.length;
-      const newCount = students.filter(s => s.status === "new").length;
-      const updatedCount = students.filter(s => s.status === "updated").length;
+      const newItems = students.filter(s => s.status === "new");
+      const updatedItems = students.filter(s => s.status === "updated");
       const removedCount = removedRecords.length;
-
       const dupGroups = duplicateOkulNoMap ? Object.keys(duplicateOkulNoMap) : [];
-      const dupCount = dupGroups.length;
+      const twinCount = twinRecordGroups.length;
 
-      document.getElementById("totalCount").textContent = total;
-      document.getElementById("newCount").textContent = newCount;
-      document.getElementById("updatedCount").textContent = updatedCount;
-      document.getElementById("removedCount").textContent = removedCount;
-      const dupCountEl = document.getElementById("dupCount");
-      if (dupCountEl) dupCountEl.textContent = dupCount;
-
-      document.getElementById("newTagCount").textContent = newCount;
-      document.getElementById("updatedTagCount").textContent = updatedCount;
+      document.getElementById("newTagCount").textContent = newItems.length;
+      document.getElementById("updatedTagCount").textContent = updatedItems.length;
       document.getElementById("removedTagCount").textContent = removedCount;
 
-
       const dupTag = document.getElementById("dupTagCount");
-      if (dupTag) dupTag.textContent = dupCount;
+      if (dupTag) dupTag.textContent = dupGroups.length;
+      const twinTag = document.getElementById("twinTagCount");
+      if (twinTag) twinTag.textContent = twinCount;
+
+      const appendEmptyState = (el, message) => {
+        const li = document.createElement("li");
+        li.className = "change-list-empty";
+        li.textContent = message;
+        el.appendChild(li);
+      };
+
+      const attachStudentOpenBehavior = (element, student) => {
+        if (!element || !student) return;
+        element.classList.add("change-list-item");
+        element.tabIndex = 0;
+        element.setAttribute("role", "button");
+        element.title = "Öğrenci detayını aç";
+        const open = () => openStudentModal(student);
+        element.addEventListener("click", open);
+        element.addEventListener("keydown", event => {
+          if (event.key === "Enter" || event.key === " ") {
+            event.preventDefault();
+            open();
+          }
+        });
+      };
+
+      const createStudentRecordButton = student => {
+        const button = document.createElement("button");
+        button.type = "button";
+        button.className = "group-record-button";
+        const name = [student.isim, student.soyisim].filter(Boolean).join(" ").trim() || "Öğrenci";
+        button.textContent = `${student.okulNo || "?"} · ${name}`;
+        button.title = "Öğrenci detayını aç";
+        button.addEventListener("click", event => {
+          event.stopPropagation();
+          openStudentModal(student);
+        });
+        return button;
+      };
 
       const fillList = (listId, items, isRemoved = false) => {
         const el = document.getElementById(listId);
+        if (!el) return;
         el.innerHTML = "";
+        if (!items.length) {
+          appendEmptyState(el, "Kayıt yok.");
+          return;
+        }
         items.forEach(s => {
           const d = isRemoved ? (s.data || {}) : s;
           const li = document.createElement("li");
@@ -4269,37 +4445,68 @@ function compareCurrentStudentsWithSnapshot(currentStudents, snap) {
           li.appendChild(strong);
           li.appendChild(document.createTextNode(" " + fullName + " "));
           li.appendChild(small);
+          if (!isRemoved) attachStudentOpenBehavior(li, s);
           el.appendChild(li);
         });
       };
 
-      fillList("newList", students.filter(s => s.status === "new"));
-      fillList("updatedList", students.filter(s => s.status === "updated"));
+      fillList("newList", newItems);
+      fillList("updatedList", updatedItems);
       fillList("removedList", removedRecords, true);
-
 
       // Okul No Çakışmaları
       const dupEl = document.getElementById("dupList");
       if (dupEl) {
         dupEl.innerHTML = "";
-        dupGroups.sort((a,b) => {
+        dupGroups.sort((a, b) => {
           const na = parseInt(a || "0", 10);
           const nb = parseInt(b || "0", 10);
           if (!Number.isNaN(na) && !Number.isNaN(nb) && na !== nb) return na - nb;
-          return String(a).localeCompare(String(b), "tr");
+          return String(a).localeCompare(String(b), "tr", { numeric: true });
         });
+        if (!dupGroups.length) appendEmptyState(dupEl, "Okul no çakışması yok.");
         dupGroups.forEach(no => {
           const arr = duplicateOkulNoMap[no] || [];
           const li = document.createElement("li");
           const strong = document.createElement("b");
-          strong.textContent = no;
-          const span = document.createElement("span");
-          span.style.opacity = "0.9";
-          span.textContent = arr.map(x => `${[x.isim, x.soyisim].filter(Boolean).join(" ").trim()} (${x.sinif || '-'})`).join(" • ");
+          strong.textContent = `Öğrenci No ${no}`;
           li.appendChild(strong);
-          li.appendChild(document.createTextNode(" "));
-          li.appendChild(span);
+          const records = document.createElement("div");
+          records.className = "group-records";
+          arr.forEach(student => records.appendChild(createStudentRecordButton(student)));
+          li.appendChild(records);
           dupEl.appendChild(li);
+        });
+      }
+
+      // İkiz / mükerrer kayıt adayları
+      const twinEl = document.getElementById("twinList");
+      if (twinEl) {
+        twinEl.innerHTML = "";
+        if (!twinRecordGroups.length) appendEmptyState(twinEl, "İkiz kayıt bulunamadı.");
+        twinRecordGroups.forEach(group => {
+          const li = document.createElement("li");
+          const title = document.createElement("div");
+          title.className = "twin-group-title";
+          const name = document.createElement("span");
+          name.textContent = [group.students[0]?.isim, group.students[0]?.soyisim].filter(Boolean).join(" ").trim() || "Öğrenci";
+          const badge = document.createElement("span");
+          badge.className = "status-badge twin";
+          badge.textContent = `${group.students.length} KAYIT`;
+          title.appendChild(name);
+          title.appendChild(badge);
+          li.appendChild(title);
+
+          const reason = document.createElement("div");
+          reason.className = "twin-group-reason";
+          reason.textContent = group.reasons.join(" ");
+          li.appendChild(reason);
+
+          const records = document.createElement("div");
+          records.className = "group-records";
+          group.students.forEach(student => records.appendChild(createStudentRecordButton(student)));
+          li.appendChild(records);
+          twinEl.appendChild(li);
         });
       }
     }
@@ -4327,8 +4534,11 @@ function compareCurrentStudentsWithSnapshot(currentStudents, snap) {
       if (dupGroupsAll.length) {
         bar.innerHTML += ` <span style="margin-left:10px; padding:3px 10px; border-radius:999px; background: var(--danger-bg); color: var(--danger-text); font-weight:700;">⚠️ ${dupGroupsAll.length} okul no çakışması</span>`;
       }
+      if (twinRecordGroups.length) {
+        bar.innerHTML += ` <span style="margin-left:10px; padding:3px 10px; border-radius:999px; background: rgba(239,246,255,.98); color:#3657a7; font-weight:800;">👥 ${twinRecordGroups.length} ikiz kayıt grubu</span>`;
+      }
 
-      // --- GÜNCELLEME 2: ALT BİLGİYİ GÜNCELLE ---
+      // Alt bilgiyi güncelle
       const bottomFooter = document.getElementById("lastSavedInfo");
       if(bottomFooter) {
          bottomFooter.textContent = `Bu yazdırma çıktısında listede ${visible} öğrenci yer almaktadır.`;
@@ -4514,6 +4724,113 @@ function compareCurrentStudentsWithSnapshot(currentStudents, snap) {
       });
     }
 
+
+    function getSelectedExportColumns() {
+      const selectedFields = new Set(
+        Array.from(document.querySelectorAll("#printColsContainer input[type='checkbox']"))
+          .filter(checkbox => checkbox.checked)
+          .map(checkbox => checkbox.dataset.field)
+          .filter(Boolean)
+      );
+      return COLUMNS.filter(column => column.key !== "status" && selectedFields.has(column.key));
+    }
+
+    function formatExcelFilenameDate(date = new Date()) {
+      const day = String(date.getDate()).padStart(2, "0");
+      const month = String(date.getMonth() + 1).padStart(2, "0");
+      const year = date.getFullYear();
+      return `${day}-${month}-${year}`;
+    }
+
+    function getExcelColumnWidth(column, rows) {
+      const headerLength = String(column.label || "").length;
+      const maxDataLength = rows.reduce((max, student) => {
+        const value = String(student?.[column.key] ?? "").trim();
+        return Math.max(max, value.length);
+      }, 0);
+      const fieldType = appSettings.fields[column.key]?.type || "text";
+      const minimum = fieldType === "phone" ? 16 : (column.key === "okulNo" ? 12 : 12);
+      return Math.max(minimum, Math.min(38, Math.max(headerLength + 3, maxDataLength + 2)));
+    }
+
+    async function downloadFilteredExcel() {
+      const rows = Array.isArray(currentFilteredStudents) ? currentFilteredStudents : [];
+      if (!rows.length) return showToast("Excel'e aktarılacak görüntülenen kayıt yok.");
+
+      const columns = getSelectedExportColumns();
+      if (!columns.length) return showToast("Excel için en az bir yazdırma sütunu seçin.");
+
+      if (!window.ExcelJS) {
+        console.error("ExcelJS yüklenemedi.");
+        return showToast("Excel bileşeni yüklenemedi. İnternet bağlantısını kontrol edip tekrar deneyin.");
+      }
+
+      const workbook = new window.ExcelJS.Workbook();
+      workbook.creator = "Öğrenci Listesi Yöneticisi";
+      workbook.created = new Date();
+      workbook.modified = new Date();
+      workbook.properties.date1904 = false;
+
+      const worksheet = workbook.addWorksheet("Öğrenci Listesi", {
+        views: [{ state: "frozen", ySplit: 1 }],
+        properties: { defaultRowHeight: 20 }
+      });
+
+      const tableRows = rows.map(student => columns.map(column => String(student?.[column.key] ?? "").trim()));
+      worksheet.addTable({
+        name: "OgrenciListesi",
+        ref: "A1",
+        headerRow: true,
+        totalsRow: false,
+        style: {
+          theme: "TableStyleMedium2",
+          showFirstColumn: false,
+          showLastColumn: false,
+          showRowStripes: true,
+          showColumnStripes: false
+        },
+        columns: columns.map(column => ({ name: column.label, filterButton: true })),
+        rows: tableRows
+      });
+
+      columns.forEach((column, index) => {
+        const excelColumn = worksheet.getColumn(index + 1);
+        excelColumn.width = getExcelColumnWidth(column, rows);
+        // Öğrenci no ve telefon gibi alanlarda baştaki sıfırların kaybolmaması için metin biçimi korunur.
+        excelColumn.numFmt = "@";
+        excelColumn.alignment = { vertical: "middle", wrapText: false };
+      });
+
+      const headerRow = worksheet.getRow(1);
+      headerRow.height = 24;
+      headerRow.font = { bold: true };
+      headerRow.alignment = { vertical: "middle", horizontal: "center", wrapText: true };
+
+      worksheet.eachRow((row, rowNumber) => {
+        if (rowNumber === 1) return;
+        row.height = 20;
+        row.eachCell(cell => {
+          cell.alignment = { vertical: "middle", horizontal: "left", wrapText: false };
+        });
+      });
+
+      worksheet.autoFilter = {
+        from: { row: 1, column: 1 },
+        to: { row: 1, column: columns.length }
+      };
+
+      const buffer = await workbook.xlsx.writeBuffer();
+      const blob = new Blob([buffer], { type: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet" });
+      const url = URL.createObjectURL(blob);
+      const anchor = document.createElement("a");
+      anchor.href = url;
+      anchor.download = `${formatExcelFilenameDate()}_Öğrenci_Listesi.xlsx`;
+      document.body.appendChild(anchor);
+      anchor.click();
+      anchor.remove();
+      setTimeout(() => URL.revokeObjectURL(url), 0);
+      showToast(`${rows.length} kayıt Excel olarak indirildi.`);
+    }
 
     function formatAttendanceDate(value) {
       if (!value) return "";
@@ -4783,6 +5100,15 @@ function compareCurrentStudentsWithSnapshot(currentStudents, snap) {
         if (event.target === document.getElementById("studentDetailModal")) closeModal();
       });
 
+      document.getElementById("downloadExcelBtn").addEventListener("click", async () => {
+        try {
+          await downloadFilteredExcel();
+        } catch (error) {
+          console.error("Excel indirme hatası:", error);
+          showToast("Excel dosyası hazırlanamadı.");
+        }
+      });
+
       document.getElementById("downloadTxtBtn").addEventListener("click", () => {
         if (!students.length) return showToast("Liste boş.");
         const blob = new Blob([JSON.stringify(buildSnapshotObject(students), null, 2)], { type: "text/plain;charset=utf-8" });
@@ -4826,6 +5152,7 @@ function compareCurrentStudentsWithSnapshot(currentStudents, snap) {
       let statusHtml = "";
       let diffHtml = "";
       let dupHtml = "";
+      let twinHtml = "";
       const displayName = [s.isim, s.soyisim].filter(Boolean).join(" ").trim() || "Öğrenci";
       const displayNameSafe = escapeHtml(displayName);
       const okulNoSafe = escapeHtml(s.okulNo || "");
@@ -4867,6 +5194,22 @@ function compareCurrentStudentsWithSnapshot(currentStudents, snap) {
         </div>`;
       }
 
+      const twinGroup = twinRecordByStudentId.get(s.id);
+      if (twinGroup) {
+        const others = twinGroup.students.filter(student => student.id !== s.id);
+        const listHtml = others.map(student => {
+          const name = [student.isim, student.soyisim].filter(Boolean).join(" ").trim() || "Öğrenci";
+          return `<li><b>${escapeHtml(student.okulNo || "?")}</b> · ${escapeHtml(name)} <small>(${escapeHtml(student.sinif || "-")})</small></li>`;
+        }).join("");
+        const reason = twinGroup.reasons.join(" ");
+        twinHtml = `<div class="change-log-box" style="background:rgba(239,246,255,.98); border-color:#93abee; color:#3657a7;">
+          <div style="font-weight:900; margin-bottom:6px;">👥 İkiz Kayıt Uyarısı</div>
+          <div style="font-size:12px; margin-bottom:7px;">${escapeHtml(reason)}</div>
+          <div style="font-size:12px; margin-bottom:6px;">Aynı kişi farklı öğrenci numarasıyla kayıtlı görünüyor:</div>
+          <ul style="margin:0; padding-left:20px; display:flex; flex-direction:column; gap:4px;">${listHtml}</ul>
+        </div>`;
+      }
+
       const detailFields = getVisibleDataFieldKeys().filter(key => key !== "isim" && key !== "soyisim");
       const detailHtml = detailFields.map(key => `
         <div class="detail-row"><span class="detail-label">${escapeHtml(getFieldLabel(key))}:</span> <span class="detail-val">${escapeHtml(s[key] || "-")}</span></div>
@@ -4881,6 +5224,7 @@ function compareCurrentStudentsWithSnapshot(currentStudents, snap) {
 
         ${detailHtml}
         ${dupHtml}
+        ${twinHtml}
         ${diffHtml}
       `;
 
@@ -4888,6 +5232,8 @@ function compareCurrentStudentsWithSnapshot(currentStudents, snap) {
     }
 
     document.addEventListener("DOMContentLoaded", async () => {
+      const versionLabel = document.getElementById("appVersionLabel");
+      if (versionLabel) versionLabel.textContent = `Sürüm ${APP_VERSION}`;
       await loadAppSettingsFromFirebase();
       renderSheetTabs();
       renderHeader();
