@@ -499,6 +499,112 @@
       border-radius: 12px;
     }
 
+    /* Birleşik öğrenci sayısı: değişiklik kartlarının üstünde */
+    .student-total-card{
+      position:relative;
+      isolation:isolate;
+      overflow:hidden;
+      display:flex;
+      flex-direction:column;
+      gap:17px;
+      min-height:174px;
+      padding:21px 23px 20px;
+      border:1px solid rgba(125,142,247,.24);
+      border-radius:22px;
+      background:linear-gradient(122deg, rgba(255,255,255,.98), rgba(236,242,255,.97) 78%, rgba(226,245,241,.96));
+      box-shadow:0 14px 30px rgba(103,120,234,.11), 0 2px 8px rgba(15,23,42,.03);
+    }
+
+    .student-total-card::before{
+      content:"";
+      position:absolute;
+      right:-62px;
+      top:-86px;
+      width:226px;
+      height:226px;
+      border-radius:50%;
+      background:radial-gradient(circle, rgba(125,142,247,.20), rgba(125,142,247,0) 70%);
+      z-index:-1;
+      pointer-events:none;
+    }
+
+    .student-total-card::after{
+      content:"";
+      position:absolute;
+      left:0;
+      top:24px;
+      bottom:24px;
+      width:4px;
+      border-radius:0 8px 8px 0;
+      background:linear-gradient(180deg, var(--primary), var(--secondary));
+      pointer-events:none;
+    }
+
+    .student-total-card__heading{
+      display:flex;
+      align-items:center;
+      gap:11px;
+    }
+
+    .student-total-card__icon{
+      width:43px;
+      height:43px;
+      flex:0 0 43px;
+      display:grid;
+      place-items:center;
+      border-radius:14px;
+      background:rgba(125,142,247,.14);
+      color:var(--primary-dark);
+      border:1px solid rgba(125,142,247,.18);
+    }
+
+    .student-total-card__label{
+      margin:0;
+      font-size:13px;
+      line-height:1.4;
+      letter-spacing:.055em;
+      font-weight:900;
+      color:var(--ink-1);
+      text-transform:uppercase;
+    }
+
+    .student-total-card__total{
+      display:flex;
+      flex-wrap:wrap;
+      gap:9px;
+      align-items:baseline;
+      min-height:54px;
+      line-height:1;
+    }
+
+    .student-total-card__number{
+      color:var(--ink-0);
+      font-size:46px;
+      font-weight:800;
+      letter-spacing:-.045em;
+      font-variant-numeric:tabular-nums;
+    }
+
+    .student-total-card__unit{
+      font-size:13px;
+      color:var(--ink-2);
+      font-weight:800;
+      letter-spacing:.01em;
+    }
+
+    .student-total-card__note{
+      margin:4px 0 0;
+      font-size:11.5px;
+      font-weight:650;
+      line-height:1.5;
+      color:var(--text-muted);
+    }
+
+    @media(max-width:480px){
+      .student-total-card{padding:19px 20px;min-height:160px;}
+      .student-total-card__number{font-size:42px;}
+    }
+
     /* Changes Accordion */
     .change-lists{
       display:flex;
@@ -2425,6 +2531,26 @@
       
       <div style="display: flex; flex-direction: column; gap: 24px;">
         
+        <section class="student-total-card" id="totalStudentsCard" aria-labelledby="totalStudentsHeading" aria-busy="true">
+          <div class="student-total-card__heading">
+            <span class="student-total-card__icon" aria-hidden="true">
+              <svg width="25" height="25" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/>
+                <circle cx="9" cy="7" r="4"/>
+                <path d="M22 21v-2a4 4 0 0 0-3-3.87M16 3.13a4 4 0 0 1 0 7.75"/>
+              </svg>
+            </span>
+            <h2 class="student-total-card__label" id="totalStudentsHeading">Toplam Öğrenci</h2>
+          </div>
+          <div>
+            <div class="student-total-card__total" role="status" aria-live="polite" aria-atomic="true">
+              <span class="student-total-card__number" id="totalStudentsCount">—</span>
+              <span class="student-total-card__unit">öğrenci</span>
+            </div>
+            <p class="student-total-card__note" id="totalStudentsNote">Kayıtlar yükleniyor...</p>
+          </div>
+        </section>
+
         <section>
           <div class="change-lists">
             <details>
@@ -4095,7 +4221,27 @@ function compareCurrentStudentsWithSnapshot(currentStudents, snap) {
       return merged;
     }
 
+    function updateTotalStudentsCard(state = "ready") {
+      const card = document.getElementById("totalStudentsCard");
+      const count = document.getElementById("totalStudentsCount");
+      const note = document.getElementById("totalStudentsNote");
+      if (!card || !count || !note) return;
+
+      const hasCount = state === "ready" || state === "partial";
+      count.textContent = hasCount ? new Intl.NumberFormat("tr-TR").format(students.length) : "—";
+      const notes = {
+        loading: "Veri kaynaklarından kayıtlar yükleniyor...",
+        empty: "Etkin veri kaynağı bulunamadı.",
+        ready: "Birleştirilmiş listedeki tüm kayıtlar",
+        partial: "Yalnızca erişilebilen kaynaklardaki kayıtlar",
+        error: "Öğrenci verileri yüklenemedi."
+      };
+      note.textContent = notes[state] || notes.ready;
+      card.setAttribute("aria-busy", state === "loading" ? "true" : "false");
+    }
+
     async function loadData() {
+      updateTotalStudentsCard("loading");
       const body = document.getElementById("tableBody");
       body.innerHTML = `<tr class="loading-row"><td colspan="${getTableColspan()}" style="text-align:center; padding:40px;">Etkin veri kaynakları okunuyor...</td></tr>`;
       document.getElementById("lastLoadedInfo").textContent = "Yükleniyor...";
@@ -4103,6 +4249,7 @@ function compareCurrentStudentsWithSnapshot(currentStudents, snap) {
       const sources = getEnabledSources();
       if (!sources.length) {
         students = [];
+        updateTotalStudentsCard("empty");
         removedRecordsCache = [];
         duplicateOkulNoMap = {};
         twinRecordGroups = [];
@@ -4123,6 +4270,7 @@ function compareCurrentStudentsWithSnapshot(currentStudents, snap) {
         });
 
         students = mergeSourceStudents(successfulLists);
+        updateTotalStudentsCard(errors.length ? "partial" : "ready");
         const comparison = compareCurrentStudentsWithSnapshot(students, snapshot);
         removedRecordsCache = comparison.removed || [];
         duplicateOkulNoMap = detectDuplicateOkulNos(students);
@@ -4143,6 +4291,7 @@ function compareCurrentStudentsWithSnapshot(currentStudents, snap) {
         if (!students.length && errors.length) throw new Error(errors.join(" | "));
       } catch (err) {
         console.error(err);
+        updateTotalStudentsCard("error");
         body.innerHTML = `<tr class="loading-row"><td colspan="${getTableColspan()}" style="color:red; text-align:center; padding:40px;">Hata: ${escapeHtml(err.message)}</td></tr>`;
         document.getElementById("lastLoadedInfo").textContent = "Hata oluştu.";
         removedRecordsCache = [];
