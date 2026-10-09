@@ -2810,7 +2810,8 @@
     // =======================
     // KONFİGÜRASYON
     // =======================
-    const APP_VERSION = "v1.0";
+    const APP_VERSION = "v1.1";
+    const MAX_ATTENDANCE_DATES = 5;
     const DEFAULT_SPREADSHEET_INPUT = "16BD_BrNLYBaXviCzB8yDKBGS2Vdj5DHi";
     const SETTINGS_STORAGE_KEY = "ogrenci_listesi_source_settings_v5";
     const FIREBASE_APP_BASE_PATH = "studentListManager/v5";
@@ -4964,8 +4965,6 @@ function compareCurrentStudentsWithSnapshot(currentStudents, snap) {
       showToast(`${rows.length} kayıt Excel olarak indirildi.`);
     }
 
-    const MAX_ATTENDANCE_DATES = 5;
-
     function formatAttendanceDate(value) {
       if (!value) return "";
       const parts = String(value).split("-");
@@ -5024,21 +5023,25 @@ function compareCurrentStudentsWithSnapshot(currentStudents, snap) {
     }
 
     function printAttendanceList(dates) {
-      if (!dates.length || dates.length > MAX_ATTENDANCE_DATES) return;
       const attendanceStudents = getAttendanceStudents();
       if (!attendanceStudents.length) {
         showToast("Yoklama listesi için görüntülenen öğrenci bulunmuyor.");
         return;
       }
 
-      const attendanceCount = dates.length;
-      const checkColumnWidth = attendanceCount === 1 ? 13 : 8;
-      const nameColumnWidth = 75 - attendanceCount * checkColumnWidth;
-      const dateItems = dates.map((date, index) => `<span><b>${index + 1}.</b> ${escapeHtml(formatAttendanceDate(date))}</span>`).join("");
-      const checkHeaders = dates.map((_, index) => `<th class="check-col"><span class="check-number">${index + 1}</span></th>`).join("");
+      const attendanceDates = dates.slice(0, MAX_ATTENDANCE_DATES);
+      const attendanceCount = attendanceDates.length;
+      if (!attendanceCount) return;
+
+      const dateItems = attendanceDates.map((date, index) => `<span><b>${index + 1}.</b> ${escapeHtml(formatAttendanceDate(date))}</span>`).join("");
+      const attendanceTotalWidth = 14 + ((attendanceCount - 1) * 4);
+      const nameColumnWidth = 75 - attendanceTotalWidth;
+      const checkColumnWidth = attendanceTotalWidth / attendanceCount;
+      const attendanceCols = Array.from({ length: attendanceCount }, () => `<col style="width:${checkColumnWidth}%">`).join("");
+      const attendanceHeaders = attendanceDates.map((_, index) => `<th class="check-col"><span class="check-number">${index + 1}</span></th>`).join("");
       const rows = attendanceStudents.map(student => {
         const fullName = [student.isim, student.soyisim].filter(Boolean).join(" ").trim();
-        const boxes = dates.map(() => `<td class="check-cell"><span class="check-box"></span></td>`).join("");
+        const boxes = attendanceDates.map(() => `<td class="check-cell"><span class="check-box"></span></td>`).join("");
         return `<tr>
           <td class="number-cell">${escapeHtml(student.okulNo || "")}</td>
           <td class="name-cell">${escapeHtml(fullName)}</td>
@@ -5062,30 +5065,35 @@ function compareCurrentStudentsWithSnapshot(currentStudents, snap) {
   *{box-sizing:border-box}
   body{margin:0;color:#000;font-family:Arial,'Segoe UI',sans-serif}
   h1{margin:0;text-align:center;font-size:20px;letter-spacing:.6px;text-transform:uppercase}
-  .dates{display:grid;grid-template-columns:repeat(${attendanceCount},minmax(0,1fr));gap:6px;margin:9px 0 14px;font-size:11px;line-height:1.3;text-align:center;min-height:18px}
-  .dates span{min-width:0;white-space:nowrap}
+  .dates{display:flex;flex-wrap:wrap;justify-content:center;gap:8px 20px;margin:9px 0 14px;font-size:12px;min-height:18px}
+  .dates span{white-space:nowrap}
   table{width:100%;border-collapse:collapse;table-layout:fixed}
-  th,td{border:1.2px solid #000;padding:5px 6px;font-size:11px;line-height:1.25;vertical-align:middle}
+  th,td{border:1.2px solid #000;padding:5px 6px;font-size:11px}
   th{text-align:center;font-weight:700;background:#fff}
-  thead tr,tbody tr{break-inside:avoid;page-break-inside:avoid}
-  tbody tr{height:28px}
+  tbody tr{height:28px;break-inside:avoid}
   .number-cell,.class-cell{text-align:center}
-  .number-col{width:13%}.name-col{width:${nameColumnWidth}%}.class-col{width:12%}.check-col{width:${checkColumnWidth}%}
+  .number-col,.class-col,.check-col{text-align:center}
   .check-cell{text-align:center;vertical-align:middle;padding:3px}
-  .check-box{display:inline-block;vertical-align:middle;width:15px;height:15px;border:1.4px solid #000}
+  .check-box{display:inline-block;width:15px;height:15px;border:1.4px solid #000}
   .check-number{display:block;font-size:11px;font-weight:700;line-height:1}
   thead{display:table-header-group}
 </style></head><body>
 <h1>FENOMEN EĞİTİM KURUMLARI YOKLAMA LİSTESİ</h1>
 <div class="dates">${dateItems}</div>
 <table>
+  <colgroup>
+    <col style="width:13%">
+    <col style="width:${nameColumnWidth}%">
+    <col style="width:12%">
+    ${attendanceCols}
+  </colgroup>
   <thead><tr>
     <th class="number-col" rowspan="2">ÖĞRENCİ NO</th>
     <th class="name-col" rowspan="2">ÖĞRENCİNİN ADI SOYADI</th>
     <th class="class-col" rowspan="2">SINIFI</th>
     <th colspan="${attendanceCount}">YOKLAMA</th>
   </tr><tr>
-    ${checkHeaders}
+    ${attendanceHeaders}
   </tr></thead>
   <tbody>${rows}</tbody>
 </table>
@@ -5184,9 +5192,8 @@ function compareCurrentStudentsWithSnapshot(currentStudents, snap) {
       });
       document.getElementById("attendanceForm").addEventListener("submit", event => {
         event.preventDefault();
-        const dates = Array.from(document.querySelectorAll("#attendanceDateList input[type='date']")).map(input => input.value).filter(Boolean);
+        const dates = Array.from(document.querySelectorAll("#attendanceDateList input[type='date']")).map(input => input.value).filter(Boolean).slice(0, MAX_ATTENDANCE_DATES);
         if (!dates.length) return showToast("En az bir yoklama tarihi seçin.");
-        if (dates.length > MAX_ATTENDANCE_DATES) return;
         printAttendanceList(dates);
       });
 
