@@ -4374,6 +4374,18 @@ function compareCurrentStudentsWithSnapshot(currentStudents, snap) {
       const wrapper = document.createElement("div");
       wrapper.className = "class-chips";
 
+      // TÜMÜ seçim kutusu diğer filtrelerden bağımsızdır; sadece sınıfları topluca işaretler.
+      const allLabel = document.createElement("label");
+      const allCheckbox = document.createElement("input");
+      allCheckbox.type = "checkbox";
+      allCheckbox.dataset.selectAllClasses = "true";
+      allCheckbox.setAttribute("aria-label", "Tüm sınıfları seç veya seçimi kaldır");
+      const allChip = document.createElement("span");
+      allChip.textContent = "TÜMÜ";
+      allLabel.appendChild(allCheckbox);
+      allLabel.appendChild(allChip);
+      wrapper.appendChild(allLabel);
+
       values.forEach(value => {
         const label = document.createElement("label");
         const checkbox = document.createElement("input");
@@ -4388,6 +4400,16 @@ function compareCurrentStudentsWithSnapshot(currentStudents, snap) {
         label.appendChild(checkbox);
         label.appendChild(chip);
         wrapper.appendChild(label);
+      });
+
+      // Tekil seçimlerle TÜMÜ seçeneği her zaman eş zamanlı kalır.
+      wrapper.addEventListener("input", event => {
+        const classCheckboxes = Array.from(wrapper.querySelectorAll('input[data-filter-mode="multi-exact"]'));
+        if (event.target === allCheckbox) {
+          classCheckboxes.forEach(checkbox => { checkbox.checked = allCheckbox.checked; });
+        } else if (classCheckboxes.includes(event.target)) {
+          allCheckbox.checked = classCheckboxes.length > 0 && classCheckboxes.every(checkbox => checkbox.checked);
+        }
       });
 
       return wrapper;
@@ -4492,6 +4514,13 @@ function compareCurrentStudentsWithSnapshot(currentStudents, snap) {
         }
 
         control.value = previousState[stateKey];
+      });
+
+      // Filtreler yeniden çizildiğinde TÜMÜ görünümünü mevcut sınıf seçimleriyle eşleştir.
+      container.querySelectorAll('.class-chips').forEach(wrapper => {
+        const allCheckbox = wrapper.querySelector('input[data-select-all-classes]');
+        const classCheckboxes = Array.from(wrapper.querySelectorAll('input[data-filter-mode="multi-exact"]'));
+        if (allCheckbox) allCheckbox.checked = classCheckboxes.length > 0 && classCheckboxes.every(checkbox => checkbox.checked);
       });
 
       const sort = document.getElementById("generalSortOrder");
@@ -5165,7 +5194,7 @@ function compareCurrentStudentsWithSnapshot(currentStudents, snap) {
         document.getElementById("recentOnly").checked = false;
         document.getElementById("generalSortOrder").value = "";
         document.querySelectorAll("#dynamicFiltersContainer input, #dynamicFiltersContainer select").forEach(control => {
-          if ((control.type === "checkbox" || control.type === "radio") && control.dataset.filterMode === "multi-exact") {
+          if (control.type === "checkbox" || control.type === "radio") {
             control.checked = false;
           } else {
             control.value = "";
