@@ -1047,6 +1047,12 @@
       border-color: rgba(242,171,191,.98);
     }
 
+    .status-badge.review{
+      background: rgba(255,247,222,.98);
+      color: #895c00;
+      border-color: rgba(239,206,102,.95);
+    }
+
     .status-badge.danger{
       background: rgba(255,247,222,.98);
       color: #a56a00;
@@ -1087,6 +1093,7 @@
     /* New/Updated Row Highlights */
     tr.new-row td{ background-color: rgba(116,196,182,.055); }
     tr.updated-row td{ background-color: rgba(255,188,165,.065); }
+    tr.review-row td{ background-color: rgba(255,247,222,.18); }
     tr.new-row:hover td{ background-color: rgba(116,196,182,.11); }
     tr.updated-row:hover td{ background-color: rgba(255,188,165,.13); }
 
@@ -2556,6 +2563,11 @@
               <ul id="removedList"></ul>
             </details>
             <details>
+              <summary>⚠️ Eşleşme İncelemesi <span class="status-badge review" id="reviewTagCount">0</span></summary>
+              <div class="change-list-note">Eski ve yeni kayıtlarda kimliği kesinleştirilemeyen öğrenciler. Yanlış güncelleme ve silme bildirimi yapılmaz.</div>
+              <ul id="reviewList"></ul>
+            </details>
+            <details>
               <summary>⚠️ Okul No Çakışmaları <span class="status-badge danger" id="dupTagCount">0</span></summary>
               <ul id="dupList"></ul>
             </details>
@@ -3074,6 +3086,7 @@
     let twinRecordGroups = [];
     let twinRecordByStudentId = new Map();
     let removedRecordsCache = [];
+    let lastLoadHadErrors = false;
     let currentFilteredStudents = [];
 
 
@@ -3499,69 +3512,8 @@
       });
     }
 
-// ID değiştiğinde (ör. isim/soyisim/okulNo düzeltmesi) aynı kişiyi "yeni" gibi göstermemek için
-// ikincil eşleştirme: veli telefonları (+ mümkünse sınıf) üzerinden eski kaydı bulup "updated" olarak işaretler.
-function normalizePhone(str) {
-  return String(str || "").replace(/\D+/g, "");
-}
-
-function getStudentPhones(student) {
-  return [student && student.veliTelefon, student && student.veli2Telefon]
-    .map(normalizePhone)
-    .filter(phone => phone && phone.length >= 8);
-}
-
-function hasSharedPhone(a, b) {
-  const phonesA = new Set(getStudentPhones(a));
-  if (!phonesA.size) return false;
-  return getStudentPhones(b).some(phone => phonesA.has(phone));
-}
-
-function findPrevMatchForStudent(student, prevMap) {
-  if (!prevMap) return null;
-
-  const candidates = [];
-  for (const prevId in prevMap) {
-    const d = (prevMap[prevId] && prevMap[prevId].data) ? prevMap[prevId].data : null;
-    if (!d) continue;
-    if (hasSharedPhone(student, d)) candidates.push(prevId);
-  }
-  if (!candidates.length) return null;
-
-  const cls = String(student.sinif || "").trim();
-  let filtered = candidates;
-  if (cls) {
-    const byClass = candidates.filter(pid => String(prevMap[pid].data.sinif || "").trim() === cls);
-    if (byClass.length) filtered = byClass;
-  }
-
-  const n = String(student.isim || "").trim().toLocaleUpperCase("tr-TR");
-  const s = String(student.soyisim || "").trim().toLocaleUpperCase("tr-TR");
-  const score = (pid) => {
-    const d = prevMap[pid].data || {};
-    const pn = String(d.isim || "").trim().toLocaleUpperCase("tr-TR");
-    const ps = String(d.soyisim || "").trim().toLocaleUpperCase("tr-TR");
-    let sc = 0;
-    if (pn === n) sc += 5;
-    else if (pn && n && (pn.includes(n) || n.includes(pn))) sc += 2;
-    if (ps === s) sc += 5;
-    else if (ps && s && (ps.includes(s) || s.includes(ps))) sc += 2;
-    const on = String(student.okulNo || "").trim();
-    const pon = String(d.okulNo || "").trim();
-    if (on && pon && on === pon) sc += 1;
-    return sc;
-  };
-
-  filtered.sort((a, b) => {
-    const sa = score(a);
-    const sb = score(b);
-    if (sb !== sa) return sb - sa;
-    return String(a).localeCompare(String(b));
-  });
-
-  return filtered[0] || null;
-}
-
+// Karşılaştırma yalnızca compareCurrentStudentsWithSnapshot() üzerinden yürütülür.
+// Eski telefon öncelikli / ilk adayı alan eşleştirme kaldırıldı.
 
 function snapshotRecordsToEntries(snap) {
   if (!snap || typeof snap !== "object") return [];
@@ -3595,6 +3547,7 @@ function snapshotRecordsToEntries(snap) {
       id,
       record: {
         id,
+        sourceIds: Array.isArray(record.sourceIds) ? record.sourceIds.map(String) : [],
         data: buildStudentDataObject(data)
       }
     });
@@ -3602,8 +3555,10 @@ function snapshotRecordsToEntries(snap) {
   return entries;
 }
 
+// Google E-Tablo satırı değil, öğrenci bilgilerinin ortak kanıtları değerlendirilir.
+// Bütün güçlü eşleşmeler tamamlanmadan hiçbir eski kayıt sahiplenilmez.
 function studentFullNameKey(student) {
-  return normalizeTextForCompare([student && student.isim, student && student.soyisim].filter(Boolean).join(" "));
+  return getStudentIdentityName(student);
 }
 
 function studentClassKey(student) {
@@ -3612,134 +3567,196 @@ function studentClassKey(student) {
 
 function addToIndex(index, group, key, entry) {
   if (!key) return;
-  if (!index[group]) index[group] = new Map();
   if (!index[group].has(key)) index[group].set(key, []);
   index[group].get(key).push(entry);
 }
 
+function studentComparePhones(student) {
+  return Array.from(new Set([
+    getGuardianIdentity(student, 1).phone,
+    getGuardianIdentity(student, 2).phone
+  ].filter(phone => phone.length >= 10)));
+}
+
 function buildPreviousStudentIndex(entries) {
-  const index = { id: new Map(), okulNo: new Map(), phone: new Map(), nameClass: new Map(), name: new Map() };
+  const index = { id: new Map(), okulNo: new Map(), phone: new Map(), name: new Map() };
   entries.forEach(entry => {
     const d = entry.record.data || {};
-    const idKeys = [entry.id, createStudentId(d), makeFirebaseSafeKey(entry.id), makeFirebaseSafeKey(createStudentId(d))]
-      .map(x => String(x || "").trim())
-      .filter(Boolean);
-    idKeys.forEach(key => addToIndex(index, "id", key, entry));
-
-    const okulNo = normalizeOkulNo(d.okulNo);
-    addToIndex(index, "okulNo", okulNo, entry);
-
-    getStudentPhones(d).forEach(phone => addToIndex(index, "phone", phone, entry));
-
-    const name = studentFullNameKey(d);
-    const cls = studentClassKey(d);
-    addToIndex(index, "name", name, entry);
-    if (name && cls) addToIndex(index, "nameClass", `${name}__${cls}`, entry);
+    [entry.id, createStudentId(d), makeFirebaseSafeKey(entry.id), makeFirebaseSafeKey(createStudentId(d))]
+      .filter(Boolean).forEach(key => addToIndex(index, "id", String(key), entry));
+    addToIndex(index, "okulNo", normalizeOkulNo(d.okulNo), entry);
+    studentComparePhones(d).forEach(phone => addToIndex(index, "phone", phone, entry));
+    addToIndex(index, "name", studentFullNameKey(d), entry);
   });
   return index;
 }
 
-function pickUnusedCandidate(candidates, usedPrevIds, currentStudent) {
-  const list = (candidates || []).filter(entry => entry && !usedPrevIds.has(entry.id));
-  if (!list.length) return null;
-  if (list.length === 1) return list[0];
-
-  const currentName = studentFullNameKey(currentStudent);
-  const currentClass = studentClassKey(currentStudent);
-  const currentPhoneSet = new Set(getStudentPhones(currentStudent));
-  const currentOkulNo = normalizeOkulNo(currentStudent.okulNo);
-
-  const scored = list.map(entry => {
-    const d = entry.record.data || {};
-    let score = 0;
-    if (normalizeOkulNo(d.okulNo) && normalizeOkulNo(d.okulNo) === currentOkulNo) score += 20;
-    if (studentFullNameKey(d) && studentFullNameKey(d) === currentName) score += 15;
-    if (studentClassKey(d) && studentClassKey(d) === currentClass) score += 6;
-    if (getStudentPhones(d).some(phone => currentPhoneSet.has(phone))) score += 10;
-    return { entry, score };
-  }).sort((a, b) => b.score - a.score || String(a.entry.id).localeCompare(String(b.entry.id), "tr"));
-
-  return scored[0] ? scored[0].entry : null;
+function countNameTokens(student) {
+  return studentFullNameKey(student).split(/\s+/).filter(Boolean).length;
 }
 
-function findBestPreviousEntry(student, prevIndex, usedPrevIds) {
-  const exactKeys = [student.id, createStudentId(student), makeFirebaseSafeKey(student.id), makeFirebaseSafeKey(createStudentId(student))]
-    .map(x => String(x || "").trim())
-    .filter(Boolean);
-  for (const key of exactKeys) {
-    const hit = pickUnusedCandidate(prevIndex.id.get(key), usedPrevIds, student);
-    if (hit) return hit;
+// Çok sınırlı yazım düzeltmelerinde (ör. AHMET -> AHMED) kullanılacak uzaklık.
+// Başka bir öğrencinin adıyla tamamen değişme, otomatik eşleşme değildir.
+function isMinorStudentNameCorrection(a, b) {
+  const left = studentFullNameKey(a);
+  const right = studentFullNameKey(b);
+  if (left.length < 5 || right.length < 5 || Math.abs(left.length - right.length) > 2) return false;
+  const previous = Array.from({length: right.length + 1}, (_, i) => i);
+  for (let i = 1; i <= left.length; i++) {
+    let diagonal = previous[0];
+    previous[0] = i;
+    for (let j = 1; j <= right.length; j++) {
+      const upper = previous[j];
+      previous[j] = Math.min(previous[j] + 1, previous[j-1] + 1,
+        diagonal + (left[i-1] === right[j-1] ? 0 : 1));
+      diagonal = upper;
+    }
   }
+  return previous[right.length] <= 2;
+}
 
-  const okulNo = normalizeOkulNo(student.okulNo);
-  if (okulNo) {
-    const byNo = prevIndex.okulNo.get(okulNo) || [];
-    const hit = pickUnusedCandidate(byNo, usedPrevIds, student);
-    if (hit) return hit;
+// Tek başına okul numarası, veli telefonu veya satır konumu asla aynı
+// öğrenciyi kanıtlamaz. Puanlar yalnızca güvenli adayları sıralamak içindir.
+function studentMatchEvidence(current, previous) {
+  const name = studentFullNameKey(current);
+  const previousName = studentFullNameKey(previous);
+  const sameName = Boolean(name && previousName && name === previousName);
+  const no = normalizeOkulNo(current.okulNo);
+  const prevNo = normalizeOkulNo(previous.okulNo);
+  const sameNo = Boolean(no && prevNo && no === prevNo);
+  const cls = studentClassKey(current);
+  const prevCls = studentClassKey(previous);
+  const sameClass = Boolean(cls && prevCls && cls === prevCls);
+  const oldGuardians = [getGuardianIdentity(previous, 1), getGuardianIdentity(previous, 2)];
+  const newGuardians = [getGuardianIdentity(current, 1), getGuardianIdentity(current, 2)];
+  const guardianComplete = newGuardians.some((g, i) => hasCompleteIdentityMatch(g, oldGuardians[i]));
+  const guardianName = newGuardians.some((g, i) => g.name && g.name === oldGuardians[i].name);
+  const currentPhones = studentComparePhones(current);
+  const previousPhones = new Set(studentComparePhones(previous));
+  const sharedPhone = currentPhones.some(phone => previousPhones.has(phone));
+  const strongGuardianConflict = newGuardians.some((g,i) => g.name && g.phone &&
+    oldGuardians[i].name && oldGuardians[i].phone &&
+    g.name !== oldGuardians[i].name && g.phone !== oldGuardians[i].phone);
+
+  if (sameName && sameNo && !strongGuardianConflict) return { score: 100, auto: true };
+  if (sameName && guardianComplete) return { score: 95, auto: true };
+  if (sameName && sharedPhone && !strongGuardianConflict) return { score: 85, auto: true };
+  if (sameName && guardianName && !strongGuardianConflict) return { score: 80, auto: true };
+  if (sameName && sameClass && countNameTokens(current) >= 2 && !strongGuardianConflict) {
+    return { score: 70, auto: true };
   }
-
-  for (const phone of getStudentPhones(student)) {
-    const hit = pickUnusedCandidate(prevIndex.phone.get(phone), usedPrevIds, student);
-    if (hit) return hit;
+  if (!sameName && sameNo && guardianComplete &&
+      isMinorStudentNameCorrection(current, previous)) {
+    return { score: 65, auto: true };
   }
-
-  const name = studentFullNameKey(student);
-  const cls = studentClassKey(student);
-  if (name && cls) {
-    const hit = pickUnusedCandidate(prevIndex.nameClass.get(`${name}__${cls}`), usedPrevIds, student);
-    if (hit) return hit;
-  }
-
-  if (name) {
-    const hit = pickUnusedCandidate(prevIndex.name.get(name), usedPrevIds, student);
-    if (hit) return hit;
-  }
-
+  // Tam adı aynı ama bütün diğer alanları değişmiş olabilir: insan incelemesi gerekir.
+  if (sameName) return { score: 40, auto: false };
+  // Hem okul numarası hem doğrulanmış veli aynı, fakat ad farklı: yazım
+  // düzeltmesi, farklı kardeş veya yeniden kullanılan numara olabilir.
+  if (sameNo && guardianComplete) return { score: 35, auto: false };
   return null;
 }
 
-function compareCurrentStudentsWithSnapshot(currentStudents, snap) {
+function findStudentMatchCandidates(student, prevIndex) {
+  const possible = new Map();
+  const gather = arr => (arr || []).forEach(entry => possible.set(entry.id, entry));
+  [student.id, createStudentId(student), makeFirebaseSafeKey(student.id), makeFirebaseSafeKey(createStudentId(student))]
+    .filter(Boolean).forEach(key => gather(prevIndex.id.get(String(key))));
+  gather(prevIndex.okulNo.get(normalizeOkulNo(student.okulNo)));
+  studentComparePhones(student).forEach(phone => gather(prevIndex.phone.get(phone)));
+  gather(prevIndex.name.get(studentFullNameKey(student)));
+  return Array.from(possible.values()).map(entry => {
+    const evidence = studentMatchEvidence(student, entry.record.data || {});
+    return evidence && { entry, ...evidence };
+  }).filter(Boolean).sort((a,b) => b.score-a.score);
+}
+
+function compareCurrentStudentsWithSnapshot(currentStudents, snap, options = {}) {
   const current = Array.isArray(currentStudents) ? currentStudents : [];
   current.forEach(s => {
     s.status = "normal";
     delete s._comparePrevId;
     delete s._previousData;
     delete s._changes;
+    delete s._reviewCandidates;
   });
 
   const previousEntries = snapshotRecordsToEntries(snap);
-  if (!previousEntries.length) {
-    return { removed: [], previousCount: 0, compared: false };
-  }
+  if (!previousEntries.length) return { removed: [], previousCount: 0, compared: false, reviewCount: 0 };
 
   const prevIndex = buildPreviousStudentIndex(previousEntries);
+  const candidates = current.map(student => findStudentMatchCandidates(student, prevIndex));
+  const usedCurrent = new Set();
   const usedPrevIds = new Set();
+  const ranks = [100, 95, 85, 80, 70, 65];
 
-  current.forEach(student => {
-    const match = findBestPreviousEntry(student, prevIndex, usedPrevIds);
-    if (!match) {
-      student.status = "new";
-      return;
-    }
-
-    usedPrevIds.add(match.id);
-    student._comparePrevId = match.id;
-    student._previousData = match.record.data || {};
-
-    const currentData = buildStudentDataObject(student);
-    const changes = getChangedFields(student._previousData, currentData);
-    student._changes = changes;
-    student.status = changes.length ? "updated" : "normal";
+  // Her puan seviyesinde iki yönlü benzersiz eşleşmeleri topluca işle.
+  // Liste sırasından bağımsızdır; eşit güçteki adaylarda rastgele karar vermez.
+  ranks.forEach(rank => {
+    let advanced;
+    do {
+      advanced = false;
+      const possibilities = [];
+      candidates.forEach((list, currentIndex) => {
+        if (usedCurrent.has(currentIndex)) return;
+        list.filter(candidate => candidate.auto && candidate.score === rank &&
+          !usedPrevIds.has(candidate.entry.id)).forEach(candidate => {
+            possibilities.push({ currentIndex, candidate });
+          });
+      });
+      const currentCounts = new Map();
+      const previousCounts = new Map();
+      possibilities.forEach(({ currentIndex, candidate }) => {
+        currentCounts.set(currentIndex, (currentCounts.get(currentIndex) || 0) + 1);
+        previousCounts.set(candidate.entry.id, (previousCounts.get(candidate.entry.id) || 0) + 1);
+      });
+      const certain = possibilities.filter(({currentIndex, candidate}) =>
+        currentCounts.get(currentIndex) === 1 && previousCounts.get(candidate.entry.id) === 1);
+      certain.forEach(({ currentIndex, candidate }) => {
+        if (usedCurrent.has(currentIndex) || usedPrevIds.has(candidate.entry.id)) return;
+        usedCurrent.add(currentIndex);
+        usedPrevIds.add(candidate.entry.id);
+        const student = current[currentIndex];
+        student._comparePrevId = candidate.entry.id;
+        student._previousData = candidate.entry.record.data || {};
+        student._changes = getChangedFields(student._previousData, buildStudentDataObject(student));
+        student.status = student._changes.length ? "updated" : "normal";
+        advanced = true;
+      });
+    } while (advanced);
   });
 
-  const removed = previousEntries
-    .filter(entry => !usedPrevIds.has(entry.id))
-    .map(entry => ({
-      id: entry.id,
-      data: entry.record.data || {}
+  const possiblePreviousForReview = new Set();
+  let reviewCount = 0;
+  candidates.forEach((list, index) => {
+    if (usedCurrent.has(index)) return;
+    const available = list.filter(candidate => !usedPrevIds.has(candidate.entry.id));
+    if (!available.length) {
+      current[index].status = "new";
+      return;
+    }
+    // Otomatik eşleştirme yapılamadı. Belirsiz öğrenci, ne "yeni" ne de
+    // "güncellendi" gösterilir; muhtemel eski kayıt da "silindi" sayılmaz.
+    current[index].status = "review";
+    current[index]._reviewCandidates = available.slice(0, 5).map(candidate => ({
+      id: candidate.entry.id,
+      data: candidate.entry.record.data
     }));
+    available.forEach(candidate => possiblePreviousForReview.add(candidate.entry.id));
+    reviewCount++;
+  });
 
-  return { removed, previousCount: previousEntries.length, compared: true };
+  const failedSourceIds = new Set(options.failedSourceIds || []);
+  const sourceFailure = failedSourceIds.size > 0;
+  const removed = previousEntries.filter(entry => {
+    if (usedPrevIds.has(entry.id) || possiblePreviousForReview.has(entry.id)) return false;
+    if (!sourceFailure) return true;
+    // Kaynak okunamadığında buradaki eksik öğrencileri "silindi" sayma.
+    const sourceIds = entry.record.sourceIds || [];
+    return sourceIds.length > 0 && sourceIds.every(id => !failedSourceIds.has(id));
+  }).map(entry => ({ id: entry.id, data: entry.record.data || {} }));
+
+  return { removed, previousCount: previousEntries.length, compared: true, reviewCount };
 }
 
     function deepEqual(a, b) {
@@ -3834,6 +3851,14 @@ function compareCurrentStudentsWithSnapshot(currentStudents, snap) {
     async function saveSnapshot(currentStudents) {
       if (!Array.isArray(currentStudents) || !currentStudents.length) {
         showToast("Kaydedilecek öğrenci listesi boş.");
+        return;
+      }
+      if (lastLoadHadErrors) {
+        showToast("Bir veri kaynağı okunamadı. Eksik liste Firebase'e kaydedilmedi.");
+        return;
+      }
+      if (currentStudents.some(student => student.status === "review")) {
+        showToast("Belirsiz öğrenci eşleşmeleri var. Kayıt öncesi kaynak verilerini kontrol edin.");
         return;
       }
       const snap = buildSnapshotObject(currentStudents);
@@ -4189,22 +4214,47 @@ function compareCurrentStudentsWithSnapshot(currentStudents, snap) {
       return parseSourceRows(source, await response.text());
     }
 
+    function canMergeSourceStudentRows(existing, incoming) {
+      if ((existing._sourceIds || []).includes(incoming._sourceId)) return false;
+      // Aynı numara + isim başka öğrencilerde de bulunabilir; farklı
+      // veli kimliklerinin iki ayrı kayıt olduğuna öncelik verilir.
+      for (const index of [1, 2]) {
+        const left = getGuardianIdentity(existing, index);
+        const right = getGuardianIdentity(incoming, index);
+        if (hasIdentityConflict(left, right)) return false;
+      }
+      return true;
+    }
+
     function mergeSourceStudents(sourceLists) {
       const merged = [];
-      const byId = new Map();
+      const byBaseId = new Map();
+      const allIds = new Set();
       sourceLists.flat().forEach(student => {
-        const existing = byId.get(student.id);
-        if (!existing) {
-          byId.set(student.id, student);
-          merged.push(student);
+        const baseId = student.id;
+        if (!byBaseId.has(baseId)) byBaseId.set(baseId, []);
+        const existing = byBaseId.get(baseId).find(other => canMergeSourceStudentRows(other, student));
+        if (existing) {
+          getDataFieldKeys().forEach(key => {
+            if (!String(existing[key] || "").trim() && String(student[key] || "").trim()) existing[key] = student[key];
+          });
+          existing._sourceIds = Array.from(new Set([...(existing._sourceIds || []), ...(student._sourceIds || [])]));
+          existing._sourceNames = Array.from(new Set([...(existing._sourceNames || []), ...(student._sourceNames || [])]));
+          existing._sourceName = existing._sourceNames.join(", ");
           return;
         }
-        getDataFieldKeys().forEach(key => {
-          if (!String(existing[key] || "").trim() && String(student[key] || "").trim()) existing[key] = student[key];
-        });
-        existing._sourceIds = Array.from(new Set([...(existing._sourceIds || []), ...(student._sourceIds || [])]));
-        existing._sourceNames = Array.from(new Set([...(existing._sourceNames || []), ...(student._sourceNames || [])]));
-        existing._sourceName = existing._sourceNames.join(", ");
+        if (allIds.has(student.id)) {
+          // Aynı görünen kimlik farklı satırlara aitse, uygulama içindeki
+          // benzersiz anahtarları ayır; E-Tablo verisine dokunma.
+          const baseUniqueId = `${baseId}__${makeFirebaseSafeKey(student._rowKey || student._sourceId)}`;
+          let uniqueId = baseUniqueId;
+          let attempt = 2;
+          while (allIds.has(uniqueId)) uniqueId = `${baseUniqueId}_${attempt++}`;
+          student.id = uniqueId;
+        }
+        allIds.add(student.id);
+        byBaseId.get(baseId).push(student);
+        merged.push(student);
       });
       return merged;
     }
@@ -4236,6 +4286,7 @@ function compareCurrentStudentsWithSnapshot(currentStudents, snap) {
 
       const sources = getEnabledSources();
       if (!sources.length) {
+        lastLoadHadErrors = false;
         students = [];
         updateTotalStudentsCard("empty");
         removedRecordsCache = [];
@@ -4252,14 +4303,19 @@ function compareCurrentStudentsWithSnapshot(currentStudents, snap) {
         const results = await Promise.allSettled(sources.map(fetchSourceStudents));
         const successfulLists = [];
         const errors = [];
+        const failedSourceIds = [];
         results.forEach((result, index) => {
           if (result.status === "fulfilled") successfulLists.push(result.value);
-          else errors.push(`${sources[index].name}: ${result.reason?.message || "Okunamadı"}`);
+          else {
+            errors.push(`${sources[index].name}: ${result.reason?.message || "Okunamadı"}`);
+            failedSourceIds.push(sources[index].id);
+          }
         });
 
+        lastLoadHadErrors = errors.length > 0;
         students = mergeSourceStudents(successfulLists);
         updateTotalStudentsCard(errors.length ? "partial" : "ready");
-        const comparison = compareCurrentStudentsWithSnapshot(students, snapshot);
+        const comparison = compareCurrentStudentsWithSnapshot(students, snapshot, { failedSourceIds });
         removedRecordsCache = comparison.removed || [];
         duplicateOkulNoMap = detectDuplicateOkulNos(students);
         twinRecordGroups = detectTwinRecords(students);
@@ -4272,12 +4328,14 @@ function compareCurrentStudentsWithSnapshot(currentStudents, snap) {
         renderSheetTabs();
 
         document.getElementById("lastLoadedInfo").textContent = `${sources.length} kaynak | ${formatDateTimeForBadge(new Date().toISOString())}`;
-        if (errors.length) showToast(`${successfulLists.length} kaynak okundu, ${errors.length} kaynakta hata var.`);
+        if (errors.length) showToast(`${successfulLists.length} kaynak okundu, ${errors.length} kaynakta hata var. Eksik kaynaklar için silme tespiti yapılmadı.`);
+        if (comparison.reviewCount) showToast(`${comparison.reviewCount} öğrenci için eşleşme belirsiz. İnceleme listesine bakın.`);
         const duplicateKeys = Object.keys(duplicateOkulNoMap || {});
         if (duplicateKeys.length) showToast(`Uyarı: ${duplicateKeys.length} okul numarası çakışması bulundu.`);
         if (twinRecordGroups.length) showToast(`Uyarı: ${twinRecordGroups.length} ikiz kayıt grubu bulundu.`);
         if (!students.length && errors.length) throw new Error(errors.join(" | "));
       } catch (err) {
+        lastLoadHadErrors = true;
         console.error(err);
         updateTotalStudentsCard("error");
         body.innerHTML = `<tr class="loading-row"><td colspan="${getTableColspan()}" style="color:red; text-align:center; padding:40px;">Hata: ${escapeHtml(err.message)}</td></tr>`;
@@ -4442,11 +4500,12 @@ function compareCurrentStudentsWithSnapshot(currentStudents, snap) {
         const row = document.createElement("div");
         row.className = "dynamic-filter-row";
         row.innerHTML = `<div class="field-label">Kayıt Durumu</div>`;
-        row.appendChild(createFilterSelect("status", ["new", "updated", "normal"], "Tüm durumlar"));
+        row.appendChild(createFilterSelect("status", ["new", "updated", "review", "normal"], "Tüm durumlar"));
         const select = row.querySelector("select");
         Array.from(select.options).forEach(option => {
           if (option.value === "new") option.textContent = "Sadece yeni";
           if (option.value === "updated") option.textContent = "Güncellenenler";
+          if (option.value === "review") option.textContent = "Eşleşme İncelemesi";
           if (option.value === "normal") option.textContent = "Değişiklik yok";
         });
         container.appendChild(row);
@@ -4542,6 +4601,7 @@ function compareCurrentStudentsWithSnapshot(currentStudents, snap) {
     function updateSummary(removedRecords = []) {
       const newItems = students.filter(s => s.status === "new");
       const updatedItems = students.filter(s => s.status === "updated");
+      const reviewItems = students.filter(s => s.status === "review");
       const removedCount = removedRecords.length;
       const dupGroups = duplicateOkulNoMap ? Object.keys(duplicateOkulNoMap) : [];
       const twinCount = twinRecordGroups.length;
@@ -4549,6 +4609,7 @@ function compareCurrentStudentsWithSnapshot(currentStudents, snap) {
       document.getElementById("newTagCount").textContent = newItems.length;
       document.getElementById("updatedTagCount").textContent = updatedItems.length;
       document.getElementById("removedTagCount").textContent = removedCount;
+      document.getElementById("reviewTagCount").textContent = reviewItems.length;
 
       const dupTag = document.getElementById("dupTagCount");
       if (dupTag) dupTag.textContent = dupGroups.length;
@@ -4619,6 +4680,7 @@ function compareCurrentStudentsWithSnapshot(currentStudents, snap) {
       fillList("newList", newItems);
       fillList("updatedList", updatedItems);
       fillList("removedList", removedRecords, true);
+      fillList("reviewList", reviewItems);
 
       // Okul No Çakışmaları
       const dupEl = document.getElementById("dupList");
@@ -4703,6 +4765,13 @@ function compareCurrentStudentsWithSnapshot(currentStudents, snap) {
       if (twinRecordGroups.length) {
         bar.innerHTML += ` <span style="margin-left:10px; padding:3px 10px; border-radius:999px; background: rgba(239,246,255,.98); color:#3657a7; font-weight:800;">👥 ${twinRecordGroups.length} ikiz kayıt grubu</span>`;
       }
+      const reviewCount = students.filter(student => student.status === "review").length;
+      if (reviewCount) {
+        bar.innerHTML += ` <span style="margin-left:10px; padding:3px 10px; border-radius:999px; background: var(--warning-bg); color:var(--warning-text); font-weight:800;">⚠️ ${reviewCount} eşleşme incelenecek</span>`;
+      }
+      if (lastLoadHadErrors) {
+        bar.innerHTML += ` <span style="margin-left:10px; color:var(--danger-text); font-weight:800;">Eksik veri kaynağı: Kaydetme engellendi.</span>`;
+      }
 
       // Alt bilgiyi güncelle
       const bottomFooter = document.getElementById("lastSavedInfo");
@@ -4757,7 +4826,7 @@ function compareCurrentStudentsWithSnapshot(currentStudents, snap) {
 
       let filtered = students.filter(student => {
         if (activeSourceView !== "all" && !(student._sourceIds || []).includes(activeSourceView)) return false;
-        if (activeViewMode === "new-updated" && !["new", "updated"].includes(student.status)) return false;
+        if (activeViewMode === "new-updated" && !["new", "updated", "review"].includes(student.status)) return false;
 
         for (const [key, selectedValues] of multiSelections.entries()) {
           if (!selectedValues.size) continue;
@@ -4792,7 +4861,7 @@ function compareCurrentStudentsWithSnapshot(currentStudents, snap) {
         return true;
       });
 
-      const statusOrder = { new: 0, updated: 1, normal: 2 };
+      const statusOrder = { review: 0, new: 1, updated: 2, normal: 3 };
       if (sortOrder.includes(":")) {
         const [key, direction] = sortOrder.split(":");
         filtered.sort((a, b) => compareFieldValues(a, b, key, direction));
@@ -4838,6 +4907,7 @@ function compareCurrentStudentsWithSnapshot(currentStudents, snap) {
         tr.dataset.studentId = s.id;
         if (s.status === "new") tr.classList.add("new-row");
         if (s.status === "updated") tr.classList.add("updated-row");
+        if (s.status === "review") tr.classList.add("review-row");
 
         COLUMNS.forEach((col, index) => {
           const td = document.createElement("td");
@@ -4854,6 +4924,10 @@ function compareCurrentStudentsWithSnapshot(currentStudents, snap) {
               span.className = "status-badge updated";
               span.textContent = `📝 GÜNCEL`;
               td.title = "Durum: Güncellenen kayıt";
+            } else if (s.status === "review") {
+              span.className = "status-badge review";
+              span.textContent = `⚠️ İNCELE`;
+              td.title = "Durum: Kimlik eşleşmesi belirsiz";
             } else {
               span.className = "status-badge normal";
               span.textContent = `NORMAL`;
@@ -5353,6 +5427,13 @@ function compareCurrentStudentsWithSnapshot(currentStudents, snap) {
         } else {
             diffHtml = `<div class="change-log-box">Görünürde değişiklik algılandı ancak biçimsel olabilir.</div>`;
         }
+      } else if (s.status === "review") {
+        statusHtml = `<span class="status-badge review" style="font-size:14px; padding:6px 12px;">⚠️ Eşleşme İncelemesi</span>`;
+        const candidates = (s._reviewCandidates || []).map(candidate => {
+          const d = candidate.data || {};
+          return `<li>${escapeHtml([d.isim, d.soyisim].filter(Boolean).join(" ") || "İsimsiz")} (No: ${escapeHtml(d.okulNo || "-")})</li>`;
+        }).join("");
+        diffHtml = `<div class="change-log-box" style="background:var(--warning-bg); border-color:#efce66; color:var(--warning-text);">Bu öğrencinin önceki kaydı kesin belirlenemedi. Otomatik güncelleme/silme yapılmadı. Google E-Tablo kayıtlarını kontrol edin.${candidates ? `<ul style="margin-top:8px; padding-left:20px;">${candidates}</ul>` : ""}</div>`;
       } else {
         statusHtml = `<span class="status-badge normal" style="font-size:14px; padding:6px 12px;">Kayıtlı Öğrenci</span>`;
       }
